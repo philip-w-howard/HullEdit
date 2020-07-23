@@ -9,7 +9,7 @@ using System.Windows.Media;
 
 namespace HullEdit
 {
-    class HullDisplay : FrameworkElement
+    class HullDisplay : System.Windows.Controls.Control
     {
         private double[][,] m_chines;           // [chine][index, axis]
         private double[][,] m_drawnBulkheads;   // [bulkhead][chine, axis]
@@ -18,17 +18,20 @@ namespace HullEdit
         private double m_rotate_x, m_rotate_y, m_rotate_z;
         private double m_translate_x, m_translate_y, m_translate_z;
         private double m_scale;
-        
+
         private Hull m_Hull;
 
         public int numChines { get { return m_Hull.numChines; } }
         public int numBulkheads { get { return m_Hull.numBulkheads; } }
+
+        public bool IsEditable { get; set; }
 
         public HullDisplay() { }
 
         public void SetHull(Hull hull)
         {
             m_Hull = hull;
+            IsEditable = false;
         }
 
         protected override void OnRender(DrawingContext drawingContext)
@@ -36,7 +39,9 @@ namespace HullEdit
             if (m_Hull == null) return;
 
             Debug.WriteLine("OnRender");
-            //            drawingContext.DrawRectangle(Brushes.Red, null, new Rect(0, 0, 100, 50));
+
+            Rect background = new Rect(new Point(0, 0), new Point(ActualWidth, ActualHeight));
+            drawingContext.DrawRectangle(new SolidColorBrush(Colors.White), null, background);
 
             Pen pen = new Pen(System.Windows.Media.Brushes.Black, 1.0);
 
@@ -327,5 +332,11 @@ namespace HullEdit
         {
             InvalidateVisual();
         }
+
+        protected override void OnPreviewMouseDown(System.Windows.Input.MouseButtonEventArgs e)
+        {
+            Debug.WriteLine(e);
+            if (IsEditable) e.Handled = true;
         }
     }
+}

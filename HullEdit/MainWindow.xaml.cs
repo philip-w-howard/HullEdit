@@ -1,6 +1,7 @@
 ﻿using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -107,6 +108,41 @@ namespace HullEdit
             PerspectiveDisplay.RotateTo(m_xAngle, m_yAngle, m_zAngle);
             PerspectiveDisplay.Scale();
 
+            PerspectiveDisplay.Draw();
+        }
+
+        private void HullMouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            Debug.WriteLine("HullMouseDown");
+
+            if (sender == FrontDisplay)
+            {
+                Debug.WriteLine("Front");
+
+                m_xAngle = 0;
+                m_yAngle = 0;
+                m_zAngle = 180;
+            }
+            else if (sender == TopDisplay)
+            {
+                Debug.WriteLine("Top");
+
+                m_xAngle = 0;
+                m_yAngle = 90;
+                m_zAngle = 90;
+            }
+            else if (sender == SideDisplay)
+            {
+                Debug.WriteLine("Side");
+
+                m_xAngle = 0;
+                m_yAngle = 90;
+                m_zAngle = 180;
+            }
+
+            PerspectiveDisplay.RotateTo(m_xAngle, m_yAngle, m_zAngle);
+            PerspectiveDisplay.Scale();
+            PerspectiveDisplay.IsEditable = true;
             PerspectiveDisplay.Draw();
         }
 

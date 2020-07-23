@@ -60,15 +60,15 @@
               ShowsPreview="true"
               Height="2"/>
             <Border BorderThickness="1" BorderBrush="Gray" Grid.Column="0" Grid.Row="0" >
-                <local:HullDisplay x:Name="FrontDisplay" Grid.Column="0" Grid.Row="0" />
+                <local:HullDisplay x:Name="FrontDisplay" Grid.Column="0" Grid.Row="0" MouseDoubleClick="HullMouseDoubleClick"/>
             </Border>
 
             <Border BorderThickness="1" BorderBrush="Gray" Grid.Column="1" Grid.Row="0" >
-                <local:HullDisplay x:Name="TopDisplay" Grid.Column="1" Grid.Row="0" />
+                <local:HullDisplay x:Name="TopDisplay" Grid.Column="1" Grid.Row="0" MouseDoubleClick="HullMouseDoubleClick"/>
             </Border>
 
             <Border BorderThickness="1" BorderBrush="Gray" Grid.Column="2" Grid.Row="0" >
-                <local:HullDisplay x:Name="SideDisplay" Grid.Column="2" Grid.Row="0" />
+                <local:HullDisplay x:Name="SideDisplay" Grid.Column="2" Grid.Row="0" MouseDoubleClick="HullMouseDoubleClick"/>
             </Border>
 
             <Border BorderThickness="1" BorderBrush="Gray" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="4" >
