@@ -5,8 +5,84 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:HullEdit"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
-        
-    </Grid>
+        Title="Hull Edit" Height="450" Width="800">
+    <DockPanel>
+        <ToolBarTray Background="White" DockPanel.Dock="Top">
+            <ToolBar Band="0 " BandIndex="1">
+                <Menu >
+                    <MenuItem Header="_File">
+                        <MenuItem Header="Open" Click="openClick"/>
+                        <MenuItem Header="Save" Click="saveClick"/>
+                    </MenuItem>
+                </Menu>
+            </ToolBar>
+            <ToolBar Band="0" BandIndex="2">
+                <Button Click="XClick">X</Button>
+                <Button Click="YClick">Y</Button>
+                <Button Click="ZClick">Z</Button>
+            </ToolBar>
+        </ToolBarTray>
+
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="3*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <GridSplitter Grid.Column="1" 
+              HorizontalAlignment="Left" 
+              VerticalAlignment="Stretch"
+              Background="Gray" 
+              ShowsPreview="true"
+              Width="2"/>
+            <GridSplitter Grid.Column="2" 
+              HorizontalAlignment="Left" 
+              VerticalAlignment="Stretch"
+              Background="Gray" 
+              ShowsPreview="true"
+              Width="2"/>
+            <GridSplitter Grid.Column="3" 
+              HorizontalAlignment="Left" 
+              VerticalAlignment="Stretch"
+              Background="Gray" 
+              ShowsPreview="true"
+              Width="2"/>
+            <GridSplitter Grid.Row="1" 
+              Grid.ColumnSpan="4"
+              VerticalAlignment="Top"
+              HorizontalAlignment="Stretch"
+              Background="Gray" 
+              ShowsPreview="true"
+              Height="2"/>
+            <Border BorderThickness="1" BorderBrush="Gray" Grid.Column="0" Grid.Row="0" >
+                <local:HullDisplay x:Name="FrontDisplay" Grid.Column="0" Grid.Row="0" />
+            </Border>
+
+            <Border BorderThickness="1" BorderBrush="Gray" Grid.Column="1" Grid.Row="0" >
+                <local:HullDisplay x:Name="TopDisplay" Grid.Column="1" Grid.Row="0" />
+            </Border>
+
+            <Border BorderThickness="1" BorderBrush="Gray" Grid.Column="2" Grid.Row="0" >
+                <local:HullDisplay x:Name="SideDisplay" Grid.Column="2" Grid.Row="0" />
+            </Border>
+
+            <Border BorderThickness="1" BorderBrush="Gray" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="4" >
+                <local:HullDisplay x:Name="PerspectiveDisplay" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="4" />
+            </Border>
+
+            <Border BorderThickness="1" BorderBrush="Gray" Grid.Column="3" Grid.Row="0">
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Label Content="Bulkhead: " />
+                        <ComboBox Name="currBulkhead" SelectionChanged="ComboBox_SelectionChanged" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </DockPanel>
 </Window>
