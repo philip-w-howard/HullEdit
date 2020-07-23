@@ -19,6 +19,8 @@ namespace HullEdit
         private double m_translate_x, m_translate_y, m_translate_z;
         private double m_scale;
 
+        private double mActualHeight, mActualWidth;
+
         private Hull m_Hull;
 
         public int numChines { get { return m_Hull.numChines; } }
@@ -26,7 +28,11 @@ namespace HullEdit
 
         public bool IsEditable { get; set; }
 
-        public HullDisplay() { }
+        public HullDisplay()
+        {
+            mActualHeight = ActualHeight;
+            mActualWidth = ActualWidth;
+        }
 
         public void SetHull(Hull hull)
         {
@@ -40,7 +46,7 @@ namespace HullEdit
 
             Debug.WriteLine("OnRender");
 
-            Rect background = new Rect(new Point(0, 0), new Point(ActualWidth, ActualHeight));
+            Rect background = new Rect(new Point(0, 0), new Point(mActualWidth, mActualHeight));
             drawingContext.DrawRectangle(new SolidColorBrush(Colors.White), null, background);
 
             Pen pen = new Pen(System.Windows.Media.Brushes.Black, 1.0);
@@ -122,8 +128,8 @@ namespace HullEdit
             }
 
             // Scale all the points to fit in the canvas
-            double scale1 = ActualWidth / (max_x - min_x);
-            double scale2 = ActualHeight / (max_y - min_y);
+            double scale1 = mActualWidth / (max_x - min_x);
+            double scale2 = mActualHeight / (max_y - min_y);
 
             m_scale = scale1;
             if (scale2 < m_scale) m_scale = scale2;
@@ -151,7 +157,7 @@ namespace HullEdit
                 }
             }
 
-            CenterTo(ActualWidth / 2, ActualHeight / 2, 0);
+            CenterTo(mActualWidth / 2, mActualHeight / 2, 0);
         }
 
         protected void PrepareChines()
@@ -337,6 +343,27 @@ namespace HullEdit
         {
             Debug.WriteLine(e);
             if (IsEditable) e.Handled = true;
+        }
+        protected override Size MeasureOverride(Size availableSize)
+        {
+            Debug.WriteLine("MeasureOverride {0} {1}", availableSize.Width, availableSize.Height);
+            //text.MaxTextWidth = availableSize.Width;
+            //text.MaxTextHeight = availableSize.Height;
+            return new Size(availableSize.Width, availableSize.Height);
+        }
+        protected override Size ArrangeOverride(Size finalSize)
+        {
+            Debug.WriteLine("ArrangeOverride {0} {1}", finalSize.Width, finalSize.Height);
+
+            mActualWidth = finalSize.Width;
+            mActualHeight = finalSize.Height;
+
+            if (m_Hull != null && m_Hull.IsValid)
+            {
+                Scale();
+                //CenterTo(0,0,0);
+            }
+            return finalSize;
         }
     }
 }

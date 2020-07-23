@@ -24,63 +24,61 @@
         </ToolBarTray>
 
         <Border BorderBrush="Gray" BorderThickness="3">
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="3*"/>
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition />
-                <ColumnDefinition Width="auto"/>
-                <ColumnDefinition />
-                <ColumnDefinition  Width="auto"/>
-                <ColumnDefinition />
-                <ColumnDefinition  Width="auto"/>
-                <ColumnDefinition />
-            </Grid.ColumnDefinitions>
-            <GridSplitter Grid.Column="1" 
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="3*"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition />
+                    <ColumnDefinition  Width="auto"/>
+                    <ColumnDefinition />
+                    <ColumnDefinition  Width="auto"/>
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <GridSplitter Grid.Column="1" 
               HorizontalAlignment="Center" 
               VerticalAlignment="Stretch"
               Background="Gray" 
               ShowsPreview="true"
               Width="3"/>
-            <GridSplitter Grid.Column="3" 
+                <GridSplitter Grid.Column="3" 
               HorizontalAlignment="Center" 
               VerticalAlignment="Stretch"
               Background="Gray" 
               ShowsPreview="true"
               Width="3"/>
-            <GridSplitter Grid.Column="5" 
+                <GridSplitter Grid.Column="5" 
               HorizontalAlignment="Center" 
               VerticalAlignment="Stretch"
               Background="Gray" 
               ShowsPreview="true"
               Width="3"/>
-            <GridSplitter Grid.Row="1" 
+                <GridSplitter Grid.Row="1" 
               Grid.ColumnSpan="7"
               VerticalAlignment="Center"
               HorizontalAlignment="Stretch"
               Background="Gray" 
               ShowsPreview="true"
               Height="3"/>
-            <local:HullDisplay x:Name="FrontDisplay" Grid.Column="0" Grid.Row="0" MouseDoubleClick="HullMouseDoubleClick"/>
+                <local:HullDisplay x:Name="FrontDisplay" Grid.Column="0" Grid.Row="0" MouseDoubleClick="HullMouseDoubleClick"/>
 
-            <local:HullDisplay x:Name="TopDisplay" Grid.Column="2" Grid.Row="0" MouseDoubleClick="HullMouseDoubleClick"/>
+                <local:HullDisplay x:Name="TopDisplay" Grid.Column="2" Grid.Row="0" MouseDoubleClick="HullMouseDoubleClick"/>
 
-            <local:HullDisplay x:Name="SideDisplay" Grid.Column="4" Grid.Row="0" MouseDoubleClick="HullMouseDoubleClick"/>
+                <local:HullDisplay x:Name="SideDisplay" Grid.Column="4" Grid.Row="0" MouseDoubleClick="HullMouseDoubleClick"/>
 
-            <local:HullDisplay x:Name="PerspectiveDisplay" Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="6" />
+                <local:HullDisplay x:Name="PerspectiveDisplay" Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="7" />
 
-            <Border BorderThickness="1" BorderBrush="Gray" Grid.Column="6" Grid.Row="0">
-                <StackPanel>
+                <StackPanel Grid.Column="6" Grid.Row="0">
                     <StackPanel Orientation="Horizontal">
                         <Label Content="Bulkhead: " />
                         <ComboBox Name="currBulkhead" SelectionChanged="ComboBox_SelectionChanged" />
                     </StackPanel>
                 </StackPanel>
-            </Border>
-        </Grid>
+            </Grid>
         </Border>
     </DockPanel>
 </Window>
