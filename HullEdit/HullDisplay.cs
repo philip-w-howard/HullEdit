@@ -19,7 +19,7 @@ namespace HullEdit
 
         private double m_rotate_x, m_rotate_y, m_rotate_z;
         private double m_translate_x, m_translate_y, m_translate_z;
-        private double m_scale;
+        private double m_scale = 1;
 
         private double mActualHeight, mActualWidth;
 
@@ -31,7 +31,7 @@ namespace HullEdit
         private int m_DraggingHandle;
         private bool m_Dragging;
         private int m_SelectedBulkhead;
-        private double m_dragX, m_dragY;
+        private double m_dragStartX, m_dragStartY;
 
         public int numChines { get { return m_Hull.numChines; } }
         public int numBulkheads { get { return m_Hull.numBulkheads; } }
@@ -126,6 +126,10 @@ namespace HullEdit
         }
         private void LoadBulkheads()
         {
+            // reset values that depend on the bulkheads
+            m_handle = null;
+            m_scale = 1.0;
+
             m_drawnBulkheads = new double[m_Hull.numBulkheads][,];
             int centerChine = m_Hull.numChines;
 
@@ -176,19 +180,22 @@ namespace HullEdit
             double scale1 = mActualWidth / (max_x - min_x);
             double scale2 = mActualHeight / (max_y - min_y);
 
-            m_scale = scale1;
-            if (scale2 < m_scale) m_scale = scale2;
-            m_scale = 0.9 * m_scale;
+            double new_scale;
 
+            new_scale = scale1;
+            if (scale2 < new_scale) new_scale = scale2;
+            new_scale = 0.9 * new_scale;
+
+            m_scale *= new_scale;
             Debug.WriteLine("Scale: {0}", m_scale);
 
             for (int bulkhead = 0; bulkhead < m_Hull.numBulkheads; bulkhead++)
             {
                 for (int chine = 0; chine < m_drawnBulkheads[bulkhead].GetLength(0); chine++)
                 {
-                    m_drawnBulkheads[bulkhead][chine, 0] *= m_scale;
-                    m_drawnBulkheads[bulkhead][chine, 1] *= m_scale;
-                    m_drawnBulkheads[bulkhead][chine, 2] *= m_scale;
+                    m_drawnBulkheads[bulkhead][chine, 0] *= new_scale;
+                    m_drawnBulkheads[bulkhead][chine, 1] *= new_scale;
+                    m_drawnBulkheads[bulkhead][chine, 2] *= new_scale;
                 }
             }
 
@@ -196,9 +203,9 @@ namespace HullEdit
             {
                 for (int point = 0; point < POINTS_PER_CHINE; point++)
                 {
-                    m_chines[chine][point, 0] *= m_scale;
-                    m_chines[chine][point, 1] *= m_scale;
-                    m_chines[chine][point, 2] *= m_scale;
+                    m_chines[chine][point, 0] *= new_scale;
+                    m_chines[chine][point, 1] *= new_scale;
+                    m_chines[chine][point, 2] *= new_scale;
                 }
             }
 
@@ -233,8 +240,6 @@ namespace HullEdit
         {
             double[,] rotate = new double[3, 3];
 
-            m_rotate_x = angle;
-
             angle = angle * Math.PI / 180.0;
 
             rotate[0, 0] = 1.0;
@@ -259,8 +264,6 @@ namespace HullEdit
         protected void RotateDrawing_Y(double angle)
         {
             double[,] rotate = new double[3, 3];
-
-            m_rotate_y = angle;
 
             angle = angle * Math.PI / 180.0;
 
@@ -287,8 +290,6 @@ namespace HullEdit
         {
             double[,] rotate = new double[3, 3];
 
-            m_rotate_z = angle;
-
             angle = angle * Math.PI / 180.0;
 
             rotate[2, 2] = 1.0;
@@ -314,6 +315,10 @@ namespace HullEdit
         {
             LoadBulkheads();
             PrepareChines();
+
+            m_rotate_x = x;
+            m_rotate_y = y;
+            m_rotate_z = z;
 
             // NOTE: Could optimize by multiplying the three rotation matrices before rotating the points
             RotateDrawing_Z(z);
@@ -398,9 +403,9 @@ namespace HullEdit
                 {
                     m_DraggingHandle = ii;
                     m_Dragging = true;
-                    m_dragX = loc.X;
-                    m_dragY = loc.Y;
-                    Debug.WriteLine("Found {0} {1},{2}", ii, m_dragX, m_dragY);
+                    m_dragStartX = loc.X;
+                    m_dragStartY = loc.Y;
+                    Debug.WriteLine("Found {0} {1},{2}", ii, loc.X, loc.Y);
 
                     //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
                     return true;
@@ -438,10 +443,23 @@ namespace HullEdit
         }
         protected override void OnPreviewMouseUp(System.Windows.Input.MouseButtonEventArgs e)
         {
+            Point loc = e.GetPosition(this);
+
             if (m_Dragging)
             {
-                // update bulkhead
+                double x = (m_dragStartX - loc.X)/m_scale;
+                double y = (m_dragStartY - loc.Y)/m_scale;
+                double z = 0;
+
+                Debug.WriteLine("Shifting by {0} {1} {2}", x, y, z);
+
+                m_Hull.ShiftBulkheadPoint(m_SelectedBulkhead, m_DraggingHandle, x, y, z);
                 m_Dragging = false;
+
+                // Note: RotateTo reloads m_drawnBulkheads from the m_Hull
+                RotateTo(m_rotate_x, m_rotate_y, m_rotate_z);
+                Scale();
+                Draw();
             }
         }
 
@@ -450,11 +468,8 @@ namespace HullEdit
             if (m_Dragging)
             {
                 Point loc = e.GetPosition(this);
-                m_dragX = loc.X;
-                m_dragY = loc.Y;
-
-                m_handle[m_DraggingHandle].X = m_dragX - RECT_SIZE / 2;
-                m_handle[m_DraggingHandle].Y = m_dragY - RECT_SIZE / 2;
+                m_handle[m_DraggingHandle].X = loc.X - RECT_SIZE / 2;
+                m_handle[m_DraggingHandle].Y = loc.Y - RECT_SIZE / 2;
 
                 Debug.WriteLine("Moved {0} to {1},{2}", m_DraggingHandle, loc.X, loc.Y);
                 Draw();
@@ -471,12 +486,15 @@ namespace HullEdit
         {
             Debug.WriteLine("ArrangeOverride {0} {1}", finalSize.Width, finalSize.Height);
 
-            mActualWidth = finalSize.Width;
-            mActualHeight = finalSize.Height;
-
-            if (m_Hull != null && m_Hull.IsValid)
+            if (mActualWidth != finalSize.Width || mActualHeight != finalSize.Height)
             {
-                Scale();
+                mActualWidth = finalSize.Width;
+                mActualHeight = finalSize.Height;
+
+                if (m_Hull != null && m_Hull.IsValid)
+                {
+                    Scale();
+                }
             }
             return finalSize;
         }
