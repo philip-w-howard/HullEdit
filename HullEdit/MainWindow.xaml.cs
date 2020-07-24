@@ -104,6 +104,8 @@ namespace HullEdit
 
         private void HullMouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
+            PerspectiveDisplay.IsEditable = false;
+
             Debug.WriteLine("HullMouseDown");
 
             if (sender == FrontDisplay)

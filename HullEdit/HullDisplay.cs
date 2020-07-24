@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
@@ -29,11 +30,22 @@ namespace HullEdit
         private Rect[] m_handle;
         private int m_DraggingHandle;
         private bool m_Dragging;
+        private int m_SelectedBulkhead;
+        private double m_dragX, m_dragY;
 
         public int numChines { get { return m_Hull.numChines; } }
         public int numBulkheads { get { return m_Hull.numBulkheads; } }
 
-        public bool IsEditable { get; set; }
+        private bool m_isEditable;
+        public bool IsEditable
+        {
+            get { return m_isEditable; }
+            set
+            {
+                m_isEditable = value;
+                if (value == false) m_handle = null;
+            }
+        }
 
         public HullDisplay()
         {
@@ -90,20 +102,25 @@ namespace HullEdit
 
         private void DrawHandles(DrawingContext drawingContext)
         {
-            m_DraggingHandle = 1;
-            m_handle = new Rect[m_Hull.numChines];
+            // If necessary, create new handles for current m_SelectedBulkhead
+            if (m_handle == null)
+            {
+                m_handle = new Rect[m_Hull.numChines];
 
+                for (int ii = 0; ii < m_Hull.numChines; ii++)
+                {
+                    m_handle[ii] = new Rect();
+                    m_handle[ii].Height = RECT_SIZE;
+                    m_handle[ii].Width = RECT_SIZE;
+                    m_handle[ii].X = m_drawnBulkheads[m_SelectedBulkhead][ii, 0] - RECT_SIZE / 2;
+                    m_handle[ii].Y = m_drawnBulkheads[m_SelectedBulkhead][ii, 1] - RECT_SIZE / 2;
+                }
+            }
+
+            // Draw handles
             for (int ii = 0; ii < m_Hull.numChines; ii++)
             {
-                Rect rect = new Rect();
-                rect.Height = RECT_SIZE;
-                rect.Width = RECT_SIZE;
-                rect.X = m_drawnBulkheads[m_DraggingHandle][ii, 0] - RECT_SIZE/2;
-                rect.Y = m_drawnBulkheads[m_DraggingHandle][ii, 1] - RECT_SIZE / 2;
-
-                drawingContext.DrawRectangle(new SolidColorBrush(Colors.White), new Pen(new SolidColorBrush(Colors.Red), 1), rect);
-
-                m_handle[ii] = rect;
+                drawingContext.DrawRectangle(new SolidColorBrush(Colors.White), new Pen(new SolidColorBrush(Colors.Red), 1), m_handle[ii]);
             }
 
         }
@@ -381,7 +398,9 @@ namespace HullEdit
                 {
                     m_DraggingHandle = ii;
                     m_Dragging = true;
-                    //Debug.WriteLine("Found {0} {1},{2}", ii, m_dragX, m_dragY);
+                    m_dragX = loc.X;
+                    m_dragY = loc.Y;
+                    Debug.WriteLine("Found {0} {1},{2}", ii, m_dragX, m_dragY);
 
                     //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
                     return true;
@@ -402,24 +421,47 @@ namespace HullEdit
 
             Debug.WriteLine("PreviewMouseDown ({0},{1}) {2}", loc.X, loc.Y, e.ButtonState);
 
-            if (e.ButtonState == System.Windows.Input.MouseButtonState.Pressed && IsEditable)
+            if (ClickedHandle(loc))
             {
-                if (ClickedHandle(loc))
-                {
-                    Debug.WriteLine("Clicked handle");
-                }
-                else if (ClickedBulkhead(loc))
-                {
-                    Debug.WriteLine("Clicked bulkhead");
-                }
-                else
-                {
-                    Debug.WriteLine("Clicked nothing");
-                }
+                Debug.WriteLine("Clicked handle");
+            }
+            else if (ClickedBulkhead(loc))
+            {
+                Debug.WriteLine("Clicked bulkhead");
+            }
+            else
+            {
+                Debug.WriteLine("Clicked nothing");
             }
 
             if (IsEditable) e.Handled = true;
         }
+        protected override void OnPreviewMouseUp(System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (m_Dragging)
+            {
+                // update bulkhead
+                m_Dragging = false;
+            }
+        }
+
+        protected override void OnPreviewMouseMove(MouseEventArgs e)
+        {
+            if (m_Dragging)
+            {
+                Point loc = e.GetPosition(this);
+                m_dragX = loc.X;
+                m_dragY = loc.Y;
+
+                m_handle[m_DraggingHandle].X = m_dragX - RECT_SIZE / 2;
+                m_handle[m_DraggingHandle].Y = m_dragY - RECT_SIZE / 2;
+
+                Debug.WriteLine("Moved {0} to {1},{2}", m_DraggingHandle, loc.X, loc.Y);
+                Draw();
+            }
+
+        }
+
         protected override Size MeasureOverride(Size availableSize)
         {
             Debug.WriteLine("MeasureOverride {0} {1}", availableSize.Width, availableSize.Height);
