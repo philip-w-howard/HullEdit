@@ -102,15 +102,6 @@ namespace HullEdit
             }
         }
 
-        private void XClick(object sender, RoutedEventArgs e)
-        {
-            m_xAngle += 5;
-            PerspectiveDisplay.RotateTo(m_xAngle, m_yAngle, m_zAngle);
-            PerspectiveDisplay.Scale();
-
-            PerspectiveDisplay.Draw();
-        }
-
         private void HullMouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             Debug.WriteLine("HullMouseDown");
@@ -146,11 +137,24 @@ namespace HullEdit
             PerspectiveDisplay.Draw();
         }
 
+        private void XClick(object sender, RoutedEventArgs e)
+        {
+            m_xAngle += 5;
+            PerspectiveDisplay.RotateTo(m_xAngle, m_yAngle, m_zAngle);
+            PerspectiveDisplay.Scale();
+
+            PerspectiveDisplay.IsEditable = false;
+
+            PerspectiveDisplay.Draw();
+        }
+
         private void YClick(object sender, RoutedEventArgs e)
         {
             m_yAngle += 5;
             PerspectiveDisplay.RotateTo(m_xAngle, m_yAngle, m_zAngle);
             PerspectiveDisplay.Scale();
+
+            PerspectiveDisplay.IsEditable = false;
 
             PerspectiveDisplay.Draw();
         }
@@ -160,6 +164,8 @@ namespace HullEdit
             m_zAngle += 5;
             PerspectiveDisplay.RotateTo(m_xAngle, m_yAngle, m_zAngle);
             PerspectiveDisplay.Scale();
+
+            PerspectiveDisplay.IsEditable = false;
 
             PerspectiveDisplay.Draw();
         }

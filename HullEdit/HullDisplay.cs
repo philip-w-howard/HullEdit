@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
+using System.Windows.Shapes;
 
 namespace HullEdit
 {
@@ -22,6 +23,12 @@ namespace HullEdit
         private double mActualHeight, mActualWidth;
 
         private Hull m_Hull;
+
+        const int RECT_SIZE = 8;
+
+        private Rect[] m_handle;
+        private int m_DraggingHandle;
+        private bool m_Dragging;
 
         public int numChines { get { return m_Hull.numChines; } }
         public int numBulkheads { get { return m_Hull.numBulkheads; } }
@@ -77,8 +84,29 @@ namespace HullEdit
                     drawingContext.DrawLine(pen, p1, p2);
                 }
             }
+
+            if (IsEditable) DrawHandles(drawingContext);
         }
 
+        private void DrawHandles(DrawingContext drawingContext)
+        {
+            m_DraggingHandle = 1;
+            m_handle = new Rect[m_Hull.numChines];
+
+            for (int ii = 0; ii < m_Hull.numChines; ii++)
+            {
+                Rect rect = new Rect();
+                rect.Height = RECT_SIZE;
+                rect.Width = RECT_SIZE;
+                rect.X = m_drawnBulkheads[m_DraggingHandle][ii, 0] - RECT_SIZE/2;
+                rect.Y = m_drawnBulkheads[m_DraggingHandle][ii, 1] - RECT_SIZE / 2;
+
+                drawingContext.DrawRectangle(new SolidColorBrush(Colors.White), new Pen(new SolidColorBrush(Colors.Red), 1), rect);
+
+                m_handle[ii] = rect;
+            }
+
+        }
         private void LoadBulkheads()
         {
             m_drawnBulkheads = new double[m_Hull.numBulkheads][,];
@@ -339,16 +367,62 @@ namespace HullEdit
             InvalidateVisual();
         }
 
+        protected bool ClickedHandle(Point loc)
+        {
+            Debug.WriteLine("Checking handles");
+            if (m_handle == null || m_handle[0] == null) return false;
+
+            for (int ii = 0; ii < m_handle.Length; ii++)
+            {
+                Debug.WriteLine("Checking handle at {0},{1}", m_handle[ii].X, m_handle[ii].Y);
+
+                if (m_handle[ii].X <= loc.X && m_handle[ii].X + m_handle[ii].Width >= loc.X &&
+                    m_handle[ii].Y <= loc.Y && m_handle[ii].Y + m_handle[ii].Height >= loc.Y)
+                {
+                    m_DraggingHandle = ii;
+                    m_Dragging = true;
+                    //Debug.WriteLine("Found {0} {1},{2}", ii, m_dragX, m_dragY);
+
+                    //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        protected bool ClickedBulkhead(Point loc)
+        {
+            Debug.WriteLine("Checking bulkheads");
+            return false;
+        }
         protected override void OnPreviewMouseDown(System.Windows.Input.MouseButtonEventArgs e)
         {
-            Debug.WriteLine(e);
+            Point loc = e.GetPosition(this);
+
+            Debug.WriteLine("PreviewMouseDown ({0},{1}) {2}", loc.X, loc.Y, e.ButtonState);
+
+            if (e.ButtonState == System.Windows.Input.MouseButtonState.Pressed && IsEditable)
+            {
+                if (ClickedHandle(loc))
+                {
+                    Debug.WriteLine("Clicked handle");
+                }
+                else if (ClickedBulkhead(loc))
+                {
+                    Debug.WriteLine("Clicked bulkhead");
+                }
+                else
+                {
+                    Debug.WriteLine("Clicked nothing");
+                }
+            }
+
             if (IsEditable) e.Handled = true;
         }
         protected override Size MeasureOverride(Size availableSize)
         {
             Debug.WriteLine("MeasureOverride {0} {1}", availableSize.Width, availableSize.Height);
-            //text.MaxTextWidth = availableSize.Width;
-            //text.MaxTextHeight = availableSize.Height;
             return new Size(availableSize.Width, availableSize.Height);
         }
         protected override Size ArrangeOverride(Size finalSize)
@@ -361,7 +435,6 @@ namespace HullEdit
             if (m_Hull != null && m_Hull.IsValid)
             {
                 Scale();
-                //CenterTo(0,0,0);
             }
             return finalSize;
         }

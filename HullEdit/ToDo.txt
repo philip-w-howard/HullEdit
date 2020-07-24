@@ -1,0 +1,36 @@
+﻿Edit PreviewMouseDown to do editing.
+   select handle
+   select bulkhead
+Data binding to force redraw on edit?
+    This should also remove SetHull?
+
+Dynamically update views while moving handle.
+Handle bow/stern correctly.
+
+mark bow/stern as bow/stern vs. transom
+Spline bulkhead for bow/stern
+
+Compute planes for bulkheads
+
+Add/position bulkheads
+Splines.GetAt(coord)
+
+Rectangle
+	Cursor: change mouse cursor
+	Fill
+	Height
+	IsEnabled
+	IsHitTestVisible
+	IsMouseOver
+	Width
+	
+	AddHandler
+	OnDragEnter, Leave, Over 
+	OnDrop
+	mouseMoveButton.MouseEnter += new MouseEventHandler(OnMouseExampleMouseEnter);
+
+	Can always use Touch events;
+
+	IsManipulationEnabled
+	ManipulationStarting, Started, Delta, IniertiaStarting, Completed, BoundaryFeedback
+
