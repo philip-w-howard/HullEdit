@@ -1,13 +1,9 @@
-﻿Edit PreviewMouseDown to do editing.
-   select handle
-   select bulkhead
-Data binding to force redraw on edit?
+﻿Data binding to force redraw on edit?
     This should also remove SetHull?
 
 Dynamically update views while moving handle.
-Handle bow/stern correctly.
+Handle transom correctly.
 
-mark bow/stern as bow/stern vs. transom
 Spline bulkhead for bow/stern
 
 Compute planes for bulkheads
@@ -15,6 +11,8 @@ Compute planes for bulkheads
 Add/position bulkheads
 Splines.GetAt(coord)
 
+??????????????????????????????????
+For later version???
 Rectangle
 	Cursor: change mouse cursor
 	Fill

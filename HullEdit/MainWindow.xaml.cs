@@ -31,12 +31,6 @@ namespace HullEdit
             myHull = new Hull();
         }
 
-        private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            PerspectiveDisplay.SelectedBulkhead = ((ComboBox)sender).SelectedIndex;
-            if (PerspectiveDisplay.IsEditable) PerspectiveDisplay.Draw();
-        }
-
         private void openClick(object sender, RoutedEventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
@@ -52,15 +46,6 @@ namespace HullEdit
                     Console.WriteLine(result);
                 else
                 {
-                    currBulkhead.Items.Clear();
-
-                    for (int ii = 1; ii < myHull.numBulkheads + 1; ii++)
-                    {
-                        currBulkhead.Items.Add(ii);
-                    }
-
-                    currBulkhead.SelectedIndex = 0;
-
                     //m_hullEditor = new HullEditor(myHull, 0, 0, 0, Perspective);
 
                     m_xAngle = 10;
@@ -142,9 +127,23 @@ namespace HullEdit
             PerspectiveDisplay.Draw();
         }
 
-        private void XClick(object sender, RoutedEventArgs e)
+        private void RotateClick(object sender, RoutedEventArgs e)
         {
-            m_xAngle += 5;
+            Button button = (Button)sender;
+
+            if ((string)button.Content == "+X")
+                m_xAngle += 5;
+            else if ((string)button.Content == "-X")
+                m_xAngle -= 5;
+            else if ((string)button.Content == "+Y")
+                m_yAngle += 5;
+            else if ((string)button.Content == "-Y")
+                m_yAngle -= 5;
+            else if ((string)button.Content == "+Z")
+                m_zAngle += 5;
+            else if ((string)button.Content == "-Z")
+                m_zAngle -= 5;
+
             PerspectiveDisplay.RotateTo(m_xAngle, m_yAngle, m_zAngle);
             PerspectiveDisplay.Scale();
 
