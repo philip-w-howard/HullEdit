@@ -8,10 +8,13 @@ namespace HullEdit
 {
     class Hull
     {
+        enum BulkheadType { BOW, VERTICAL, TRANSOM };
+
         public int numChines { get; private set; }
         public int numBulkheads { get; private set; }
 
         private double[][,] m_bulkheads;        // [bulkhead][chine, axis]
+        private BulkheadType[] m_bulkheadType;
 
         private bool m_IsValid;
 
@@ -31,10 +34,19 @@ namespace HullEdit
             numChines = num_chines;
             numBulkheads = 5;
             m_bulkheads = new double[numBulkheads][,];
+            m_bulkheadType = new BulkheadType[numBulkheads];
+
             for (int bulkhead = 0; bulkhead < numBulkheads; bulkhead++)
             {
                 m_bulkheads[bulkhead] = new double[numChines, 3];
             }
+
+            m_bulkheadType[0] = BulkheadType.BOW;
+            for (int bulkhead=1; bulkhead<numBulkheads; bulkhead++)
+            {
+                m_bulkheadType[bulkhead] = BulkheadType.VERTICAL;
+            }
+            m_bulkheadType[numBulkheads-1] = BulkheadType.TRANSOM;
 
             if (lines.Length < numBulkheads * numChines * 3 + 1) return "Invalid file format 2";
 
@@ -88,6 +100,9 @@ namespace HullEdit
         }
         public void ShiftBulkheadPoint(int bulkhead, int chine, double x, double y, double z)
         {
+            if (m_bulkheadType[bulkhead] == BulkheadType.VERTICAL) z = 0;
+            if (m_bulkheadType[bulkhead] == BulkheadType.BOW) x = 0;
+
             m_bulkheads[bulkhead][chine, 0] += x;
             m_bulkheads[bulkhead][chine, 1] += y;
             m_bulkheads[bulkhead][chine, 2] += z;

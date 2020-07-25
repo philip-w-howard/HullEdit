@@ -33,7 +33,8 @@ namespace HullEdit
 
         private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-
+            PerspectiveDisplay.SelectedBulkhead = ((ComboBox)sender).SelectedIndex;
+            if (PerspectiveDisplay.IsEditable) PerspectiveDisplay.Draw();
         }
 
         private void openClick(object sender, RoutedEventArgs e)
@@ -57,6 +58,8 @@ namespace HullEdit
                     {
                         currBulkhead.Items.Add(ii);
                     }
+
+                    currBulkhead.SelectedIndex = 0;
 
                     //m_hullEditor = new HullEditor(myHull, 0, 0, 0, Perspective);
 
@@ -113,7 +116,7 @@ namespace HullEdit
                 Debug.WriteLine("Front");
 
                 m_xAngle = 0;
-                m_yAngle = 0;
+                m_yAngle = 180;
                 m_zAngle = 180;
             }
             else if (sender == TopDisplay)

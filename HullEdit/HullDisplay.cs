@@ -30,7 +30,15 @@ namespace HullEdit
         private Rect[] m_handle;
         private int m_DraggingHandle;
         private bool m_Dragging;
+
         private int m_SelectedBulkhead;
+
+        public int SelectedBulkhead
+        {
+            get { return m_SelectedBulkhead; }
+            set { m_SelectedBulkhead = value; m_handle = null; }
+        }
+
         private double m_dragStartX, m_dragStartY;
 
         public int numChines { get { return m_Hull.numChines; } }
@@ -102,7 +110,7 @@ namespace HullEdit
 
         private void DrawHandles(DrawingContext drawingContext)
         {
-            // If necessary, create new handles for current m_SelectedBulkhead
+            // If necessary, create new handles for current SelectedBulkhead
             if (m_handle == null)
             {
                 m_handle = new Rect[m_Hull.numChines];
@@ -112,8 +120,8 @@ namespace HullEdit
                     m_handle[ii] = new Rect();
                     m_handle[ii].Height = RECT_SIZE;
                     m_handle[ii].Width = RECT_SIZE;
-                    m_handle[ii].X = m_drawnBulkheads[m_SelectedBulkhead][ii, 0] - RECT_SIZE / 2;
-                    m_handle[ii].Y = m_drawnBulkheads[m_SelectedBulkhead][ii, 1] - RECT_SIZE / 2;
+                    m_handle[ii].X = m_drawnBulkheads[SelectedBulkhead][ii, 0] - RECT_SIZE / 2;
+                    m_handle[ii].Y = m_drawnBulkheads[SelectedBulkhead][ii, 1] - RECT_SIZE / 2;
                 }
             }
 
@@ -447,13 +455,39 @@ namespace HullEdit
 
             if (m_Dragging)
             {
-                double x = (m_dragStartX - loc.X)/m_scale;
-                double y = (m_dragStartY - loc.Y)/m_scale;
-                double z = 0;
+                double x, y, z;
 
-                Debug.WriteLine("Shifting by {0} {1} {2}", x, y, z);
+                if (m_rotate_x == 0 && m_rotate_y == 180 && m_rotate_z == 180)
+                {
+                    // Front
+                    x = -(m_dragStartX - loc.X) / m_scale;
+                    y = (m_dragStartY - loc.Y) / m_scale;
+                    z = 0;
+                }
+                else if (m_rotate_x == 0 && m_rotate_y == 90 && m_rotate_z == 180)
+                {
+                    // Side
+                    x = 0;
+                    y = (m_dragStartY - loc.Y) / m_scale;
+                    z = -(m_dragStartX - loc.X) / m_scale;
+                }
+                else if (m_rotate_x == 0 && m_rotate_y == 90 && m_rotate_z == 90)
+                {
+                    // Top
+                    x = -(m_dragStartY - loc.Y) / m_scale;
+                    y = 0;
+                    z = -(m_dragStartX - loc.X) / m_scale;
+                }
+                else
+                {
+                    x = 0;
+                    y = 0;
+                    z = 0;
+                }
 
-                m_Hull.ShiftBulkheadPoint(m_SelectedBulkhead, m_DraggingHandle, x, y, z);
+                Debug.WriteLine("Shifting [{0} {1}] by {2} {3} {4}", SelectedBulkhead, m_DraggingHandle, x, y, z);
+
+                m_Hull.ShiftBulkheadPoint(SelectedBulkhead, m_DraggingHandle, x, y, z);
                 m_Dragging = false;
 
                 // Note: RotateTo reloads m_drawnBulkheads from the m_Hull
