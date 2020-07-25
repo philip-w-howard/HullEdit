@@ -404,8 +404,6 @@ namespace HullEdit
 
             for (int ii = 0; ii < m_handle.Length; ii++)
             {
-                Debug.WriteLine("Checking handle at {0},{1}", m_handle[ii].X, m_handle[ii].Y);
-
                 if (m_handle[ii].X <= loc.X && m_handle[ii].X + m_handle[ii].Width >= loc.X &&
                     m_handle[ii].Y <= loc.Y && m_handle[ii].Y + m_handle[ii].Height >= loc.Y)
                 {
@@ -413,7 +411,6 @@ namespace HullEdit
                     m_Dragging = true;
                     m_dragStartX = loc.X;
                     m_dragStartY = loc.Y;
-                    Debug.WriteLine("Found {0} {1},{2}", ii, loc.X, loc.Y);
 
                     //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
                     return true;
@@ -423,9 +420,120 @@ namespace HullEdit
             return false;
         }
 
+        protected bool IsNearLine(double x1, double y1, double x2, double y2, double x3, double y3, double delta)
+        {
+            if (x1 == x2) // vertical line
+            {
+                Debug.WriteLine("Checking Vertical: ({0}, {1}), {2}", y1, y2, y3);
+                // is point along segment?
+                if ((y1 <= y3 && y2 >= y3) || (y1 >= y3 && y2 <= y3))
+                {
+                    Debug.WriteLine("Along segment");
+                    if (Math.Abs(x1 - x3) <= delta) return true;
+                }
+
+                return false;
+            }
+            else if (y1 == y2) // horizontal line
+            {
+                Debug.WriteLine("Checking Horizontal: ({0}, {1}), {2}", x1, x2, x3);
+                // is point along segment?
+                if ((x1 <= x3 && x2 >= x3) || (x1 >= x3 && x2 <= x3))
+                {
+                    Debug.WriteLine("Along segment");
+                    if (Math.Abs(y1 - y3) <= delta) return true;
+                }
+
+                return false;
+            }
+            else // sloped line
+            {
+                double m1, m2;
+                double b1, b2;
+                double x, y;
+
+                Debug.WriteLine("Checking Sloped: ({0}, {1}), ({2}, {3}), ({4}, {5})", x1, y1, x2, y2, x3, y3);
+
+                // compute slope between first two points:
+                m1 = (y2 - y1) / (x2 - x1);
+
+                // y intercept for first line
+                b1 = -m1 * x1 + y1;
+
+                // compute slope of second (perpendicular) line
+                m2 = -1 / m1;
+
+                // y intercept for second (perpendicular) line
+                b2 = -m2 * x3 + y3;
+
+                // Itersection of the two lines
+                x = (b2 - b1) / (m1 - m2);
+                y = m1 * x + b1;
+
+                // is the intersection NOT within the line segment?
+                if ((x <= x1 && x <= x2) || (x >= x1 && x >= x2)) return false;
+                if ((y <= y1 && y <= y2) || (y >= y1 && y >= y2)) return false;
+
+                // Is the intersection within delta of the point?
+                double distance = Math.Sqrt((x - x3) * (x - x3) + (y - y3) * (y - y3));
+                if (distance <= delta) return true;
+
+                return false;
+            }
+        }
         protected bool ClickedBulkhead(Point loc)
         {
             Debug.WriteLine("Checking bulkheads");
+            for (int bulkhead = 0; bulkhead < numBulkheads; bulkhead++)
+            {
+                for (int chine = 0; chine < numChines - 1; chine++)
+                {
+                    Debug.WriteLine("Checking Bulkhead {0} Chine {1}", bulkhead, chine);
+                    if (IsNearLine(m_drawnBulkheads[bulkhead][chine, 0], m_drawnBulkheads[bulkhead][chine, 1],
+                            m_drawnBulkheads[bulkhead][chine + 1, 0], m_drawnBulkheads[bulkhead][chine + 1, 1],
+                            loc.X, loc.Y, 3))
+                    {
+                        Debug.WriteLine("Selected bulkhead {0}", bulkhead);
+
+                        m_SelectedBulkhead = bulkhead;
+                        m_handle = null;
+                        Draw();
+                        return true;
+                    }
+
+                    // check for reflected bulkheads in front and top views
+                    if (m_rotate_x == 0 && m_rotate_y == 180 && m_rotate_z == 180)
+                    {
+                        // Front
+                        if (IsNearLine(m_drawnBulkheads[bulkhead][chine, 0], m_drawnBulkheads[bulkhead][chine, 1],
+                                m_drawnBulkheads[bulkhead][chine + 1, 0], m_drawnBulkheads[bulkhead][chine + 1, 1],
+                                mActualWidth - loc.X, loc.Y, 3))
+                        {
+                            Debug.WriteLine("Selected bulkhead {0}", bulkhead);
+
+                            m_SelectedBulkhead = bulkhead;
+                            m_handle = null;
+                            Draw();
+                            return true;
+                        }
+                    }
+                    else if (m_rotate_x == 0 && m_rotate_y == 90 && m_rotate_z == 90)
+                    {
+                        // Top
+                        if (IsNearLine(m_drawnBulkheads[bulkhead][chine, 0], m_drawnBulkheads[bulkhead][chine, 1],
+                                m_drawnBulkheads[bulkhead][chine + 1, 0], m_drawnBulkheads[bulkhead][chine + 1, 1],
+                                loc.X, loc.Y + mActualHeight / 2, 3))
+                        {
+                            Debug.WriteLine("Selected bulkhead {0}", bulkhead);
+
+                            m_SelectedBulkhead = bulkhead;
+                            m_handle = null;
+                            Draw();
+                            return true;
+                        }
+                    }
+                }
+            }
             return false;
         }
         protected override void OnPreviewMouseDown(System.Windows.Input.MouseButtonEventArgs e)
@@ -434,20 +542,22 @@ namespace HullEdit
 
             Debug.WriteLine("PreviewMouseDown ({0},{1}) {2}", loc.X, loc.Y, e.ButtonState);
 
-            if (ClickedHandle(loc))
+            if (IsEditable)
             {
-                Debug.WriteLine("Clicked handle");
+                if (ClickedHandle(loc))
+                {
+                    Debug.WriteLine("Clicked handle");
+                }
+                else if (ClickedBulkhead(loc))
+                {
+                    Debug.WriteLine("Clicked bulkhead");
+                }
+                else
+                {
+                    Debug.WriteLine("Clicked nothing");
+                }
+                e.Handled = true;
             }
-            else if (ClickedBulkhead(loc))
-            {
-                Debug.WriteLine("Clicked bulkhead");
-            }
-            else
-            {
-                Debug.WriteLine("Clicked nothing");
-            }
-
-            if (IsEditable) e.Handled = true;
         }
         protected override void OnPreviewMouseUp(System.Windows.Input.MouseButtonEventArgs e)
         {
