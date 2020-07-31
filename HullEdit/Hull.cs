@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace HullEdit
 {
-    class Hull
+    class Hull : INotifyPropertyChanged
     {
         enum BulkheadType { BOW, VERTICAL, TRANSOM };
 
@@ -17,6 +18,17 @@ namespace HullEdit
         private BulkheadType[] m_bulkheadType;
 
         private bool m_IsValid;
+
+        public int HullData { get; set; }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        void Notify(string propName)
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(propName));
+            }
+        }
 
         public bool IsValid {  get { return m_IsValid; } }
 
@@ -65,6 +77,8 @@ namespace HullEdit
             }
 
             m_IsValid = true;
+            HullData++;
+            Notify("HullData");
 
             return "";
         }
@@ -97,6 +111,9 @@ namespace HullEdit
             m_bulkheads[bulkhead][chine, 0] = x;
             m_bulkheads[bulkhead][chine, 1] = y;
             m_bulkheads[bulkhead][chine, 2] = z;
+
+            HullData++;
+            Notify("HullData");
         }
         public void ShiftBulkheadPoint(int bulkhead, int chine, double x, double y, double z)
         {
@@ -106,6 +123,9 @@ namespace HullEdit
             m_bulkheads[bulkhead][chine, 0] += x;
             m_bulkheads[bulkhead][chine, 1] += y;
             m_bulkheads[bulkhead][chine, 2] += z;
+
+            HullData++;
+            Notify("HullData");
         }
 
     }

@@ -1,15 +1,19 @@
-﻿Data binding to force redraw on edit?
-    This should also remove SetHull?
+﻿DONE: Data binding to force redraw on edit?
+    DOABLE? This should also remove SetHull?
 
 Dynamically update views while moving handle.
 Handle transom correctly.
 
 Spline bulkhead for bow/stern
 
-Compute planes for bulkheads
+Compute planes for transom bulkheads
 
 Add/position bulkheads
 Splines.GetAt(coord)
+
+cut layout
+
+MVC: Model (data) View (appearance) Control (user interaction): should be separate classes.
 
 ??????????????????????????????????
 For later version???

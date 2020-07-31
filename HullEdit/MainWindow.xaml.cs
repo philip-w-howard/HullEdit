@@ -1,6 +1,7 @@
 ﻿using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -29,6 +30,13 @@ namespace HullEdit
         {
             InitializeComponent();
             myHull = new Hull();
+
+            FrontDisplay.SetHull(myHull);
+            TopDisplay.SetHull(myHull);
+            SideDisplay.SetHull(myHull);
+            PerspectiveDisplay.SetHull(myHull);
+
+            myHull.PropertyChanged += hull_PropertyChanged;
         }
 
         private void openClick(object sender, RoutedEventArgs e)
@@ -51,11 +59,6 @@ namespace HullEdit
                     m_xAngle = 10;
                     m_yAngle = 30;
                     m_zAngle = 190;
-
-                    FrontDisplay.SetHull(myHull);
-                    TopDisplay.SetHull(myHull);
-                    SideDisplay.SetHull(myHull);
-                    PerspectiveDisplay.SetHull(myHull);
 
                     UpdateDrawings();
                 }
@@ -174,5 +177,9 @@ namespace HullEdit
             PerspectiveDisplay.Draw();
         }
 
+        void hull_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            UpdateDrawings();
+        }
     }
 }
