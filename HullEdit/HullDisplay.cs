@@ -171,6 +171,11 @@ namespace HullEdit
             double max_x = double.MinValue;
             double max_y = double.MinValue;
 
+            double chine_min_x = double.MaxValue;
+            double chine_min_y = double.MaxValue;
+            double chine_max_x = double.MinValue;
+            double chine_max_y = double.MinValue;
+
             for (int bulkhead = 0; bulkhead < m_Hull.numBulkheads; bulkhead++)
             {
                 for (int chine = 0; chine < m_drawnBulkheads[bulkhead].GetLength(0); chine++)
@@ -183,15 +188,30 @@ namespace HullEdit
                     if (y < min_y) min_y = y;
                 }
             }
+            //        private double[][,] m_chines;           // [chine][index, axis]
 
+            for (int chine = 0; chine < m_Hull.numChines * 2; chine++)
+            {
+                for (int point = 0; point < POINTS_PER_CHINE; point++)
+                {
+                    double x = m_chines[chine][point, 0];
+                    double y = m_chines[chine][point, 1];
+                    if (x > chine_max_x) chine_max_x = x;
+                    if (y > chine_max_y) chine_max_y = y;
+                    if (x < chine_min_x) chine_min_x = x;
+                    if (y < chine_min_y) chine_min_y = y;
+                }
+            }
             // Scale all the points to fit in the canvas
             double scale1 = mActualWidth / (max_x - min_x);
             double scale2 = mActualHeight / (max_y - min_y);
+            double scale3 = mActualWidth / (chine_max_x - chine_min_x);
+            double scale4 = mActualHeight / (chine_max_y - chine_min_y);
 
             double new_scale;
 
-            new_scale = scale1;
-            if (scale2 < new_scale) new_scale = scale2;
+            new_scale = Math.Min(Math.Min(scale1, scale2), Math.Min(scale3, scale4));
+            //if (scale2 < new_scale) new_scale = scale2;
             new_scale = 0.9 * new_scale;
 
             m_scale *= new_scale;
