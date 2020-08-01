@@ -55,8 +55,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Geometry.cs" />
     <Compile Include="Hull.cs" />
     <Compile Include="HullDisplay.cs" />
+    <Compile Include="Panel.cs" />
     <Compile Include="Splines.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
