@@ -16,6 +16,7 @@ namespace HullEdit
         private double[][,] m_chines;           // [chine][index, axis]
         private double[][,] m_drawnBulkheads;   // [bulkhead][chine, axis]
         private const int POINTS_PER_CHINE = 50;
+        private int points_in_chine;
 
         private double m_rotate_x, m_rotate_y, m_rotate_z;
         private double m_translate_x, m_translate_y, m_translate_z;
@@ -96,7 +97,7 @@ namespace HullEdit
 
             for (int chine = 0; chine < m_Hull.numChines * 2; chine++)
             {
-                for (int point = 0; point < POINTS_PER_CHINE - 2; point++)
+                for (int point = 0; point < points_in_chine - 1; point++)
                 {
                     Point p1 = new Point(m_chines[chine][point, 0], m_chines[chine][point, 1]);
                     Point p2 = new Point(m_chines[chine][point + 1, 0], m_chines[chine][point + 1, 1]);
@@ -192,7 +193,7 @@ namespace HullEdit
 
             for (int chine = 0; chine < m_Hull.numChines * 2; chine++)
             {
-                for (int point = 0; point < POINTS_PER_CHINE; point++)
+                for (int point = 0; point < points_in_chine; point++)
                 {
                     double x = m_chines[chine][point, 0];
                     double y = m_chines[chine][point, 1];
@@ -229,7 +230,7 @@ namespace HullEdit
 
             for (int chine = 0; chine < m_Hull.numChines * 2; chine++)
             {
-                for (int point = 0; point < POINTS_PER_CHINE; point++)
+                for (int point = 0; point < points_in_chine; point++)
                 {
                     m_chines[chine][point, 0] *= new_scale;
                     m_chines[chine][point, 1] *= new_scale;
@@ -260,7 +261,7 @@ namespace HullEdit
                     if (chine >= m_Hull.numChines) chine_data[bulkhead, 0] *= -1;
                 }
                 Splines spline = new Splines(m_Hull.numBulkheads, Splines.RELAXED, chine_data);
-                spline.GetPoints(m_chines[chine]);
+                points_in_chine = spline.GetPoints(m_chines[chine]);
             }
         }
 
@@ -403,7 +404,7 @@ namespace HullEdit
 
             for (int ii = 0; ii < m_Hull.numChines * 2; ii++)
             {
-                for (int point = 0; point < POINTS_PER_CHINE; point++)
+                for (int point = 0; point < points_in_chine; point++)
                 {
                     m_chines[ii][point, 0] += shiftX;
                     m_chines[ii][point, 1] += shiftY;

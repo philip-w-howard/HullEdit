@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -48,7 +49,7 @@ namespace HullEdit
                     m_chordLength[ii] += value;
                 }
                 m_chordLength[ii] = Math.Sqrt(m_chordLength[ii]);
-                Console.WriteLine("{0} {1}", ii, m_chordLength[ii]);
+                Debug.WriteLine("{0} {1}", ii, m_chordLength[ii]);
             }
         }
 
@@ -138,7 +139,7 @@ namespace HullEdit
             }
         }
 
-        public void GetPoints(double[,] points)
+        public int GetPoints(double[,] points)
         {
             // B[1-4, segment, axis]
             double[,,] B = new double[4, m_numPoints - 1, 3];
@@ -160,7 +161,7 @@ namespace HullEdit
                 }
             }
 
-            int pointsPerSegment = points.GetLength(0) / (m_numPoints - 1);
+            int pointsPerSegment = (points.GetLength(0) - 1) / (m_numPoints - 1);
 
             int index = 0;
             for (int seg = 0; seg < m_numPoints - 1; seg++)
@@ -186,30 +187,10 @@ namespace HullEdit
             {
                 points[index, axis] = m_points[m_numPoints - 1, axis];
             }
-        }
-        private void PrintM()
-        {
-            for (int row = 0; row < m_numPoints; row++)
-            {
-                for (int col = 0; col < m_numPoints; col++)
-                {
-                    Console.Write("{0,7:F3}", m_m_matrix[row, col]);
-                }
-                Console.Write("      ");
-                for (int axis = 0; axis < 3; axis++)
-                {
-                    Console.Write("{0,7:F3}", m_b_matrix[row, axis]);
-                }
-                Console.WriteLine();
-            }
-        }
 
-        private void PrintM(string msg)
-        {
-            Console.WriteLine(msg);
-            PrintM();
+            return index + 1;
         }
-
+        
         private int m_numPoints;                // N
         private int m_endCondition;             // C1
         //private int m_pointsPerSegment;         // Z
