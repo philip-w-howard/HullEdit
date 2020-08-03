@@ -151,6 +151,7 @@ namespace HullEdit
             m_Hull.CopyBulkheads(m_drawnBulkheads);
 
             // Add chines for the other half of the hull
+//            for (int bulkhead = m_Hull.numBulkheads - 1; bulkhead >= 0; bulkhead--)
             for (int bulkhead = 0; bulkhead < m_Hull.numBulkheads; bulkhead++)
             {
                 for (int chine = 0; chine < m_Hull.numChines; chine++)

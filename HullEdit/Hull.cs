@@ -73,14 +73,17 @@ namespace HullEdit
                     if (!double.TryParse(lines[index], out value))
                         return "Invalid file format on line " + index;
                     point.X = value;
+                    index++;
 
                     if (!double.TryParse(lines[index], out value))
                         return "Invalid file format on line " + index;
                     point.Y = value;
+                    index++;
 
                     if (!double.TryParse(lines[index], out value))
                         return "Invalid file format on line " + index;
                     point.Z = value;
+                    index++;
 
                     m_bulkheads[bulkhead].Add(point);
                 }
@@ -97,7 +100,7 @@ namespace HullEdit
         {
             for (int bulkhead = 0; bulkhead < numBulkheads; bulkhead++)
             {
-                bulkheads[bulkhead] = m_bulkheads[bulkhead];
+                bulkheads[bulkhead] = m_bulkheads[bulkhead].Clone();
             }
         }
 
