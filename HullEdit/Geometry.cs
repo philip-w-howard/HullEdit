@@ -22,7 +22,7 @@ namespace HullEdit
             }
         }
 
-        static void Intersection(double x1, double y1, double r1, double x2, double y2, double r2, out double xout, out double yout, int index)
+        static public void Intersection(double x1, double y1, double r1, double x2, double y2, double r2, out double xout, out double yout, int index)
         {
             if (x1 != x2)
             {

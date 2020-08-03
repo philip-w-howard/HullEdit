@@ -61,6 +61,8 @@ namespace HullEdit
                     m_zAngle = 190;
 
                     UpdateDrawings();
+
+                    PanelsMenu.IsEnabled = true;
                 }
             }
 
@@ -164,6 +166,11 @@ namespace HullEdit
             PerspectiveDisplay.IsEditable = false;
 
             PerspectiveDisplay.Draw();
+        }
+
+        private void PanelsClick(object sender, RoutedEventArgs e)
+        {
+            Panels p = new Panels(myHull);
         }
 
         private void ZClick(object sender, RoutedEventArgs e)

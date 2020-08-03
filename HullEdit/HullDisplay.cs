@@ -241,6 +241,7 @@ namespace HullEdit
             CenterTo(mActualWidth / 2, mActualHeight / 2, 0);
         }
 
+        // Note: This code is largely duplicated in HullDisplay. Should it go in Hull?
         protected void PrepareChines()
         {
             m_chines = new double[m_Hull.numChines * 2][,];
@@ -281,12 +282,12 @@ namespace HullEdit
 
             for (int ii = 0; ii < m_Hull.numBulkheads; ii++)
             {
-                Matrix.Multiply(m_drawnBulkheads[ii], rotate, m_drawnBulkheads[ii]);
+                Matrix.Multiply(m_drawnBulkheads[ii], rotate, out m_drawnBulkheads[ii]);
             }
 
             for (int ii = 0; ii < m_Hull.numChines * 2; ii++)
             {
-                Matrix.Multiply(m_chines[ii], rotate, m_chines[ii]);
+                Matrix.Multiply(m_chines[ii], rotate, out m_chines[ii]);
             }
         }
 
@@ -306,12 +307,12 @@ namespace HullEdit
 
             for (int ii = 0; ii < m_Hull.numBulkheads; ii++)
             {
-                Matrix.Multiply(m_drawnBulkheads[ii], rotate, m_drawnBulkheads[ii]);
+                Matrix.Multiply(m_drawnBulkheads[ii], rotate, out m_drawnBulkheads[ii]);
             }
 
             for (int ii = 0; ii < m_Hull.numChines * 2; ii++)
             {
-                Matrix.Multiply(m_chines[ii], rotate, m_chines[ii]);
+                Matrix.Multiply(m_chines[ii], rotate, out m_chines[ii]);
             }
         }
 
@@ -331,12 +332,12 @@ namespace HullEdit
 
             for (int ii = 0; ii < m_Hull.numBulkheads; ii++)
             {
-                Matrix.Multiply(m_drawnBulkheads[ii], rotate, m_drawnBulkheads[ii]);
+                Matrix.Multiply(m_drawnBulkheads[ii], rotate, out m_drawnBulkheads[ii]);
             }
 
             for (int ii = 0; ii < m_Hull.numChines * 2; ii++)
             {
-                Matrix.Multiply(m_chines[ii], rotate, m_chines[ii]);
+                Matrix.Multiply(m_chines[ii], rotate, out m_chines[ii]);
             }
         }
 

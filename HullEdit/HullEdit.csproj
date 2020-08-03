@@ -59,6 +59,7 @@
     <Compile Include="Hull.cs" />
     <Compile Include="HullDisplay.cs" />
     <Compile Include="Panel.cs" />
+    <Compile Include="Panels.cs" />
     <Compile Include="Splines.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>

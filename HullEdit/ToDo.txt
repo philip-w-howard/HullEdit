@@ -1,6 +1,9 @@
 ﻿DONE: Data binding to force redraw on edit?
     DOABLE? This should also remove SetHull?
 
+EXCEPTIONS:
+    LoadFromHullFile instead of returning a string
+
 Dynamically update views while moving handle.
 Handle transom correctly.
 
@@ -25,6 +28,12 @@ panels(hull)
     high resolution chines
 	loop
 	    panel()
+
+Rotate perspective x,y with mouse movement
+
+Convert from arrays of double to Point3DCollection?
+	Rotation operations
+	Draw operations
 
 ??????????????????????????????????
 For later version???

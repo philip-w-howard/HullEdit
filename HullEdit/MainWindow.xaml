@@ -14,6 +14,9 @@
                         <MenuItem Header="Open" Click="openClick"/>
                         <MenuItem Header="Save" Click="saveClick"/>
                     </MenuItem>
+                    <MenuItem Header="_Tools">
+                        <MenuItem Name="PanelsMenu" Header="_Panels" Click="PanelsClick" IsEnabled="False"/>
+                    </MenuItem>
                 </Menu>
             </ToolBar>
             <ToolBar Band="0" BandIndex="2">

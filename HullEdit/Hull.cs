@@ -97,6 +97,11 @@ namespace HullEdit
             }
         }
 
+        public double GetBulkheadPoint(int bulkhead, int chine, int axis)
+        {
+            return m_bulkheads[bulkhead][chine, axis];
+        }
+
         //public void GetBulkheadPoints(int bulkhead, double[,] points)
         //{
         //    for (int ii=0; ii<numChines; ii++)
