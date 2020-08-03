@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media.Media3D;
 
 namespace HullEdit
 {
@@ -14,7 +15,7 @@ namespace HullEdit
         public int numChines { get; private set; }
         public int numBulkheads { get; private set; }
 
-        private double[][,] m_bulkheads;        // [bulkhead][chine, axis]
+        private Point3DCollection[] m_bulkheads;        // [bulkhead]
         private BulkheadType[] m_bulkheadType;
 
         private bool m_IsValid;
@@ -45,12 +46,12 @@ namespace HullEdit
             if (!int.TryParse(lines[0], out num_chines)) return "Invalid file format 1";
             numChines = num_chines;
             numBulkheads = 5;
-            m_bulkheads = new double[numBulkheads][,];
+            m_bulkheads = new Point3DCollection[numBulkheads];
             m_bulkheadType = new BulkheadType[numBulkheads];
 
             for (int bulkhead = 0; bulkhead < numBulkheads; bulkhead++)
             {
-                m_bulkheads[bulkhead] = new double[numChines, 3];
+                m_bulkheads[bulkhead] = new Point3DCollection(numChines);
             }
 
             m_bulkheadType[0] = BulkheadType.BOW;
@@ -67,12 +68,21 @@ namespace HullEdit
             {
                 for (int chine = 0; chine < numChines; chine++)
                 {
-                    for (int axis = 0; axis < 3; axis++)
-                    {
-                        if (!double.TryParse(lines[index], out m_bulkheads[bulkhead][chine, axis]))
-                            return "Invalid file format on line " + index;
-                        index++;
-                    }
+                    Point3D point = new Point3D();
+                    double value;
+                    if (!double.TryParse(lines[index], out value))
+                        return "Invalid file format on line " + index;
+                    point.X = value;
+
+                    if (!double.TryParse(lines[index], out value))
+                        return "Invalid file format on line " + index;
+                    point.Y = value;
+
+                    if (!double.TryParse(lines[index], out value))
+                        return "Invalid file format on line " + index;
+                    point.Z = value;
+
+                    m_bulkheads[bulkhead].Add(point);
                 }
             }
 
@@ -83,23 +93,17 @@ namespace HullEdit
             return "";
         }
 
-        public void CopyBulkheads(double[][,] bulkheads)
+        public void CopyBulkheads(Point3DCollection[] bulkheads)
         {
             for (int bulkhead = 0; bulkhead < numBulkheads; bulkhead++)
             {
-                for (int chine = 0; chine < m_bulkheads[bulkhead].GetLength(0); chine++)
-                {
-                    for (int axis = 0; axis < 3; axis++)
-                    {
-                        bulkheads[bulkhead][chine, axis] = m_bulkheads[bulkhead][chine, axis];
-                    }
-                }
+                bulkheads[bulkhead] = m_bulkheads[bulkhead];
             }
         }
 
-        public double GetBulkheadPoint(int bulkhead, int chine, int axis)
+        public Point3D GetBulkheadPoint(int bulkhead, int chine)
         {
-            return m_bulkheads[bulkhead][chine, axis];
+            return m_bulkheads[bulkhead][chine];
         }
 
         //public void GetBulkheadPoints(int bulkhead, double[,] points)
@@ -113,9 +117,12 @@ namespace HullEdit
 
         public void SetBulkheadPoint(int bulkhead, int chine, double x, double y, double z)
         {
-            m_bulkheads[bulkhead][chine, 0] = x;
-            m_bulkheads[bulkhead][chine, 1] = y;
-            m_bulkheads[bulkhead][chine, 2] = z;
+            Point3D point = new Point3D();
+            point.X = x;
+            point.Y = y;
+            point.Z = z;
+
+            m_bulkheads[bulkhead][chine] = point;
 
             HullData++;
             Notify("HullData");
@@ -125,9 +132,13 @@ namespace HullEdit
             if (m_bulkheadType[bulkhead] == BulkheadType.VERTICAL) z = 0;
             if (m_bulkheadType[bulkhead] == BulkheadType.BOW) x = 0;
 
-            m_bulkheads[bulkhead][chine, 0] += x;
-            m_bulkheads[bulkhead][chine, 1] += y;
-            m_bulkheads[bulkhead][chine, 2] += z;
+            Point3D point = m_bulkheads[bulkhead][chine];
+
+            point.X += x;
+            point.Y += y;
+            point.Z += z;
+
+            m_bulkheads[bulkhead][chine] = point;
 
             HullData++;
             Notify("HullData");

@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media.Media3D;
 
 namespace HullEdit
 {
@@ -12,8 +13,7 @@ namespace HullEdit
         public const int RELAXED = 1;
         public const int CLAMPED = 2;
 
-        public Splines(int numPoints, int endCondition,
-                    double[,] points)
+        public Splines(int numPoints, int endCondition, Point3DCollection points)
         {
             m_numPoints = numPoints;
             m_endCondition = endCondition;
@@ -40,19 +40,26 @@ namespace HullEdit
             // Compute chord length for scaling
             for (int ii = 0; ii < m_numPoints - 1; ii++)
             {
-                m_chordLength[ii] = 0;
-                for (int axis = 0; axis < 3; axis++)
-                {
-                    double value;
-                    value = (m_points[ii, axis] - m_points[ii + 1, axis]);
-                    value *= value;
-                    m_chordLength[ii] += value;
-                }
-                m_chordLength[ii] = Math.Sqrt(m_chordLength[ii]);
-                Debug.WriteLine("{0} {1}", ii, m_chordLength[ii]);
+                double x = m_points[ii].X - m_points[ii + 1].X;
+                double y = m_points[ii].Y - m_points[ii + 1].Y;
+                double z = m_points[ii].Z - m_points[ii + 1].Z;
+
+                m_chordLength[ii] = Math.Sqrt(x * x + y * y + z * z);
+//                Debug.WriteLine("{0} {1}", ii, m_chordLength[ii]);
             }
         }
 
+        private double GetCoord(Point3D point, int axis)
+        {
+            if (axis == 0)
+                return point.X;
+            else if (axis == 1)
+                return point.Y;
+            else if (axis == 2)
+                return point.Z;
+            else
+                return Double.NaN;
+        }
         private void CreateMatrices()
         {
             m_m_matrix[0, 0] = 1;
@@ -70,14 +77,15 @@ namespace HullEdit
 
             for (int axis = 0; axis < 3; axis++)
             {
-                m_b_matrix[0, axis] = 3.0 / 2.0 / m_chordLength[0] * (m_points[1, axis] - m_points[0, axis]);
-                m_b_matrix[m_numPoints - 1, axis] = 6.0 / m_chordLength[m_numPoints - 2] * (m_points[m_numPoints - 1, axis] - m_points[m_numPoints - 2, axis]);
+                m_b_matrix[0, axis] = 3.0 / 2.0 / m_chordLength[0] * (GetCoord(m_points[1], axis) - GetCoord(m_points[0], axis));
+                m_b_matrix[m_numPoints - 1, axis] = 6.0 / m_chordLength[m_numPoints - 2] * 
+                    (GetCoord(m_points[m_numPoints - 1], axis) - GetCoord(m_points[m_numPoints - 2], axis));
 
                 for (int point = 1; point < m_numPoints - 1; point++)
                 {
                     double factor = 3 / m_chordLength[point - 1] / m_chordLength[point];
-                    double diff1 = m_points[point + 1, axis] - m_points[point, axis];
-                    double diff2 = m_points[point, axis] - m_points[point - 1, axis];
+                    double diff1 = GetCoord(m_points[point + 1], axis) - GetCoord(m_points[point], axis);
+                    double diff2 = GetCoord(m_points[point], axis) - GetCoord(m_points[point - 1], axis);
                     double scale1 = m_chordLength[point - 1] * m_chordLength[point - 1];
                     double scale2 = m_chordLength[point] * m_chordLength[point];
                     m_b_matrix[point, axis] = factor * (scale1 * diff1 + scale2 * diff2);
@@ -139,8 +147,10 @@ namespace HullEdit
             }
         }
 
-        public int GetPoints(double[,] points)
+        public int GetPoints(Point3DCollection points)
         {
+            points.Clear();
+
             // B[1-4, segment, axis]
             double[,,] B = new double[4, m_numPoints - 1, 3];
 
@@ -150,18 +160,18 @@ namespace HullEdit
                 for (int axis = 0; axis < 3; axis++)
                 {
                     double tmax = m_chordLength[seg];
-                    B[0, seg, axis] = m_points[seg, axis];
+                    B[0, seg, axis] = GetCoord(m_points[seg], axis);
                     B[1, seg, axis] = m_b_matrix[seg, axis];
-                    B[2, seg, axis] = 3 / (tmax * tmax) * (m_points[seg + 1, axis] - m_points[seg, axis])
+                    B[2, seg, axis] = 3 / (tmax * tmax) * (GetCoord(m_points[seg + 1], axis) - GetCoord(m_points[seg], axis))
                                       - 2 / tmax * m_b_matrix[seg, axis]
                                       - 1.0 / tmax * m_b_matrix[seg + 1, axis];
-                    B[3, seg, axis] = 2 / (tmax * tmax * tmax) * (m_points[seg, axis] - m_points[seg + 1, axis])
+                    B[3, seg, axis] = 2 / (tmax * tmax * tmax) * (GetCoord(m_points[seg], axis) - GetCoord(m_points[seg + 1], axis))
                                       + 1.0 / (tmax * tmax) * m_b_matrix[seg, axis]
                                       + 1.0 / (tmax * tmax) * m_b_matrix[seg + 1, axis];
                 }
             }
 
-            int pointsPerSegment = (points.GetLength(0) - 1) / (m_numPoints - 1);
+            int pointsPerSegment = (points.Count - 1) / (m_numPoints - 1);
 
             int index = 0;
             for (int seg = 0; seg < m_numPoints - 1; seg++)
@@ -171,22 +181,31 @@ namespace HullEdit
                 for (int point = 0; point < pointsPerSegment; point++)
                 {
                     double t = point * tmax / pointsPerSegment;
-                    for (int axis = 0; axis < 3; axis++)
-                    {
-                        points[index, axis] = B[0, seg, axis] +
-                                              B[1, seg, axis] * t +
-                                              B[2, seg, axis] * t * t +
-                                              B[3, seg, axis] * t * t * t;
-                    }
+
+                    Point3D loc = new Point3D();
+
+                    loc.X = B[0, seg, 0] +
+                            B[1, seg, 0] * t +
+                            B[2, seg, 0] * t * t +
+                            B[3, seg, 0] * t * t * t;
+
+                    loc.Y = B[0, seg, 1] +
+                            B[1, seg, 1] * t +
+                            B[2, seg, 1] * t * t +
+                            B[3, seg, 1] * t * t * t;
+
+                    loc.Z = B[0, seg, 2] +
+                            B[1, seg, 2] * t +
+                            B[2, seg, 2] * t * t +
+                            B[3, seg, 2] * t * t * t;
+
+                    points.Add(loc);
                     index++;
                 }
             }
 
             // Set the end point
-            for (int axis = 0; axis < 3; axis++)
-            {
-                points[index, axis] = m_points[m_numPoints - 1, axis];
-            }
+            points.Add(m_points[m_numPoints - 1]);
 
             return index + 1;
         }
@@ -194,7 +213,7 @@ namespace HullEdit
         private int m_numPoints;                // N
         private int m_endCondition;             // C1
         //private int m_pointsPerSegment;         // Z
-        private double[,] m_points;             // P [n, axis]
+        private Point3DCollection m_points;
         private double[,] m_m_matrix;           // N [rows, cols]
         private double[,] m_b_matrix;           // B [rows, axis]
         private double[] m_chordLength;         // L [rows]

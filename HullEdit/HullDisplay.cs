@@ -7,14 +7,15 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Media3D;
 using System.Windows.Shapes;
 
 namespace HullEdit
 {
     class HullDisplay : System.Windows.Controls.Control
     {
-        private double[][,] m_chines;           // [chine][index, axis]
-        private double[][,] m_drawnBulkheads;   // [bulkhead][chine, axis]
+        private Point3DCollection[] m_chines;           // [chine]
+        private Point3DCollection[] m_drawnBulkheads;   // [bulkhead]
         private const int POINTS_PER_CHINE = 50;
         private int points_in_chine;
 
@@ -70,7 +71,7 @@ namespace HullEdit
 
         protected override void OnRender(DrawingContext drawingContext)
         {
-            if (m_Hull == null) return;
+            if (m_Hull == null || !m_Hull.IsValid) return;
 
             Debug.WriteLine("OnRender");
 
@@ -81,12 +82,12 @@ namespace HullEdit
 
             for (int bulkhead = 0; bulkhead < m_Hull.numBulkheads; bulkhead++)
             {
-                for (int chine = 0; chine < m_drawnBulkheads[bulkhead].GetLength(0) - 1; chine++)
+                for (int chine = 0; chine < m_drawnBulkheads[bulkhead].Count - 1; chine++)
                 {
-                    if (chine != m_drawnBulkheads[bulkhead].GetLength(0) / 2 - 1)
+                    if (chine != m_drawnBulkheads[bulkhead].Count / 2 - 1)
                     {
-                        Point p1 = new Point(m_drawnBulkheads[bulkhead][chine, 0], m_drawnBulkheads[bulkhead][chine, 1]);
-                        Point p2 = new Point(m_drawnBulkheads[bulkhead][chine + 1, 0], m_drawnBulkheads[bulkhead][chine + 1, 1]);
+                        Point p1 = new Point(m_drawnBulkheads[bulkhead][chine].X, m_drawnBulkheads[bulkhead][chine].Y);
+                        Point p2 = new Point(m_drawnBulkheads[bulkhead][chine + 1].X, m_drawnBulkheads[bulkhead][chine + 1].Y);
 
                         drawingContext.DrawLine(pen, p1, p2);
                     }
@@ -99,8 +100,8 @@ namespace HullEdit
             {
                 for (int point = 0; point < points_in_chine - 1; point++)
                 {
-                    Point p1 = new Point(m_chines[chine][point, 0], m_chines[chine][point, 1]);
-                    Point p2 = new Point(m_chines[chine][point + 1, 0], m_chines[chine][point + 1, 1]);
+                    Point p1 = new Point(m_chines[chine][point].X, m_chines[chine][point].Y);
+                    Point p2 = new Point(m_chines[chine][point + 1].X, m_chines[chine][point + 1].Y);
 
                     drawingContext.DrawLine(pen, p1, p2);
                 }
@@ -121,8 +122,8 @@ namespace HullEdit
                     m_handle[ii] = new Rect();
                     m_handle[ii].Height = RECT_SIZE;
                     m_handle[ii].Width = RECT_SIZE;
-                    m_handle[ii].X = m_drawnBulkheads[SelectedBulkhead][ii, 0] - RECT_SIZE / 2;
-                    m_handle[ii].Y = m_drawnBulkheads[SelectedBulkhead][ii, 1] - RECT_SIZE / 2;
+                    m_handle[ii].X = m_drawnBulkheads[SelectedBulkhead][ii].X - RECT_SIZE / 2;
+                    m_handle[ii].Y = m_drawnBulkheads[SelectedBulkhead][ii].Y - RECT_SIZE / 2;
                 }
             }
 
@@ -139,27 +140,25 @@ namespace HullEdit
             m_handle = null;
             m_scale = 1.0;
 
-            m_drawnBulkheads = new double[m_Hull.numBulkheads][,];
+            m_drawnBulkheads = new Point3DCollection[m_Hull.numBulkheads];
             int centerChine = m_Hull.numChines;
 
             for (int ii = 0; ii < m_Hull.numBulkheads; ii++)
             {
-                m_drawnBulkheads[ii] = new double[m_Hull.numChines * 2, 3];
+                m_drawnBulkheads[ii] = new Point3DCollection(m_Hull.numChines * 2);
             }
 
             m_Hull.CopyBulkheads(m_drawnBulkheads);
 
+            // Add chines for the other half of the hull
             for (int bulkhead = 0; bulkhead < m_Hull.numBulkheads; bulkhead++)
             {
                 for (int chine = 0; chine < m_Hull.numChines; chine++)
                 {
-                    for (int axis = 0; axis < 3; axis++)
-                    {
-                        m_drawnBulkheads[bulkhead][chine + centerChine, axis] = m_drawnBulkheads[bulkhead][chine, axis];
-                    }
-
                     // mirror the X
-                    m_drawnBulkheads[bulkhead][chine + centerChine, 0] *= -1;
+                    Point3D point = m_drawnBulkheads[bulkhead][chine];
+                    point.X = -point.X;
+                    m_drawnBulkheads[bulkhead].Add(point);
                 }
             }
         }
@@ -179,10 +178,10 @@ namespace HullEdit
 
             for (int bulkhead = 0; bulkhead < m_Hull.numBulkheads; bulkhead++)
             {
-                for (int chine = 0; chine < m_drawnBulkheads[bulkhead].GetLength(0); chine++)
+                for (int chine = 0; chine < m_drawnBulkheads[bulkhead].Count; chine++)
                 {
-                    double x = m_drawnBulkheads[bulkhead][chine, 0];
-                    double y = m_drawnBulkheads[bulkhead][chine, 1];
+                    double x = m_drawnBulkheads[bulkhead][chine].X;
+                    double y = m_drawnBulkheads[bulkhead][chine].Y;
                     if (x > max_x) max_x = x;
                     if (y > max_y) max_y = y;
                     if (x < min_x) min_x = x;
@@ -195,8 +194,8 @@ namespace HullEdit
             {
                 for (int point = 0; point < points_in_chine; point++)
                 {
-                    double x = m_chines[chine][point, 0];
-                    double y = m_chines[chine][point, 1];
+                    double x = m_chines[chine][point].X;
+                    double y = m_chines[chine][point].Y;
                     if (x > chine_max_x) chine_max_x = x;
                     if (y > chine_max_y) chine_max_y = y;
                     if (x < chine_min_x) chine_min_x = x;
@@ -220,21 +219,27 @@ namespace HullEdit
 
             for (int bulkhead = 0; bulkhead < m_Hull.numBulkheads; bulkhead++)
             {
-                for (int chine = 0; chine < m_drawnBulkheads[bulkhead].GetLength(0); chine++)
+                for (int chine = 0; chine < m_drawnBulkheads[bulkhead].Count; chine++)
                 {
-                    m_drawnBulkheads[bulkhead][chine, 0] *= new_scale;
-                    m_drawnBulkheads[bulkhead][chine, 1] *= new_scale;
-                    m_drawnBulkheads[bulkhead][chine, 2] *= new_scale;
+                    Point3D point = m_drawnBulkheads[bulkhead][chine];
+                    point.X *= new_scale;
+                    point.Y *= new_scale;
+                    point.Z *= new_scale;
+
+                    m_drawnBulkheads[bulkhead][chine] = point;
                 }
             }
 
             for (int chine = 0; chine < m_Hull.numChines * 2; chine++)
             {
-                for (int point = 0; point < points_in_chine; point++)
+                for (int ii = 0; ii < points_in_chine; ii++)
                 {
-                    m_chines[chine][point, 0] *= new_scale;
-                    m_chines[chine][point, 1] *= new_scale;
-                    m_chines[chine][point, 2] *= new_scale;
+                    Point3D point = m_chines[chine][ii];
+                    point.X *= new_scale;
+                    point.Y *= new_scale;
+                    point.Z *= new_scale;
+
+                    m_chines[chine][ii] = point;
                 }
             }
 
@@ -244,22 +249,24 @@ namespace HullEdit
         // Note: This code is largely duplicated in HullDisplay. Should it go in Hull?
         protected void PrepareChines()
         {
-            m_chines = new double[m_Hull.numChines * 2][,];
-            double[,] chine_data = new double[m_Hull.numBulkheads, 3];
+            m_chines = new Point3DCollection[m_Hull.numChines * 2];
+            Point3DCollection chine_data = new Point3DCollection(m_Hull.numBulkheads);
             for (int chine = 0; chine < m_Hull.numChines * 2; chine++)
             {
                 int actual_chine = chine;
                 if (chine >= m_Hull.numChines) actual_chine = chine - m_Hull.numChines;
 
-                m_chines[chine] = new double[POINTS_PER_CHINE, 3];
+                m_chines[chine] = new Point3DCollection(POINTS_PER_CHINE);
                 for (int bulkhead = 0; bulkhead < m_Hull.numBulkheads; bulkhead++)
                 {
-                    for (int axis = 0; axis < 3; axis++)
-                    {
-                        chine_data[bulkhead, axis] = m_drawnBulkheads[bulkhead][actual_chine, axis];
-                    }
+                    chine_data.Add(m_drawnBulkheads[bulkhead][actual_chine]);
 
-                    if (chine >= m_Hull.numChines) chine_data[bulkhead, 0] *= -1;
+                    if (chine >= m_Hull.numChines)
+                    {
+                        Point3D point = chine_data[bulkhead];
+                        point.X = -point.X;
+                        chine_data[bulkhead] = point;
+                    }
                 }
                 Splines spline = new Splines(m_Hull.numBulkheads, Splines.RELAXED, chine_data);
                 points_in_chine = spline.GetPoints(m_chines[chine]);
@@ -368,11 +375,11 @@ namespace HullEdit
 
             for (int bulkhead = 0; bulkhead < m_Hull.numBulkheads; bulkhead++)
             {
-                for (int chine = 0; chine < m_drawnBulkheads[bulkhead].GetLength(0); chine++)
+                for (int chine = 0; chine < m_drawnBulkheads[bulkhead].Count; chine++)
                 {
-                    double x = m_drawnBulkheads[bulkhead][chine, 0];
-                    double y = m_drawnBulkheads[bulkhead][chine, 1];
-                    double z = m_drawnBulkheads[bulkhead][chine, 2];
+                    double x = m_drawnBulkheads[bulkhead][chine].X;
+                    double y = m_drawnBulkheads[bulkhead][chine].Y;
+                    double z = m_drawnBulkheads[bulkhead][chine].Z;
                     if (x > max_x) max_x = x;
                     if (y > max_y) max_y = y;
                     if (z > max_z) max_z = z;
@@ -395,21 +402,29 @@ namespace HullEdit
         {
             for (int bulkhead = 0; bulkhead < m_Hull.numBulkheads; bulkhead++)
             {
-                for (int chine = 0; chine < m_drawnBulkheads[bulkhead].GetLength(0); chine++)
+                for (int chine = 0; chine < m_drawnBulkheads[bulkhead].Count; chine++)
                 {
-                    m_drawnBulkheads[bulkhead][chine, 0] += shiftX;
-                    m_drawnBulkheads[bulkhead][chine, 1] += shiftY;
-                    m_drawnBulkheads[bulkhead][chine, 2] += shiftZ;
+                    Point3D point = m_drawnBulkheads[bulkhead][chine];
+
+                    point.X += shiftX;
+                    point.Y += shiftY;
+                    point.Z += shiftZ;
+
+                    m_drawnBulkheads[bulkhead][chine] = point;
                 }
             }
 
-            for (int ii = 0; ii < m_Hull.numChines * 2; ii++)
+            for (int chine = 0; chine < m_Hull.numChines * 2; chine++)
             {
-                for (int point = 0; point < points_in_chine; point++)
+                for (int ii = 0; ii < points_in_chine; ii++)
                 {
-                    m_chines[ii][point, 0] += shiftX;
-                    m_chines[ii][point, 1] += shiftY;
-                    m_chines[ii][point, 2] += shiftZ;
+                    Point3D point = m_chines[chine][ii];
+
+                    point.X += shiftX;
+                    point.Y += shiftY;
+                    point.Z += shiftZ;
+
+                    m_chines[chine][ii] = point;
                 }
             }
         }
@@ -511,8 +526,8 @@ namespace HullEdit
                 for (int chine = 0; chine < numChines - 1; chine++)
                 {
                     Debug.WriteLine("Checking Bulkhead {0} Chine {1}", bulkhead, chine);
-                    if (IsNearLine(m_drawnBulkheads[bulkhead][chine, 0], m_drawnBulkheads[bulkhead][chine, 1],
-                            m_drawnBulkheads[bulkhead][chine + 1, 0], m_drawnBulkheads[bulkhead][chine + 1, 1],
+                    if (IsNearLine(m_drawnBulkheads[bulkhead][chine].X, m_drawnBulkheads[bulkhead][chine].Y,
+                            m_drawnBulkheads[bulkhead][chine + 1].X, m_drawnBulkheads[bulkhead][chine + 1].Y,
                             loc.X, loc.Y, 3))
                     {
                         Debug.WriteLine("Selected bulkhead {0}", bulkhead);
@@ -527,8 +542,8 @@ namespace HullEdit
                     if (m_rotate_x == 0 && m_rotate_y == 180 && m_rotate_z == 180)
                     {
                         // Front
-                        if (IsNearLine(m_drawnBulkheads[bulkhead][chine, 0], m_drawnBulkheads[bulkhead][chine, 1],
-                                m_drawnBulkheads[bulkhead][chine + 1, 0], m_drawnBulkheads[bulkhead][chine + 1, 1],
+                        if (IsNearLine(m_drawnBulkheads[bulkhead][chine].X, m_drawnBulkheads[bulkhead][chine].Y,
+                                m_drawnBulkheads[bulkhead][chine + 1].X, m_drawnBulkheads[bulkhead][chine + 1].Y,
                                 mActualWidth - loc.X, loc.Y, 3))
                         {
                             Debug.WriteLine("Selected bulkhead {0}", bulkhead);
@@ -542,8 +557,8 @@ namespace HullEdit
                     else if (m_rotate_x == 0 && m_rotate_y == 90 && m_rotate_z == 90)
                     {
                         // Top
-                        if (IsNearLine(m_drawnBulkheads[bulkhead][chine, 0], m_drawnBulkheads[bulkhead][chine, 1],
-                                m_drawnBulkheads[bulkhead][chine + 1, 0], m_drawnBulkheads[bulkhead][chine + 1, 1],
+                        if (IsNearLine(m_drawnBulkheads[bulkhead][chine].X, m_drawnBulkheads[bulkhead][chine].Y,
+                                m_drawnBulkheads[bulkhead][chine + 1].X, m_drawnBulkheads[bulkhead][chine + 1].Y,
                                 loc.X, loc.Y + mActualHeight / 2, 3))
                         {
                             Debug.WriteLine("Selected bulkhead {0}", bulkhead);

@@ -40,7 +40,7 @@ namespace HullEdit
                 point.Y = left[arow].X * right[0, 1] + left[arow].Y * right[1, 1] + left[arow].Z * right[2, 1];
                 point.Z = left[arow].X * right[0, 2] + left[arow].Y * right[1, 2] + left[arow].Z * right[2, 2];
 
-                result[arow] = point;
+                result.Add(point);
             }
 
             returnMatrix = result;
