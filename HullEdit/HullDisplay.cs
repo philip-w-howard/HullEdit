@@ -162,6 +162,8 @@ namespace HullEdit
                     m_drawnBulkheads[bulkhead].Add(point);
                 }
             }
+
+            PrepareChines();
         }
 
         public void Scale()
@@ -258,6 +260,7 @@ namespace HullEdit
                 if (chine >= m_Hull.numChines) actual_chine = chine - m_Hull.numChines;
 
                 m_chines[chine] = new Point3DCollection(POINTS_PER_CHINE);
+                chine_data.Clear();
                 for (int bulkhead = 0; bulkhead < m_Hull.numBulkheads; bulkhead++)
                 {
                     chine_data.Add(m_drawnBulkheads[bulkhead][actual_chine]);
@@ -270,7 +273,7 @@ namespace HullEdit
                     }
                 }
                 Splines spline = new Splines(m_Hull.numBulkheads, Splines.RELAXED, chine_data);
-                points_in_chine = spline.GetPoints(m_chines[chine]);
+                points_in_chine = spline.GetPoints(POINTS_PER_CHINE, m_chines[chine]);
             }
         }
 
@@ -352,7 +355,6 @@ namespace HullEdit
         public void RotateTo(double x, double y, double z)
         {
             LoadBulkheads();
-            PrepareChines();
 
             m_rotate_x = x;
             m_rotate_y = y;
@@ -437,7 +439,6 @@ namespace HullEdit
 
         protected bool ClickedHandle(Point loc)
         {
-            Debug.WriteLine("Checking handles");
             if (m_handle == null || m_handle[0] == null) return false;
 
             for (int ii = 0; ii < m_handle.Length; ii++)
@@ -462,11 +463,9 @@ namespace HullEdit
         {
             if (x1 == x2) // vertical line
             {
-                Debug.WriteLine("Checking Vertical: ({0}, {1}), {2}", y1, y2, y3);
                 // is point along segment?
                 if ((y1 <= y3 && y2 >= y3) || (y1 >= y3 && y2 <= y3))
                 {
-                    Debug.WriteLine("Along segment");
                     if (Math.Abs(x1 - x3) <= delta) return true;
                 }
 
@@ -474,11 +473,9 @@ namespace HullEdit
             }
             else if (y1 == y2) // horizontal line
             {
-                Debug.WriteLine("Checking Horizontal: ({0}, {1}), {2}", x1, x2, x3);
                 // is point along segment?
                 if ((x1 <= x3 && x2 >= x3) || (x1 >= x3 && x2 <= x3))
                 {
-                    Debug.WriteLine("Along segment");
                     if (Math.Abs(y1 - y3) <= delta) return true;
                 }
 
@@ -489,8 +486,6 @@ namespace HullEdit
                 double m1, m2;
                 double b1, b2;
                 double x, y;
-
-                Debug.WriteLine("Checking Sloped: ({0}, {1}), ({2}, {3}), ({4}, {5})", x1, y1, x2, y2, x3, y3);
 
                 // compute slope between first two points:
                 m1 = (y2 - y1) / (x2 - x1);
@@ -521,18 +516,14 @@ namespace HullEdit
         }
         protected bool ClickedBulkhead(Point loc)
         {
-            Debug.WriteLine("Checking bulkheads");
             for (int bulkhead = 0; bulkhead < numBulkheads; bulkhead++)
             {
                 for (int chine = 0; chine < numChines - 1; chine++)
                 {
-                    Debug.WriteLine("Checking Bulkhead {0} Chine {1}", bulkhead, chine);
                     if (IsNearLine(m_drawnBulkheads[bulkhead][chine].X, m_drawnBulkheads[bulkhead][chine].Y,
                             m_drawnBulkheads[bulkhead][chine + 1].X, m_drawnBulkheads[bulkhead][chine + 1].Y,
                             loc.X, loc.Y, 3))
                     {
-                        Debug.WriteLine("Selected bulkhead {0}", bulkhead);
-
                         m_SelectedBulkhead = bulkhead;
                         m_handle = null;
                         Draw();
@@ -547,8 +538,6 @@ namespace HullEdit
                                 m_drawnBulkheads[bulkhead][chine + 1].X, m_drawnBulkheads[bulkhead][chine + 1].Y,
                                 mActualWidth - loc.X, loc.Y, 3))
                         {
-                            Debug.WriteLine("Selected bulkhead {0}", bulkhead);
-
                             m_SelectedBulkhead = bulkhead;
                             m_handle = null;
                             Draw();
@@ -562,8 +551,6 @@ namespace HullEdit
                                 m_drawnBulkheads[bulkhead][chine + 1].X, m_drawnBulkheads[bulkhead][chine + 1].Y,
                                 loc.X, loc.Y + mActualHeight / 2, 3))
                         {
-                            Debug.WriteLine("Selected bulkhead {0}", bulkhead);
-
                             m_SelectedBulkhead = bulkhead;
                             m_handle = null;
                             Draw();
@@ -577,8 +564,6 @@ namespace HullEdit
         protected override void OnPreviewMouseDown(System.Windows.Input.MouseButtonEventArgs e)
         {
             Point loc = e.GetPosition(this);
-
-            Debug.WriteLine("PreviewMouseDown ({0},{1}) {2}", loc.X, loc.Y, e.ButtonState);
 
             if (IsEditable)
             {
@@ -633,8 +618,6 @@ namespace HullEdit
                     z = 0;
                 }
 
-                Debug.WriteLine("Shifting [{0} {1}] by {2} {3} {4}", SelectedBulkhead, m_DraggingHandle, x, y, z);
-
                 m_Hull.ShiftBulkheadPoint(SelectedBulkhead, m_DraggingHandle, x, y, z);
                 m_Dragging = false;
 
@@ -653,7 +636,6 @@ namespace HullEdit
                 m_handle[m_DraggingHandle].X = loc.X - RECT_SIZE / 2;
                 m_handle[m_DraggingHandle].Y = loc.Y - RECT_SIZE / 2;
 
-                Debug.WriteLine("Moved {0} to {1},{2}", m_DraggingHandle, loc.X, loc.Y);
                 Draw();
             }
 

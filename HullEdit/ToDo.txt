@@ -1,4 +1,6 @@
-﻿DONE: Data binding to force redraw on edit?
+﻿Chines draw, but repeat. Every other one is the same.
+
+DONE: Data binding to force redraw on edit?
     DOABLE? This should also remove SetHull?
 
 EXCEPTIONS:

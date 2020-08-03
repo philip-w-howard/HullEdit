@@ -147,7 +147,7 @@ namespace HullEdit
             }
         }
 
-        public int GetPoints(Point3DCollection points)
+        public int GetPoints(int total_points, Point3DCollection points)
         {
             points.Clear();
 
@@ -171,7 +171,7 @@ namespace HullEdit
                 }
             }
 
-            int pointsPerSegment = (points.Count - 1) / (m_numPoints - 1);
+            int pointsPerSegment = (total_points - 1) / (m_numPoints - 1);
 
             int index = 0;
             for (int seg = 0; seg < m_numPoints - 1; seg++)
