@@ -1,4 +1,15 @@
-﻿Chines draw, but repeat. Every other one is the same.
+﻿Use foreach loops where appropriate
+
+cut layout
+	panel(chine1, chine2)
+		Trianglize
+		Handle pointy end
+
+	panels(hull)
+		high resolution chines
+		loop
+			panel()
+
 
 DONE: Data binding to force redraw on edit?
     DOABLE? This should also remove SetHull?
@@ -16,20 +27,11 @@ Compute planes for transom bulkheads
 Add/position bulkheads
 Splines.GetAt(coord)
 
-cut layout
+
 
 MVC: Model (data) View (appearance) Control (user interaction): should be separate classes.
 
 resize doesn't reposition handles
-
-panel(chine1, chine2)
-	Trianglize
-	Handle pointy end
-
-panels(hull)
-    high resolution chines
-	loop
-	    panel()
 
 Rotate perspective x,y with mouse movement
 

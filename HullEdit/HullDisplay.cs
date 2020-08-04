@@ -169,82 +169,36 @@ namespace HullEdit
         public void Scale()
         {
             // Get size
-            double min_x = double.MaxValue;
-            double min_y = double.MaxValue;
-            double max_x = double.MinValue;
-            double max_y = double.MinValue;
+            double size_x = 0;
+            double size_y = 0;
+
+            double curr_size_x;
+            double curr_size_y;
 
             double chine_min_x = double.MaxValue;
             double chine_min_y = double.MaxValue;
             double chine_max_x = double.MinValue;
             double chine_max_y = double.MinValue;
 
-            for (int bulkhead = 0; bulkhead < m_Hull.numBulkheads; bulkhead++)
-            {
-                for (int chine = 0; chine < m_drawnBulkheads[bulkhead].Count; chine++)
-                {
-                    double x = m_drawnBulkheads[bulkhead][chine].X;
-                    double y = m_drawnBulkheads[bulkhead][chine].Y;
-                    if (x > max_x) max_x = x;
-                    if (y > max_y) max_y = y;
-                    if (x < min_x) min_x = x;
-                    if (y < min_y) min_y = y;
-                }
-            }
-            //        private double[][,] m_chines;           // [chine][index, axis]
+            Geometry.ComputeSize(m_drawnBulkheads, out curr_size_x, out curr_size_y);
+            size_x = Math.Max(size_x, curr_size_x);
+            size_y = Math.Max(size_y, curr_size_y);
 
-            for (int chine = 0; chine < m_Hull.numChines * 2; chine++)
-            {
-                for (int point = 0; point < points_in_chine; point++)
-                {
-                    double x = m_chines[chine][point].X;
-                    double y = m_chines[chine][point].Y;
-                    if (x > chine_max_x) chine_max_x = x;
-                    if (y > chine_max_y) chine_max_y = y;
-                    if (x < chine_min_x) chine_min_x = x;
-                    if (y < chine_min_y) chine_min_y = y;
-                }
-            }
+            Geometry.ComputeSize(m_chines, out curr_size_x, out curr_size_y);
+            size_x = Math.Max(size_x, curr_size_x);
+            size_y = Math.Max(size_y, curr_size_y);
+
             // Scale all the points to fit in the canvas
-            double scale1 = mActualWidth / (max_x - min_x);
-            double scale2 = mActualHeight / (max_y - min_y);
-            double scale3 = mActualWidth / (chine_max_x - chine_min_x);
-            double scale4 = mActualHeight / (chine_max_y - chine_min_y);
+            double scale1 = mActualWidth / (size_x);
+            double scale2 = mActualHeight / (size_y);
 
-            double new_scale;
-
-            new_scale = Math.Min(Math.Min(scale1, scale2), Math.Min(scale3, scale4));
-            //if (scale2 < new_scale) new_scale = scale2;
-            new_scale = 0.9 * new_scale;
+            double new_scale = 0.9 * Math.Min(scale1, scale2);
 
             m_scale *= new_scale;
             Debug.WriteLine("Scale: {0}", m_scale);
 
-            for (int bulkhead = 0; bulkhead < m_Hull.numBulkheads; bulkhead++)
-            {
-                for (int chine = 0; chine < m_drawnBulkheads[bulkhead].Count; chine++)
-                {
-                    Point3D point = m_drawnBulkheads[bulkhead][chine];
-                    point.X *= new_scale;
-                    point.Y *= new_scale;
-                    point.Z *= new_scale;
-
-                    m_drawnBulkheads[bulkhead][chine] = point;
-                }
-            }
-
-            for (int chine = 0; chine < m_Hull.numChines * 2; chine++)
-            {
-                for (int ii = 0; ii < points_in_chine; ii++)
-                {
-                    Point3D point = m_chines[chine][ii];
-                    point.X *= new_scale;
-                    point.Y *= new_scale;
-                    point.Z *= new_scale;
-
-                    m_chines[chine][ii] = point;
-                }
-            }
+            Geometry.ResizeShape(m_drawnBulkheads, new_scale);
+            Geometry.ResizeShape(m_chines, new_scale);
 
             CenterTo(mActualWidth / 2, mActualHeight / 2, 0);
         }
