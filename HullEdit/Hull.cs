@@ -104,6 +104,19 @@ namespace HullEdit
             }
         }
 
+        public Point3DCollection[] CopyBulkheads()
+        {
+            // not sure why "return m_bulkheads.Clone() does not work
+
+            Point3DCollection[] bulkheads = new Point3DCollection[numBulkheads];
+            for (int bulkhead = 0; bulkhead < numBulkheads; bulkhead++)
+            {
+                bulkheads[bulkhead] = m_bulkheads[bulkhead].Clone();
+            }
+            return bulkheads;
+
+        }
+
         public Point3D GetBulkheadPoint(int bulkhead, int chine)
         {
             return m_bulkheads[bulkhead][chine];
@@ -146,6 +159,5 @@ namespace HullEdit
             HullData++;
             Notify("HullData");
         }
-
     }
 }

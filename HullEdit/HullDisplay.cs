@@ -17,7 +17,6 @@ namespace HullEdit
         private Point3DCollection[] m_chines;           // [chine]
         private Point3DCollection[] m_drawnBulkheads;   // [bulkhead]
         private const int POINTS_PER_CHINE = 50;
-        private int points_in_chine;
 
         private double m_rotate_x, m_rotate_y, m_rotate_z;
         private double m_translate_x, m_translate_y, m_translate_z;
@@ -98,7 +97,7 @@ namespace HullEdit
 
             for (int chine = 0; chine < m_Hull.numChines * 2; chine++)
             {
-                for (int point = 0; point < points_in_chine - 1; point++)
+                for (int point = 0; point < m_chines[chine].Count - 1; point++)
                 {
                     Point p1 = new Point(m_chines[chine][point].X, m_chines[chine][point].Y);
                     Point p2 = new Point(m_chines[chine][point + 1].X, m_chines[chine][point + 1].Y);
@@ -140,18 +139,9 @@ namespace HullEdit
             m_handle = null;
             m_scale = 1.0;
 
-            m_drawnBulkheads = new Point3DCollection[m_Hull.numBulkheads];
-            int centerChine = m_Hull.numChines;
-
-            for (int ii = 0; ii < m_Hull.numBulkheads; ii++)
-            {
-                m_drawnBulkheads[ii] = new Point3DCollection(m_Hull.numChines * 2);
-            }
-
-            m_Hull.CopyBulkheads(m_drawnBulkheads);
+            m_drawnBulkheads = m_Hull.CopyBulkheads();
 
             // Add chines for the other half of the hull
-//            for (int bulkhead = m_Hull.numBulkheads - 1; bulkhead >= 0; bulkhead--)
             for (int bulkhead = 0; bulkhead < m_Hull.numBulkheads; bulkhead++)
             {
                 for (int chine = 0; chine < m_Hull.numChines; chine++)
@@ -163,7 +153,7 @@ namespace HullEdit
                 }
             }
 
-            PrepareChines();
+            m_chines = Geometry.PrepareChines(m_drawnBulkheads, POINTS_PER_CHINE);
         }
 
         public void Scale()
@@ -174,11 +164,6 @@ namespace HullEdit
 
             double curr_size_x;
             double curr_size_y;
-
-            double chine_min_x = double.MaxValue;
-            double chine_min_y = double.MaxValue;
-            double chine_max_x = double.MinValue;
-            double chine_max_y = double.MinValue;
 
             Geometry.ComputeSize(m_drawnBulkheads, out curr_size_x, out curr_size_y);
             size_x = Math.Max(size_x, curr_size_x);
@@ -201,34 +186,6 @@ namespace HullEdit
             Geometry.ResizeShape(m_chines, new_scale);
 
             CenterTo(mActualWidth / 2, mActualHeight / 2, 0);
-        }
-
-        // Note: This code is largely duplicated in HullDisplay. Should it go in Hull?
-        protected void PrepareChines()
-        {
-            m_chines = new Point3DCollection[m_Hull.numChines * 2];
-            Point3DCollection chine_data = new Point3DCollection(m_Hull.numBulkheads);
-            for (int chine = 0; chine < m_Hull.numChines * 2; chine++)
-            {
-                int actual_chine = chine;
-                if (chine >= m_Hull.numChines) actual_chine = chine - m_Hull.numChines;
-
-                m_chines[chine] = new Point3DCollection(POINTS_PER_CHINE);
-                chine_data.Clear();
-                for (int bulkhead = 0; bulkhead < m_Hull.numBulkheads; bulkhead++)
-                {
-                    chine_data.Add(m_drawnBulkheads[bulkhead][actual_chine]);
-
-                    if (chine >= m_Hull.numChines)
-                    {
-                        Point3D point = chine_data[bulkhead];
-                        point.X = -point.X;
-                        chine_data[bulkhead] = point;
-                    }
-                }
-                Splines spline = new Splines(m_Hull.numBulkheads, Splines.RELAXED, chine_data);
-                points_in_chine = spline.GetPoints(POINTS_PER_CHINE, m_chines[chine]);
-            }
         }
 
         protected void RotateDrawing_X(double angle)
@@ -373,7 +330,7 @@ namespace HullEdit
 
             for (int chine = 0; chine < m_Hull.numChines * 2; chine++)
             {
-                for (int ii = 0; ii < points_in_chine; ii++)
+                for (int ii = 0; ii < m_chines[chine].Count; ii++)
                 {
                     Point3D point = m_chines[chine][ii];
 

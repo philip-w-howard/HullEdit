@@ -182,5 +182,26 @@ namespace HullEdit
                 }
             }
         }
+
+        public static Point3DCollection[] PrepareChines(Point3DCollection[] bulkheads, int points_per_chine)
+        {
+            int nChines = bulkheads[0].Count;
+
+            Point3DCollection[] chines = new Point3DCollection[nChines];
+            Point3DCollection chine_data = new Point3DCollection(bulkheads.Length);
+            for (int chine = 0; chine < nChines; chine++)
+            {
+                chines[chine] = new Point3DCollection(points_per_chine);
+                chine_data.Clear();
+                for (int bulkhead = 0; bulkhead < bulkheads.Length; bulkhead++)
+                {
+                    chine_data.Add(bulkheads[bulkhead][chine]);
+                }
+                Splines spline = new Splines(bulkheads.Length, Splines.RELAXED, chine_data);
+                spline.GetPoints(points_per_chine, chines[chine]);
+            }
+
+            return chines;
+        }
     }
 }
