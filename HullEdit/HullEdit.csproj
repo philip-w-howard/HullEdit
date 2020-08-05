@@ -59,7 +59,13 @@
     <Compile Include="Hull.cs" />
     <Compile Include="HullDisplay.cs" />
     <Compile Include="Panel.cs" />
+    <Compile Include="PanelsSetupWindow.xaml.cs">
+      <DependentUpon>PanelsSetupWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Panels.cs" />
+    <Compile Include="PanelsLayoutWindow.xaml.cs">
+      <DependentUpon>PanelsLayoutWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Splines.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -73,6 +79,14 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="PanelsSetupWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="PanelsLayoutWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Matrix.cs" />

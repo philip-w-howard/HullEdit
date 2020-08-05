@@ -8,7 +8,7 @@ using System.Windows.Media.Media3D;
 
 namespace HullEdit
 {
-    class Hull : INotifyPropertyChanged
+    public class Hull : INotifyPropertyChanged
     {
         enum BulkheadType { BOW, VERTICAL, TRANSOM };
 

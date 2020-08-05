@@ -15,7 +15,10 @@ namespace HullEdit
         {
             x1 = Double.NaN;
             x2 = Double.NaN;
-            if (b * b - 4 * a * c < 0) return Double.NaN;
+            if (b * b - 4 * a * c < 0)
+            {
+                return Double.NaN;
+            }
 
             double root = Math.Sqrt(b * b - 4 * a * c);
             x1 = (-b + root) / (2 * a);
@@ -31,11 +34,12 @@ namespace HullEdit
 
             if (p1.X != p2.X)
             {
+                //double A = (r1 * r1 - r2 * r2 - p1.X * p1.X + p2.X * p2.X - p1.Y * p1.Y + p2.Y * p2.Y) / (2 * p2.X - 2 * p1.X);
                 double A = (r1 * r1 - r2 * r2 - p1.X * p1.X + p2.X * p2.X - p1.Y * p1.Y + p2.Y * p2.Y) / (2 * p2.X - 2 * p1.X);
                 double B = (p1.Y - p2.Y) / (p2.X - p1.X);
                 double a = B * B + 1;
                 double b = 2 * A * B - 2 * p1.X * B - 2 * p1.Y;
-                double c = A * A - 2 * p1.X * A + p1.X * p1.X - p1.Y * p1.Y - r1 * r1;
+                double c = A * A - 2 * p1.X * A + p1.X * p1.X + p1.Y * p1.Y - r1 * r1;
 
                 double y1, y2;
 
@@ -52,7 +56,7 @@ namespace HullEdit
                 double B = (p1.X - p2.X) / (p2.Y - p1.Y);
                 double a = B * B + 1;
                 double b = 2 * A * B - 2 * p1.Y * B - 2 * p1.X;
-                double c = A * A - 2 * p1.Y * A + p1.Y * p1.Y - p1.X * p1.X - r1 * r1;
+                double c = A * A - 2 * p1.Y * A + p1.Y * p1.Y + p1.X * p1.X - r1 * r1;
                 double x1, x2;
 
                 QuadradicSolution(a, b, c, out x1, out x2);
@@ -154,6 +158,18 @@ namespace HullEdit
             size_y = max_y - min_y;
         }
 
+        static public void ComputeMin(PointCollection points, out double min_x, out double min_y)
+        {
+            min_x = double.MaxValue;
+            min_y = double.MaxValue;
+
+            foreach (Point point in points)
+            {
+                min_x = Math.Min(min_x, point.X);
+                min_y = Math.Min(min_y, point.Y);
+            }
+        }
+
         static public void ResizeShape(Point3DCollection[] shape, double scale)
         {
             double x, y, z;
@@ -180,6 +196,17 @@ namespace HullEdit
                     y = points[ii].Y * scale;
                     points[ii] = new Point(x, y);
                 }
+            }
+        }
+
+        static public void TranslateShape(PointCollection points, double move_x, double move_y)
+        {
+            double x, y;
+            for (int ii = 0; ii < points.Count; ii++)
+            {
+                x = points[ii].X + move_x;
+                y = points[ii].Y + move_y;
+                points[ii] = new Point(x, y);
             }
         }
 

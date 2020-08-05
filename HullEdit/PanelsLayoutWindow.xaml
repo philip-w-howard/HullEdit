@@ -1,0 +1,29 @@
+﻿<Window x:Class="HullEdit.PanelsLayoutWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:HullEdit"
+        mc:Ignorable="d"
+        Title="PanelsWindow" Height="450" Width="800">
+    <DockPanel>
+        <ToolBarTray Background="White" DockPanel.Dock="Top">
+            <ToolBar Band="0 " BandIndex="1">
+                <Menu >
+                    <MenuItem Header="_File">
+                        <MenuItem Header="_Open" Click="openClick"/>
+                        <MenuItem Header="_Save" Click="saveClick"/>
+                    </MenuItem>
+                    <MenuItem Header="_View">
+                        <MenuItem Header="_Zoom" Click="ZoomClick"/>
+                        <MenuItem Header="_Layout" Click="LayoutClick" />
+                        <MenuItem Header="_Redraw" Click="DrawClick" />
+                    </MenuItem>
+                </Menu>
+            </ToolBar>
+        </ToolBarTray>
+        <ScrollViewer>
+            <Canvas Name="canvas" />
+        </ScrollViewer>
+    </DockPanel>
+</Window>
