@@ -1,14 +1,15 @@
 ﻿Use foreach loops where appropriate
+   Started, need to finish.
 
 cut layout
 	panel(chine1, chine2)
-		Trianglize
-		Handle pointy end
+		DONE: Trianglize
+		DONE: Handle pointy start
+		Handle end
+		Better algorithm to choose intersection. See 178A.HUL
 
 	panels(hull)
 		high resolution chines
-		loop
-			panel()
 
 
 DONE: Data binding to force redraw on edit?
@@ -20,7 +21,7 @@ EXCEPTIONS:
 Dynamically update views while moving handle.
 Handle transom correctly.
 
-Spline bulkhead for bow/stern
+Spline bulkhead for bow/stern (Not in Carson Hull)
 
 Compute planes for transom bulkheads
 

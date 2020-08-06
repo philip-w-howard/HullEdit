@@ -24,10 +24,10 @@ namespace HullEdit
             x1 = (-b + root) / (2 * a);
             x2 = (-b - root) / (2 * a);
 
-            return x1;
+            return 0;
         }
 
-        static public void Intersection(Point p1, double r1, Point p2, double r2, out Point intersection1, out Point intersection2)
+        static public double Intersection(Point p1, double r1, Point p2, double r2, out Point intersection1, out Point intersection2)
         {
             intersection1 = new Point();
             intersection2 = new Point();
@@ -43,7 +43,10 @@ namespace HullEdit
 
                 double y1, y2;
 
-                QuadradicSolution(a, b, c, out y1, out y2);
+                if (QuadradicSolution(a, b, c, out y1, out y2) != 0) return Double.NaN; ;
+
+                if (y1 == Double.NaN || y2 == Double.NaN) return Double.NaN;  //<<<<<<<<<<<<<<<<<<<<<<<<<
+
                 intersection1.Y = y1;
                 intersection1.X = A + B * intersection1.Y;
 
@@ -59,13 +62,15 @@ namespace HullEdit
                 double c = A * A - 2 * p1.Y * A + p1.Y * p1.Y + p1.X * p1.X - r1 * r1;
                 double x1, x2;
 
-                QuadradicSolution(a, b, c, out x1, out x2);
+                if (QuadradicSolution(a, b, c, out x1, out x2) != 0) return Double.NaN;
                 intersection1.X = x1;
                 intersection1.Y = A + B * intersection1.X;
 
                 intersection2.X = x2;
                 intersection2.Y = A + B * intersection2.X;
             }
+
+            return 0;
         }
 
         static public void ComputeSize(Point3DCollection points, out double size_x, out double size_y)
