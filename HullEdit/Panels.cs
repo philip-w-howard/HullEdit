@@ -27,8 +27,8 @@ namespace HullEdit
             for (int ii=0; ii<m_numPanels; ii++)
             {
                 m_panels[ii] = new Panel(m_chines[ii], m_chines[ii + 1]);
-                m_panels[ii].ShiftTo(10, 10);
-                m_panels[ii].scale = 0.1;
+                m_panels[ii].ShiftTo(5, 5);
+                m_panels[ii].scale = 3;
             }
         }
 
@@ -36,11 +36,10 @@ namespace HullEdit
         {
             canvas.Children.Clear();
 
-            m_panels[0].draw(canvas);
-            //foreach(Panel panel in m_panels)
-            //{
-            //    panel.draw(canvas);
-            //}
+            foreach (Panel panel in m_panels)
+            {
+                panel.draw(canvas);
+            }
         }
     }
 }
