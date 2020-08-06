@@ -27,7 +27,8 @@ namespace HullEdit
             for (int ii=0; ii<m_numPanels; ii++)
             {
                 m_panels[ii] = new Panel(m_chines[ii], m_chines[ii + 1]);
-                m_panels[ii].ShiftTo(5, 5);
+                m_panels[ii].HorizontalizePanel();
+                m_panels[ii].ShiftTo(20, 20+20*ii);
                 m_panels[ii].scale = 3;
             }
         }

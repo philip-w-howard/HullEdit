@@ -24,7 +24,9 @@ namespace HullEdit
         public Panel(Point3DCollection chine1, Point3DCollection chine2)
         {
             Panelize(chine1, chine2);
+            //HorizontalizePanels();
         }
+
         protected void Panelize(Point3DCollection chine1, Point3DCollection chine2)
         {
             double r1, r2;
@@ -132,156 +134,38 @@ namespace HullEdit
 
         }
 
-        protected void Panelize_2(Point3DCollection chine1, Point3DCollection chine2)
+        public void HorizontalizePanel()
         {
-            double r1, r2;
-            Point intersection_a1, intersection_a2;
-            Point intersection_b1, intersection_b2;
+            double x = m_edge1[m_edge1.Count - 1].X - m_edge1[0].X;
+            double y = m_edge1[m_edge1.Count - 1].Y - m_edge1[0].Y;
 
-            scale = 1.0;
+            double angle;
 
-            m_edge1 = new PointCollection();
-            m_edge2 = new PointCollection();
+            angle = Math.Atan2(y, x);
+            Rotate(new Point(0, 0), -2*Math.PI*angle);
+        }
+        private void RotateEdge(PointCollection points, Point origin, double angle)
+        {
+            angle /= 2 * Math.PI;
 
-            // See if we start at a point or an edge:
-            if ((chine1[0] - chine2[0]).Length < MIN_EDGE_LENGTH)
+            for (int ii = 0; ii < points.Count; ii++)
             {
-                Debug.WriteLine("Panel staring with a point");
-                // Start both edges at (0,0)
-                m_edge1.Add(new Point(0, 0));
-                m_edge2.Add(new Point(0, 0));
-            }
-            else
-            {
-                Debug.WriteLine("Panel staring with a edge");
-                // Make the edge the first segment in edge2
-                m_edge1.Add(new Point(0, 0));
-                m_edge2.Add(new Point(0, 0));
+                double cos = Math.Cos(angle);
+                double sin = Math.Sin(angle);
 
-                r1 = (chine1[0] - chine2[0]).Length;
-                m_edge2.Add(new Point(0, -r1));
-            }
+                Point newPoint = new Point(cos * points[ii].X - sin * points[ii].Y, sin * points[ii].X + cos * points[ii].Y);
+                newPoint.X += origin.X;
+                newPoint.Y += origin.Y;
 
-            for (int ii = 1; ii < chine1.Count; ii++)
-            {
-                // advance edge1 by one point
-                r1 = (chine1[ii - 1] - chine1[ii]).Length;
-                r2 = (chine2[ii - 1] - chine1[ii]).Length;
-                Geometry.Intersection(m_edge1[m_edge1.Count - 1], r1, m_edge2[m_edge2.Count - 1], r2, out intersection_a1, out intersection_a2);
-
-                // advance edge2 by one point
-                r1 = (chine2[ii - 1] - chine2[ii]).Length;
-                r2 = (chine1[ii - 1] - chine2[ii]).Length;
-                Geometry.Intersection(m_edge2[m_edge2.Count - 1], r1, m_edge1[m_edge1.Count - 1], r2, out intersection_b1, out intersection_b2);
-
-                Debug.WriteLine("Points: ({0})  ({1})  ({2})  ({3})", intersection_a1, intersection_a2, intersection_b1, intersection_b2);
-
-                double desiredLen, diff1, diff2, diff3, diff4;
-
-                desiredLen = (chine1[ii] - chine2[ii]).Length;
-                diff1 = Math.Abs(desiredLen - (intersection_a1 - intersection_b1).Length);
-                diff2 = Math.Abs(desiredLen - (intersection_a1 - intersection_b2).Length);
-                diff3 = Math.Abs(desiredLen - (intersection_a2 - intersection_b1).Length);
-                diff4 = Math.Abs(desiredLen - (intersection_a2 - intersection_b2).Length);
-                Debug.WriteLine("Diffs: {0}: {1}  {2}  {3}  {4}", desiredLen, diff1, diff2, diff3, diff4);
-
-                // Pick the points to add to the edges.
-                // The distance between the two new points should be the same as the distance between the two chine points.
-
-                //diff1 = 0; //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
-                if (diff1 <= diff2 && diff1 <= diff3 && diff1 <= diff4)
-                {
-                    m_edge1.Add(intersection_a1);
-                    m_edge2.Add(intersection_b1);
-                    Debug.WriteLine("Diff1: ({0})  ({1})\n", m_edge1[m_edge1.Count - 1], m_edge2[m_edge2.Count - 1]);
-                }
-                else if (diff2 <= diff1 && diff2 <= diff3 && diff2 <= diff4)
-                {
-                    m_edge1.Add(intersection_a1);
-                    m_edge2.Add(intersection_b2);
-                    Debug.WriteLine("Diff2: ({0})  ({1})\n", m_edge1[m_edge1.Count - 1], m_edge2[m_edge2.Count - 1]);
-                }
-                else if (diff3 <= diff1 && diff3 <= diff2 && diff3 <= diff4)
-                {
-                    m_edge1.Add(intersection_a2);
-                    m_edge2.Add(intersection_b1);
-                    Debug.WriteLine("Diff3: ({0})  ({1})\n", m_edge1[m_edge1.Count - 1], m_edge2[m_edge2.Count - 1]);
-                }
-                else
-                {
-                    m_edge1.Add(intersection_a2);
-                    m_edge2.Add(intersection_b2);
-                    Debug.WriteLine("Diff4: ({0})  ({1})\n", m_edge1[m_edge1.Count - 1], m_edge2[m_edge2.Count - 1]);
-                }
+                Debug.WriteLine("old: ({0}) angle: {1} new: ({2})", points[ii], angle * 2 * Math.PI, newPoint);
+                points[ii] = newPoint;
             }
         }
 
-        protected void Panelize_1(Point3DCollection chine1, Point3DCollection chine2)
+        public void Rotate(Point origin, double angle)
         {
-            double r1, r2;
-            Point intersection_a1, intersection_a2;
-            Point intersection_b1, intersection_b2;
-
-            scale = 1.0;
-
-            m_edge1 = new PointCollection();
-            m_edge2 = new PointCollection();
-
-            // See if we start at a point or an edge:
-            if ((chine1[0] - chine2[0]).Length < MIN_EDGE_LENGTH)
-            {
-                Debug.WriteLine("Panel staring with a point");
-                // Start both edges at (0,0)
-                m_edge1.Add(new Point(0, 0));
-                m_edge2.Add(new Point(0, 0));
-            }
-            else
-            {
-                Debug.WriteLine("Panel staring with a edge");
-                // Make the edge the first segment in edge2
-                m_edge1.Add(new Point(0, 0));
-                m_edge2.Add(new Point(0, 0));
-
-                r1 = (chine1[0] - chine2[0]).Length;
-                m_edge2.Add(new Point(0, -r1));
-            }
-
-            for (int ii = 1; ii < chine1.Count; ii++)
-            {
-                // advance edge1 by one point
-                r1 = (chine1[ii - 1] - chine1[ii]).Length;
-                r2 = (chine2[ii - 1] - chine1[ii]).Length;
-                Geometry.Intersection(m_edge1[m_edge1.Count - 1], r1, m_edge2[m_edge2.Count - 1], r2, out intersection_a1, out intersection_a2);
-
-                // choose between the two intersections
-                if (intersection_a1.Y > intersection_a2.Y)
-                    m_edge1.Add(intersection_a1);
-                else if (intersection_a1.Y == intersection_a2.Y && intersection_a1.X > intersection_a2.X)
-                    m_edge1.Add(intersection_a1);
-                else
-                    m_edge1.Add(intersection_a2);
-                Debug.WriteLine("edge 1: ({0}), {1}, ({2}), {3}: ({4})", m_edge1[m_edge1.Count - 2], r1, m_edge2[m_edge2.Count - 1], r2, m_edge1[m_edge1.Count - 1]);
-
-                // advance edge2 by one point
-                r1 = (chine2[ii - 1] - chine2[ii]).Length;
-                r2 = (chine1[ii - 1] - chine2[ii]).Length;
-                Geometry.Intersection(m_edge2[m_edge2.Count - 1], r1, m_edge1[m_edge1.Count - 2], r2, out intersection_b1, out intersection_b2);
-
-                // choose between the two intersections
-                if (intersection_b1.Y > intersection_b2.Y)
-                    m_edge2.Add(intersection_b2);
-                else if (intersection_b1.Y == intersection_b2.Y && intersection_b1.X < intersection_b2.X)
-                    m_edge2.Add(intersection_b2);
-                else
-                    m_edge2.Add(intersection_b1);
-                Debug.WriteLine("edge 2: ({0}), {1}, ({2}), {3}: ({4})", m_edge2[m_edge2.Count - 1], r1, m_edge1[m_edge1.Count - 2], r2, m_edge2[m_edge1.Count - 1]);
-            }
-        }
-
-        public void rotate(double angle)
-        {
-
+            RotateEdge(m_edge1, origin, angle);
+            RotateEdge(m_edge2, origin, angle);
         }
 
         public void ShiftTo(double x, double y)
