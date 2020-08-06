@@ -123,6 +123,13 @@ namespace HullEdit
                 else
                     m_edge2.Add(intersection_b2);
             }
+
+            // Close the tail?
+            if ( (m_edge1[m_edge1.Count - 1] - m_edge2[m_edge2.Count - 1]).Length > MIN_EDGE_LENGTH)
+            {
+                m_edge2.Add(m_edge1[m_edge1.Count - 1]);
+            }
+
         }
 
         protected void Panelize_2(Point3DCollection chine1, Point3DCollection chine2)
