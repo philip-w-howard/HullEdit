@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Media;
 using System.Windows.Media.Media3D;
 
 namespace HullEdit
@@ -33,12 +35,28 @@ namespace HullEdit
         {
             Point3DCollection result = new Point3DCollection(left.Count);   // temp array so we can compute in place
 
-            for (int arow = 0; arow < left.Count; arow++)
+            for (int ii = 0; ii < left.Count; ii++)
             {
                 Point3D point = new Point3D();
-                point.X = left[arow].X * right[0, 0] + left[arow].Y * right[1, 0] + left[arow].Z * right[2, 0];
-                point.Y = left[arow].X * right[0, 1] + left[arow].Y * right[1, 1] + left[arow].Z * right[2, 1];
-                point.Z = left[arow].X * right[0, 2] + left[arow].Y * right[1, 2] + left[arow].Z * right[2, 2];
+                point.X = left[ii].X * right[0, 0] + left[ii].Y * right[1, 0] + left[ii].Z * right[2, 0];
+                point.Y = left[ii].X * right[0, 1] + left[ii].Y * right[1, 1] + left[ii].Z * right[2, 1];
+                point.Z = left[ii].X * right[0, 2] + left[ii].Y * right[1, 2] + left[ii].Z * right[2, 2];
+
+                result.Add(point);
+            }
+
+            returnMatrix = result;
+        }
+
+        public static void Multiply(PointCollection left, double[,] right, out PointCollection returnMatrix)
+        {
+            PointCollection result = new PointCollection(left.Count);   // temp array so we can compute in place
+
+            for (int ii = 0; ii < left.Count; ii++)
+            {
+                Point point = new Point();
+                point.X = left[ii].X * right[0, 0] + left[ii].Y * right[1, 0];
+                point.Y = left[ii].X * right[0, 1] + left[ii].Y * right[1, 1];
 
                 result.Add(point);
             }
