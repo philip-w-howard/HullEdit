@@ -1,6 +1,5 @@
 ﻿Features
-    Use PanelDisplay to display panels in PanelsLayoutWindow
-	    After each transform, ShiftTo(0,0);
+    Work out scaling of Panel and PanelDisplay.
 
 	cut layout
 		panel(chine1, chine2)

@@ -17,7 +17,6 @@
                     <MenuItem Header="_View">
                         <MenuItem Header="_Zoom" Click="ZoomClick"/>
                         <MenuItem Header="_Layout" Click="LayoutClick" />
-                        <MenuItem Header="_Redraw" Click="DrawClick" />
                     </MenuItem>
                 </Menu>
             </ToolBar>

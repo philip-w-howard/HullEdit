@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -42,7 +43,8 @@ namespace HullEdit
             PanelDisplay panel = new PanelDisplay(p);
             panel.X = x;
             panel.Y = y;
-
+            panel.Click += PanelClick;
+            
             m_displayPanels.Add(panel);
             canvas.Children.Add(panel);
             Canvas.SetLeft(panel, x);
@@ -69,8 +71,10 @@ namespace HullEdit
 
         }
 
-        private void DrawClick(object sender, RoutedEventArgs e)
+        private void PanelClick(object sender, RoutedEventArgs e)
         {
+            Debug.WriteLine(sender);
+
             //f (m_panels != null) m_panels.Draw(canvas);
         }
     }
