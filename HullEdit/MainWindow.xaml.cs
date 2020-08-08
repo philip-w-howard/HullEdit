@@ -171,8 +171,7 @@ namespace HullEdit
         private void PanelsClick(object sender, RoutedEventArgs e)
         {
             Panels p = new Panels(myHull);
-            PanelsLayoutWindow layout = new PanelsLayoutWindow();
-            layout.SetPanels(p);
+            PanelsLayoutWindow layout = new PanelsLayoutWindow(p);
             layout.Show();
         }
 

@@ -12,35 +12,34 @@ namespace HullEdit
 {
     public class Panels
     {
-        private Point3DCollection[] m_chines;           // [chine][index, axis]
         private const int POINTS_PER_CHINE = 50;
-        private int m_numPanels;
         private Panel[] m_panels;
+        public Panel[] panel { get { return m_panels; } }
 
         public Panels(Hull hull)
         {
-            m_numPanels = hull.numChines - 1;
-            m_panels = new Panel[m_numPanels];
+            Point3DCollection[] chines;
+            int numPanels = hull.numChines - 1;
 
-            m_chines = Geometry.PrepareChines(hull.CopyBulkheads(), POINTS_PER_CHINE);
+            m_panels = new Panel[numPanels];
 
-            for (int ii=0; ii<m_numPanels; ii++)
+            chines = Geometry.PrepareChines(hull.CopyBulkheads(), POINTS_PER_CHINE);
+
+            for (int ii=0; ii<numPanels; ii++)
             {
-                m_panels[ii] = new Panel(m_chines[ii], m_chines[ii + 1]);
-                m_panels[ii].HorizontalizePanel();
-                m_panels[ii].ShiftTo(20, 20+20*ii);
+                m_panels[ii] = new Panel(chines[ii], chines[ii + 1]);
                 m_panels[ii].scale = 3;
             }
         }
 
-        public void Draw(Canvas canvas)
-        {
-            canvas.Children.Clear();
+        //public void Draw(Canvas canvas)
+        //{
+        //    canvas.Children.Clear();
 
-            foreach (Panel panel in m_panels)
-            {
-                panel.draw(canvas);
-            }
-        }
+        //    foreach (Panel panel in m_panels)
+        //    {
+        //        panel.draw(canvas);
+        //    }
+        //}
     }
 }

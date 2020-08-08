@@ -1,44 +1,50 @@
-﻿Use foreach loops where appropriate
-   Started, need to finish.
+﻿Features
+    Use PanelDisplay to display panels in PanelsLayoutWindow
+	    After each transform, ShiftTo(0,0);
 
-cut layout
-	panel(chine1, chine2)
-		DONE: Trianglize
-		DONE: Handle pointy start
-		Handle end
-		Better algorithm to choose intersection. See 178A.HUL
+	cut layout
+		panel(chine1, chine2)
+			Handle end
 
-	panels(hull)
-		high resolution chines
+		panels(hull)
+			high resolution chines
 
+		Include bulkheads, etc.
+		Position, rotate, flip panels
+		Setup dialog: size, number, arrangement of sheets
 
-DONE: Data binding to force redraw on edit?
-    DOABLE? This should also remove SetHull?
+	Status bar at the bottom showing x,y,z location, etc.
 
-EXCEPTIONS:
-    LoadFromHullFile instead of returning a string
-
-Dynamically update views while moving handle.
-Handle transom correctly.
-
-Spline bulkhead for bow/stern (Not in Carson Hull)
-
-Compute planes for transom bulkheads
-
-Add/position bulkheads
-Splines.GetAt(coord)
+	DONE: Data binding to force redraw on edit?
+		DOABLE? This should also remove SetHull?
 
 
+	Dynamically update views while moving handle.
+	Handle transom correctly.
 
-MVC: Model (data) View (appearance) Control (user interaction): should be separate classes.
+	Spline bulkhead for bow/stern (Not in Carson Hull)
 
-resize doesn't reposition handles
+	Compute planes for transom bulkheads
 
-Rotate perspective x,y with mouse movement
+	Add/position bulkheads
+	Splines.GetAt(coord)
 
-Convert from arrays of double to Point3DCollection?
-	Rotation operations
-	Draw operations
+	Rotate perspective x,y with mouse movement
+
+	Undo/Redo capability
+
+Code/Implementation Enhancements
+	Use foreach loops where appropriate
+		Started, need to finish.
+	MVC: Model (data) View (appearance) Control (user interaction): should be separate classes.
+
+	EXCEPTIONS:
+		LoadFromHullFile instead of returning a string
+
+
+Bugs
+	resize doesn't reposition handles
+
 
 ??????????????????????????????????
 For later version???

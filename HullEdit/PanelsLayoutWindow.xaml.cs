@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,15 +21,32 @@ namespace HullEdit
     public partial class PanelsLayoutWindow : Window
     {
         Panels m_panels;
+        ObservableCollection<PanelDisplay> m_displayPanels = new ObservableCollection<PanelDisplay>();
 
-        public PanelsLayoutWindow()
+        public PanelsLayoutWindow(Panels panels)
         {
+            m_panels = panels;
             InitializeComponent();
+
+            double y = 10;
+            foreach (Panel p in panels.panel)
+            {
+                DisplayPanel(p, 10, y);
+                y += 60;
+            }
         }
 
-        public void SetPanels(Panels p)
+
+        public void DisplayPanel(Panel p, double x, double y)
         {
-            m_panels = p;
+            PanelDisplay panel = new PanelDisplay(p);
+            panel.X = x;
+            panel.Y = y;
+
+            m_displayPanels.Add(panel);
+            canvas.Children.Add(panel);
+            Canvas.SetLeft(panel, x);
+            Canvas.SetTop(panel, y);
         }
 
         private void openClick(object sender, RoutedEventArgs e)
@@ -53,7 +71,7 @@ namespace HullEdit
 
         private void DrawClick(object sender, RoutedEventArgs e)
         {
-            if (m_panels != null) m_panels.Draw(canvas);
+            //f (m_panels != null) m_panels.Draw(canvas);
         }
     }
 }
