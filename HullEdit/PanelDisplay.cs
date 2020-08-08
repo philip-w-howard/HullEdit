@@ -31,16 +31,12 @@ namespace HullEdit
             LineSegment line = new LineSegment();
             PathSegmentCollection lines = new PathSegmentCollection();
 
-            for (int ii = 1; ii < m_panel.NumPoints - 1; ii++)
+            for (int ii = 1; ii < m_panel.NumPoints; ii++)
             {
                 line = new LineSegment();
                 line.Point = m_panel.point(ii);
                 lines.Add(line);
             }
-
-            line = new LineSegment();
-            line.Point = m_panel.point(0);
-            lines.Add(line);
 
             PathFigure path = new PathFigure();
             path.StartPoint = m_panel.point(0);
