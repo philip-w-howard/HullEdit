@@ -31,19 +31,19 @@ namespace HullEdit
             LineSegment line = new LineSegment();
             PathSegmentCollection lines = new PathSegmentCollection();
 
-            for (int ii = 1; ii < m_panel.points.Count - 1; ii++)
+            for (int ii = 1; ii < m_panel.NumPoints - 1; ii++)
             {
                 line = new LineSegment();
-                line.Point = m_panel.points[ii];
+                line.Point = m_panel.point(ii);
                 lines.Add(line);
             }
 
             line = new LineSegment();
-            line.Point = m_panel.points[0];
+            line.Point = m_panel.point(0);
             lines.Add(line);
 
             PathFigure path = new PathFigure();
-            path.StartPoint = m_panel.points[0];
+            path.StartPoint = m_panel.point(0);
             path.Segments = lines;
 
             PathFigureCollection actualPath = new PathFigureCollection();
@@ -53,37 +53,16 @@ namespace HullEdit
             drawing.Figures = actualPath;
 
             drawingContext.DrawGeometry(new System.Windows.Media.SolidColorBrush(Colors.White), new Pen(System.Windows.Media.Brushes.Black, 1.0), drawing);
-            
-
-            //if (m_panel == null) return;
-
-            //Rect background = new Rect(new Point(0, 0), new Point(Width, Height));
-            //SolidColorBrush brush = new SolidColorBrush(Colors.White);
-            //brush.Opacity = .5;
-
-            ////drawingContext.DrawRectangle(brush, null, background);
-
-            //Pen pen = new Pen(System.Windows.Media.Brushes.Black, 1.0);
-
-            //for (int ii = 0; ii < m_panel.points.Count - 1; ii++)
-            //{
-            //    Point p1 = new Point(m_panel.points[ii].X * m_panel.scale, m_panel.points[ii].Y * m_panel.scale);
-            //    Point p2 = new Point(m_panel.points[ii + 1].X * m_panel.scale, m_panel.points[ii + 1].Y * m_panel.scale);
-            //    drawingContext.DrawLine(pen, p1, p2);
-            //}
         }
         protected override Size MeasureOverride(Size availableSize)
         {
-            double size_x, size_y;
-            Geometry.ComputeSize(m_panel.points, out size_x, out size_y);
+            Size size = m_panel.GetSize();
 
-            size_x *= m_panel.scale;
-            size_y *= m_panel.scale;
-            Width = size_x;
-            Height = size_y;
+            Width = size.Width;
+            Height = size.Height;
 
-            Debug.WriteLine("PanelDisplay MeasureOverride {0} {1}", size_x, size_y);
-            return new Size(size_x, size_y);
+            Debug.WriteLine("PanelDisplay MeasureOverride {0} {1}", Width, Height);
+            return size;
         }
         protected override Size ArrangeOverride(Size finalSize)
         {

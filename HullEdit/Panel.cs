@@ -18,9 +18,18 @@ namespace HullEdit
 
         private const double MIN_EDGE_LENGTH = 0.1;
 
+        public int NumPoints { get { return m_panelPoints.Count; } }
+
         protected PointCollection m_panelPoints;
 
-        public PointCollection points { get { return m_panelPoints; } }
+        public Point point(int index)
+        {
+            Point p = new Point();
+            p.X = m_panelPoints[index].X * scale;
+            p.Y = m_panelPoints[index].Y * scale;
+
+            return p;
+        }
 
         public Panel(Point3DCollection chine1, Point3DCollection chine2)
         {
@@ -167,28 +176,14 @@ namespace HullEdit
             Geometry.TranslateShape(m_panelPoints, x, y);
         }
 
-        //protected void DrawEdge(PointCollection edge, Canvas canvas, Brush brush)
-        //{
-        //    for (int ii = 0; ii < edge.Count - 1; ii++)
-        //    {
-        //        Line myLine = new Line();
+        public Size GetSize()
+        {
+            double size_x;
+            double size_y;
 
-        //        myLine.Stroke = brush;
+            Geometry.ComputeSize(m_panelPoints, out size_x, out size_y);
 
-        //        myLine.X1 = edge[ii].X * scale;
-        //        myLine.Y1 = edge[ii].Y * scale;
-        //        myLine.X2 = edge[ii + 1].X * scale;
-        //        myLine.Y2 = edge[ii + 1].Y * scale;
-
-        //        myLine.StrokeThickness = 1;
-
-        //        canvas.Children.Add(myLine);
-        //    }
-
-        //}
-        //public void draw(Canvas canvas)
-        //{
-        //    DrawEdge(m_panelPoints, canvas, System.Windows.Media.Brushes.Red);
-        //}
+            return new Size(size_x*scale, size_y*scale);
+        }
     }
 }
