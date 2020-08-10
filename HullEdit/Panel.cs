@@ -31,11 +31,19 @@ namespace HullEdit
             return p;
         }
 
+        // Develop the panel from two chines
         public Panel(Point3DCollection chine1, Point3DCollection chine2)
         {
             Panelize(chine1, chine2);
             HorizontalizePanel();
             ShiftTo(0, 0);
+        }
+
+        // Project a bulkhead onto its 2D shape.
+        // NOTE: This assumes the bulkhead is within a plane.
+        public Panel(Point3DCollection points)
+        {
+
         }
 
         protected void Panelize(Point3DCollection chine1, Point3DCollection chine2)
@@ -52,9 +60,28 @@ namespace HullEdit
             // See if we start at a point or an edge:
             if ((chine1[0] - chine2[0]).Length < MIN_EDGE_LENGTH)
             {
-                // Start both edges at (0,0)
-                m_panelPoints.Add(new Point(0, 0));
-                edge2.Add(new Point(0, 0));
+                // Not implemented yet
+                throw new Exception();
+
+                //// Start both edges at (0,0)
+                //m_panelPoints.Add(new Point(0, 0));
+                //edge2.Add(new Point(0, 0));
+
+                //// Compute next point, and place it on the x axis
+                //// advance edge1 by one point
+                //r1 = (chine1[0] - chine1[1]).Length;
+                //m_panelPoints.Add(new Point(r1, 0));
+
+
+                //// advance edge2 by one point
+                //r1 = (chine2[0] - chine2[1]).Length;
+                //r2 = (chine1[0] - chine2[1]).Length;
+                //Geometry.Intersection(edge2[edge2.Count - 1], r1, m_panelPoints[m_panelPoints.Count - 1], r2, out intersection_b1, out intersection_b2);
+
+                //if (intersection_b1.X >= intersection_b2.X)
+                //    edge2.Add(intersection_b1);
+                //else
+                //    edge2.Add(intersection_b2);
             }
             else
             {
@@ -64,28 +91,29 @@ namespace HullEdit
 
                 r1 = (chine1[0] - chine2[0]).Length;
                 edge2.Add(new Point(0, -r1));
+                
+                // Compute next point, and favor positive X direction
+                // advance edge1 by one point
+                r1 = (chine1[0] - chine1[1]).Length;
+                r2 = (chine2[0] - chine1[1]).Length;
+                Geometry.Intersection(m_panelPoints[m_panelPoints.Count - 1], r1, edge2[edge2.Count - 1], r2, out intersection_a1, out intersection_a2);
+
+                // advance edge2 by one point
+                r1 = (chine2[0] - chine2[1]).Length;
+                r2 = (chine1[0] - chine2[1]).Length;
+                Geometry.Intersection(edge2[edge2.Count - 1], r1, m_panelPoints[m_panelPoints.Count - 1], r2, out intersection_b1, out intersection_b2);
+
+                if (intersection_a1.X >= intersection_a2.X)
+                    m_panelPoints.Add(intersection_a1);
+                else
+                    m_panelPoints.Add(intersection_a2);
+
+                if (intersection_b1.X >= intersection_b2.X)
+                    edge2.Add(intersection_b1);
+                else
+                    edge2.Add(intersection_b2);
             }
 
-            // Compute next point, and favor positive X direction
-            // advance edge1 by one point
-            r1 = (chine1[0] - chine1[1]).Length;
-            r2 = (chine2[0] - chine1[1]).Length;
-            Geometry.Intersection(m_panelPoints[m_panelPoints.Count - 1], r1, edge2[edge2.Count - 1], r2, out intersection_a1, out intersection_a2);
-
-            // advance edge2 by one point
-            r1 = (chine2[0] - chine2[1]).Length;
-            r2 = (chine1[0] - chine2[1]).Length;
-            Geometry.Intersection(edge2[edge2.Count - 1], r1, m_panelPoints[m_panelPoints.Count - 1], r2, out intersection_b1, out intersection_b2);
-
-            if (intersection_a1.X >= intersection_a2.X)
-                m_panelPoints.Add(intersection_a1);
-            else
-                m_panelPoints.Add(intersection_a2);
-
-            if (intersection_b1.X >= intersection_b2.X)
-                edge2.Add(intersection_b1);
-            else
-                edge2.Add(intersection_b2);
 
             for (int ii = 2; ii < chine1.Count; ii++)
             {

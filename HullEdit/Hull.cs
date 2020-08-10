@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,15 +11,17 @@ namespace HullEdit
 {
     public class Hull : INotifyPropertyChanged
     {
-        enum BulkheadType { BOW, VERTICAL, TRANSOM };
-
-        public int numChines { get; private set; }
+        public enum BulkheadType { BOW, VERTICAL, TRANSOM };
         public int numBulkheads { get; private set; }
+        public int numChines { get; private set; }
 
         private Point3DCollection[] m_bulkheads;        // [bulkhead]
         private BulkheadType[] m_bulkheadType;
 
-        private bool m_IsValid;
+        public BulkheadType GetBulkheadType(int index)
+        {
+            return m_bulkheadType[index];
+        }
 
         public int HullData { get; set; }
 
@@ -31,6 +34,7 @@ namespace HullEdit
             }
         }
 
+        private bool m_IsValid;
         public bool IsValid {  get { return m_IsValid; } }
 
         public Hull() { m_IsValid = false; }
@@ -39,69 +43,64 @@ namespace HullEdit
         {
             m_IsValid = false;
 
-            string[] lines = System.IO.File.ReadAllLines(filename);
-            if (lines.Length < 1) return "Invalid file format";
-            int num_chines = numChines;
-
-            if (!int.TryParse(lines[0], out num_chines)) return "Invalid file format 1";
-            numChines = num_chines;
-            numBulkheads = 5;
-            m_bulkheads = new Point3DCollection[numBulkheads];
-            m_bulkheadType = new BulkheadType[numBulkheads];
-
-            for (int bulkhead = 0; bulkhead < numBulkheads; bulkhead++)
+            using (StreamReader file = File.OpenText(filename))
             {
-                m_bulkheads[bulkhead] = new Point3DCollection(numChines);
-            }
+                string line;
+                int num_chines = numChines;
 
-            m_bulkheadType[0] = BulkheadType.BOW;
-            for (int bulkhead=1; bulkhead<numBulkheads; bulkhead++)
-            {
-                m_bulkheadType[bulkhead] = BulkheadType.VERTICAL;
-            }
-            m_bulkheadType[numBulkheads-1] = BulkheadType.TRANSOM;
+                line = file.ReadLine();
+                if (!int.TryParse(line, out num_chines)) return "Invalid file format 1";
+                numChines = num_chines;
+                numBulkheads = 5;
+                m_bulkheads = new Point3DCollection[numBulkheads];
+                m_bulkheadType = new BulkheadType[numBulkheads];
 
-            if (lines.Length < numBulkheads * numChines * 3 + 1) return "Invalid file format 2";
-
-            int index = 1;
-            for (int bulkhead = 0; bulkhead < numBulkheads; bulkhead++)
-            {
-                for (int chine = 0; chine < numChines; chine++)
+                for (int bulkhead = 0; bulkhead < numBulkheads; bulkhead++)
                 {
-                    Point3D point = new Point3D();
-                    double value;
-                    if (!double.TryParse(lines[index], out value))
-                        return "Invalid file format on line " + index;
-                    point.X = value;
-                    index++;
+                    m_bulkheads[bulkhead] = new Point3DCollection(numChines);
+                }
 
-                    if (!double.TryParse(lines[index], out value))
-                        return "Invalid file format on line " + index;
-                    point.Y = value;
-                    index++;
+                m_bulkheadType[0] = BulkheadType.BOW;
+                for (int bulkhead = 1; bulkhead < numBulkheads; bulkhead++)
+                {
+                    m_bulkheadType[bulkhead] = BulkheadType.VERTICAL;
+                }
+                m_bulkheadType[numBulkheads - 1] = BulkheadType.TRANSOM;
 
-                    if (!double.TryParse(lines[index], out value))
-                        return "Invalid file format on line " + index;
-                    point.Z = value;
-                    index++;
+                int index = 1;
+                for (int bulkhead = 0; bulkhead < numBulkheads; bulkhead++)
+                {
+                    for (int chine = 0; chine < numChines; chine++)
+                    {
+                        Point3D point = new Point3D();
+                        double value;
+                        line = file.ReadLine();
+                        if (!double.TryParse(line, out value))
+                            return "Invalid file format on line " + index;
+                        point.X = value;
+                        index++;
 
-                    m_bulkheads[bulkhead].Add(point);
+                        line = file.ReadLine();
+                        if (!double.TryParse(line, out value))
+                            return "Invalid file format on line " + index;
+                        point.Y = value;
+                        index++;
+
+                        line = file.ReadLine();
+                        if (!double.TryParse(line, out value))
+                            return "Invalid file format on line " + index;
+                        point.Z = value;
+                        index++;
+
+                        m_bulkheads[bulkhead].Add(point);
+                    }
                 }
             }
-
             m_IsValid = true;
             HullData++;
             Notify("HullData");
 
             return "";
-        }
-
-        public void CopyBulkheads(Point3DCollection[] bulkheads)
-        {
-            for (int bulkhead = 0; bulkhead < numBulkheads; bulkhead++)
-            {
-                bulkheads[bulkhead] = m_bulkheads[bulkhead].Clone();
-            }
         }
 
         public Point3DCollection[] CopyBulkheads()
@@ -115,6 +114,11 @@ namespace HullEdit
             }
             return bulkheads;
 
+        }
+
+        public Point3DCollection GetBulkhead(int index)
+        {
+            return m_bulkheads[index].Clone();
         }
 
         public Point3D GetBulkheadPoint(int bulkhead, int chine)

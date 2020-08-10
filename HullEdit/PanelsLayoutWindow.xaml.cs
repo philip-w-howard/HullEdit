@@ -30,10 +30,16 @@ namespace HullEdit
             InitializeComponent();
 
             double y = 10;
-            foreach (Panel p in panels.panel)
+            foreach (Panel p in panels.panels)
             {
                 DisplayPanel(p, 10, y);
-                y += 60;
+                y += 40;
+            }
+
+            foreach (Panel p in panels.bulkheads)
+            {
+                DisplayPanel(p, 10, y);
+                y += 40;
             }
         }
 

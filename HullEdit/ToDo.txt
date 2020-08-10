@@ -1,5 +1,9 @@
 ﻿Features
-    Work out scaling of Panel and PanelDisplay.
+    Create a Bulkhead type that includes (BOW, VERTICAL, TRANSOM), points.
+		Hull becomes a collection of bulkheads
+
+    Include bulkheads in panels
+		Create Panel from 3D bulkhead shape
 
 	cut layout
 		panel(chine1, chine2)
@@ -24,6 +28,7 @@
 	Spline bulkhead for bow/stern (Not in Carson Hull)
 
 	Compute planes for transom bulkheads
+		limit point movement to within this plane.
 
 	Add/position bulkheads
 	Splines.GetAt(coord)
