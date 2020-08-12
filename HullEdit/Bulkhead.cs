@@ -45,16 +45,29 @@ namespace HullEdit
         {
             Bulkhead bulk = Copy();
 
-            if (type != BulkheadType.BOW)
+            //if (type != BulkheadType.BOW)
             {
+                Point3DCollection newPoints = new Point3DCollection();
+
                 // FIXTHIS: reverse before adding?
                 // FIXTHIS: Eliminate duplicate at bottom/top?
                 foreach (Point3D p in m_points)
                 {
                     // mirror the X
                     Point3D point = new Point3D(-p.X, p.Y, p.Z);
-                    bulk.m_points.Add(point);
+                    newPoints.Add(point);
                 }
+
+                // closed at top or bottom, remove duplicates.
+                //if (newPoints[newPoints.Count - 1] == m_points[m_points.Count - 1]) newPoints.RemoveAt(newPoints.Count - 1);
+                //if (newPoints[0] == m_points[0]) newPoints.RemoveAt(0);
+
+                foreach (Point3D p in newPoints)
+                {
+                    bulk.m_points.Insert(0, p);
+                }
+
+                bulk.m_IsValid = true;
             }
 
             return bulk;

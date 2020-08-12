@@ -112,11 +112,13 @@ namespace HullEdit
                     fullHull.m_bulkheads.Add(bulk.CopyWithReflection());
                 }
 
-                fullHull.PrepareChines(POINTS_PER_CHINE);
 
-                fullHull.RepositionToZero();
+                fullHull.numChines= fullHull.m_bulkheads[0].Count-1;
 
                 fullHull.m_IsValid = true;
+
+                fullHull.PrepareChines(POINTS_PER_CHINE);
+                fullHull.RepositionToZero();
             }
             return fullHull;
         }
