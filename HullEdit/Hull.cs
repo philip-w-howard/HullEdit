@@ -113,7 +113,7 @@ namespace HullEdit
                 }
 
 
-                fullHull.numChines= fullHull.m_bulkheads[0].Count-1;
+                fullHull.numChines= fullHull.m_bulkheads[0].Count;
 
                 fullHull.m_IsValid = true;
 
