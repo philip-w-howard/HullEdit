@@ -113,7 +113,7 @@ namespace HullEdit
                 }
 
 
-                fullHull.numChines= fullHull.m_bulkheads[0].Count;
+                fullHull.numChines = fullHull.m_bulkheads[0].Count;
 
                 fullHull.m_IsValid = true;
 
@@ -121,6 +121,22 @@ namespace HullEdit
                 fullHull.RepositionToZero();
             }
             return fullHull;
+        }
+        public Hull Copy()
+        {
+            Hull copy = new Hull();
+
+            if (IsValid)
+            {
+                copy.numBulkheads = numBulkheads;
+                copy.numChines = numChines;
+                copy.m_chines = null;
+                copy.m_bulkheads = new List<Bulkhead>(m_bulkheads);
+                copy.m_chines = new List<Point3DCollection>(m_chines);
+                copy.m_IsValid = true;
+                copy.RepositionToZero();
+            }
+            return copy;
         }
 
         //public Bulkhead GetBulkhead(int index)
@@ -218,6 +234,8 @@ namespace HullEdit
 
         public Size3D GetSize()
         {
+            if (!IsValid) return new Size3D(0, 0, 0);
+
             double min_x = double.MaxValue;
             double min_y = double.MaxValue;
             double min_z = double.MaxValue;

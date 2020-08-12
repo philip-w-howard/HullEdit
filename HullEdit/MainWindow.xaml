@@ -65,13 +65,13 @@
               Background="Gray" 
               ShowsPreview="true"
               Height="3"/>
-                <local:HullDisplay x:Name="FrontDisplay" Grid.Column="0" Grid.Row="0" MouseDoubleClick="HullMouseDoubleClick"/>
+                <local:HullDisplay x:Name="FrontDisplay" Grid.Column="0" Grid.Row="0" MouseDoubleClick="HullMouseDoubleClick" HorizontalAlignment="Center" VerticalAlignment="Center"/>
 
-                <local:HullDisplay x:Name="TopDisplay" Grid.Column="2" Grid.Row="0" MouseDoubleClick="HullMouseDoubleClick"/>
+                <local:HullDisplay x:Name="TopDisplay" Grid.Column="2" Grid.Row="0" MouseDoubleClick="HullMouseDoubleClick" HorizontalAlignment="Center" VerticalAlignment="Center"/>
 
-                <local:HullDisplay x:Name="SideDisplay" Grid.Column="4" Grid.Row="0" MouseDoubleClick="HullMouseDoubleClick"/>
+                <local:HullDisplay x:Name="SideDisplay" Grid.Column="4" Grid.Row="0" MouseDoubleClick="HullMouseDoubleClick" HorizontalAlignment="Center" VerticalAlignment="Center"/>
 
-                <local:HullDisplay x:Name="PerspectiveDisplay" Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="7" />
+                <local:HullDisplay x:Name="PerspectiveDisplay" Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="7" HorizontalAlignment="Center" VerticalAlignment="Center"/>
 
                 <StackPanel Grid.Column="6" Grid.Row="0">
                     <StackPanel Orientation="Horizontal">

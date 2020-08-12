@@ -111,31 +111,17 @@ namespace HullEdit
 
             if (sender == FrontDisplay)
             {
-                Debug.WriteLine("Front");
-
-                m_xAngle = 0;
-                m_yAngle = 180;
-                m_zAngle = 180;
+                PerspectiveDisplay.SetHull(FrontDisplay.hull.Copy());
             }
             else if (sender == TopDisplay)
             {
-                Debug.WriteLine("Top");
-
-                m_xAngle = 0;
-                m_yAngle = 90;
-                m_zAngle = 90;
+                PerspectiveDisplay.SetHull(TopDisplay.hull.Copy());
             }
             else if (sender == SideDisplay)
             {
-                Debug.WriteLine("Side");
-
-                m_xAngle = 0;
-                m_yAngle = 90;
-                m_zAngle = 180;
+                PerspectiveDisplay.SetHull(SideDisplay.hull.Copy());
             }
 
-            //PerspectiveDisplay.RotateTo(m_xAngle, m_yAngle, m_zAngle);
-            //PerspectiveDisplay.Scale();
             PerspectiveDisplay.IsEditable = true;
             PerspectiveDisplay.Draw();
         }
@@ -145,31 +131,17 @@ namespace HullEdit
             Button button = (Button)sender;
 
             if ((string)button.Content == "+X")
-                m_xAngle += 5;
+                PerspectiveDisplay.hull.Rotate(5, 0, 0);
             else if ((string)button.Content == "-X")
-                m_xAngle -= 5;
+                PerspectiveDisplay.hull.Rotate(-5, 0, 0);
             else if ((string)button.Content == "+Y")
-                m_yAngle += 5;
+                PerspectiveDisplay.hull.Rotate(0, 5, 0);
             else if ((string)button.Content == "-Y")
-                m_yAngle -= 5;
+                PerspectiveDisplay.hull.Rotate(0, -5, 0);
             else if ((string)button.Content == "+Z")
-                m_zAngle += 5;
+                PerspectiveDisplay.hull.Rotate(0, 0, 5);
             else if ((string)button.Content == "-Z")
-                m_zAngle -= 5;
-
-            //PerspectiveDisplay.RotateTo(m_xAngle, m_yAngle, m_zAngle);
-            //PerspectiveDisplay.Scale();
-
-            PerspectiveDisplay.IsEditable = false;
-
-            PerspectiveDisplay.Draw();
-        }
-
-        private void YClick(object sender, RoutedEventArgs e)
-        {
-            m_yAngle += 5;
-            //PerspectiveDisplay.RotateTo(m_xAngle, m_yAngle, m_zAngle);
-            //PerspectiveDisplay.Scale();
+                PerspectiveDisplay.hull.Rotate(0, 0, -5);
 
             PerspectiveDisplay.IsEditable = false;
 
@@ -181,17 +153,6 @@ namespace HullEdit
             Panels p = new Panels(myHull);
             PanelsLayoutWindow layout = new PanelsLayoutWindow(p);
             layout.Show();
-        }
-
-        private void ZClick(object sender, RoutedEventArgs e)
-        {
-            m_zAngle += 5;
-            //PerspectiveDisplay.RotateTo(m_xAngle, m_yAngle, m_zAngle);
-            //PerspectiveDisplay.Scale();
-
-            PerspectiveDisplay.IsEditable = false;
-
-            PerspectiveDisplay.Draw();
         }
 
         void hull_PropertyChanged(object sender, PropertyChangedEventArgs e)

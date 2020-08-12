@@ -18,8 +18,6 @@ namespace HullEdit
 
         private double m_scale = 1;
 
-        private double mActualHeight, mActualWidth;
-
         private Hull m_Hull;
         public Hull hull{ get { return m_Hull; } }
 
@@ -56,14 +54,14 @@ namespace HullEdit
 
         public HullDisplay()
         {
-            mActualHeight = ActualHeight;
-            mActualWidth = ActualWidth;
+            m_scale = 1;
         }
 
         public void SetHull(Hull hull)
         {
             m_Hull = hull;
             IsEditable = false;
+            m_scale = 1;
             Draw();
         }
 
@@ -73,7 +71,7 @@ namespace HullEdit
 
             Debug.WriteLine("OnRender");
 
-            Rect background = new Rect(new Point(0, 0), new Point(mActualWidth, mActualHeight));
+            Rect background = new Rect(new Point(0, 0), new Point(ActualWidth, ActualHeight));
             drawingContext.DrawRectangle(new SolidColorBrush(Colors.White), null, background);
 
             Pen pen = new Pen(System.Windows.Media.Brushes.Black, 1.0);
@@ -133,17 +131,26 @@ namespace HullEdit
             }
 
         }
-        public void Scale(double xSize, double ySize)
+
+        protected Size size2d()
+        {
+            Size3D hullSize = m_Hull.GetSize();
+
+            return new Size(hullSize.X, hullSize.Y);
+        }
+        protected void Scale(Size size)
         {
             Size3D hullSize = m_Hull.GetSize();
 
             // Scale all the points to fit in the canvas
-            double scale1 = xSize / hullSize.X;
-            double scale2 = ySize / hullSize.Y;
+            double scale1 = size.Width / hullSize.X;
+            double scale2 = size.Height / hullSize.Y;
 
             double new_scale = 0.9 * Math.Min(scale1, scale2);
 
             Debug.WriteLine("Scale: {0}", new_scale);
+
+            m_scale *= new_scale;
 
             m_Hull.Scale(new_scale, new_scale, new_scale);
         }
@@ -362,23 +369,29 @@ namespace HullEdit
         protected override Size MeasureOverride(Size availableSize)
         {
             Debug.WriteLine("MeasureOverride {0} {1}", availableSize.Width, availableSize.Height);
-            return new Size(availableSize.Width, availableSize.Height);
+            if (m_Hull.IsValid)
+            {
+                Scale(availableSize);
+                return size2d();
+            }
+            else
+            {
+                return availableSize;
+            }
         }
         protected override Size ArrangeOverride(Size finalSize)
         {
             Debug.WriteLine("ArrangeOverride {0} {1}", finalSize.Width, finalSize.Height);
 
-            if (mActualWidth != finalSize.Width || mActualHeight != finalSize.Height)
+            if (m_Hull != null && m_Hull.IsValid)
             {
-                mActualWidth = finalSize.Width;
-                mActualHeight = finalSize.Height;
-
-                if (m_Hull != null && m_Hull.IsValid)
-                {
-                    // FIXTHIS: Scale();
-                }
+                Scale(finalSize);
+                return size2d();
             }
-            return finalSize;
+            else
+            {
+                return finalSize;
+            }
         }
     }
 }
