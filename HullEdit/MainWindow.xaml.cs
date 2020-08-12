@@ -50,11 +50,26 @@ namespace HullEdit
                 if (myHull == null) myHull = new Hull();
                 myHull.LoadFromHullFile(openFileDialog.FileName);
 
-                m_xAngle = 10;
-                m_yAngle = 30;
-                m_zAngle = 190;
+                
+                Hull displayHull = myHull.CopyToFullHull();
+                displayHull.Rotate(0, 0, 180);
+                FrontDisplay.SetHull(displayHull);
+                FrontDisplay.Draw();
 
-                UpdateDrawings();
+                displayHull = myHull.CopyToFullHull();
+                displayHull.Rotate(0, 90, 180);
+                SideDisplay.SetHull(displayHull);
+                SideDisplay.Draw();
+
+                displayHull = myHull.CopyToFullHull();
+                displayHull.Rotate(0, 90, 90);
+                TopDisplay.SetHull(displayHull);
+                TopDisplay.Draw();
+
+                displayHull = myHull.CopyToFullHull();
+                displayHull.Rotate(10, 30, 190);
+                PerspectiveDisplay.SetHull(displayHull);
+                PerspectiveDisplay.Draw();
 
                 PanelsMenu.IsEnabled = true;
             }

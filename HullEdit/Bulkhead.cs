@@ -126,12 +126,12 @@ namespace HullEdit
 
             foreach (Point3D point in m_points)
             {
-                Point3D m_points = new Point3D();
-                m_points.X = point.X * matrix[0, 0] + point.Y * matrix[1, 0] + point.Z * matrix[2, 0];
-                m_points.Y = point.X * matrix[0, 1] + point.Y * matrix[1, 1] + point.Z * matrix[2, 1];
-                m_points.Z = point.X * matrix[0, 2] + point.Y * matrix[1, 2] + point.Z * matrix[2, 2];
+                Point3D new_points = new Point3D();
+                new_points.X = point.X * matrix[0, 0] + point.Y * matrix[1, 0] + point.Z * matrix[2, 0];
+                new_points.Y = point.X * matrix[0, 1] + point.Y * matrix[1, 1] + point.Z * matrix[2, 1];
+                new_points.Z = point.X * matrix[0, 2] + point.Y * matrix[1, 2] + point.Z * matrix[2, 2];
 
-                result.Add(point);
+                result.Add(new_points);
             }
 
             m_points = result;

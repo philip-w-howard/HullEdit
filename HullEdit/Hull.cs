@@ -81,6 +81,7 @@ namespace HullEdit
                 m_bulkheads.Add(bulkhead);
             }
             PrepareChines(POINTS_PER_CHINE);
+            RepositionToZero();
 
             m_IsValid = true;
             HullData++;
@@ -98,16 +99,25 @@ namespace HullEdit
         public Hull CopyToFullHull()
         {
             Hull fullHull = new Hull();
-            fullHull.numBulkheads = numBulkheads;
-            fullHull.numChines = numChines;
-            fullHull.m_chines = null;
-            fullHull.m_bulkheads = new List<Bulkhead>();
 
-            foreach (Bulkhead bulk in m_bulkheads)
+            if (IsValid)
             {
-                fullHull.m_bulkheads.Add(bulk.CopyWithReflection());
-            }
+                fullHull.numBulkheads = numBulkheads;
+                fullHull.numChines = numChines;
+                fullHull.m_chines = null;
+                fullHull.m_bulkheads = new List<Bulkhead>();
 
+                foreach (Bulkhead bulk in m_bulkheads)
+                {
+                    fullHull.m_bulkheads.Add(bulk.CopyWithReflection());
+                }
+
+                fullHull.PrepareChines(POINTS_PER_CHINE);
+
+                fullHull.RepositionToZero();
+
+                fullHull.m_IsValid = true;
+            }
             return fullHull;
         }
 
@@ -174,10 +184,7 @@ namespace HullEdit
             rotate[0, 1] = Math.Sin(angle);
             rotate[1, 0] = -Math.Sin(angle);
 
-            //CenterTo(0, 0, 0);
-
             UpdateWithMatrix(rotate);
-
         }
 
         private void UpdateWithMatrix(double [,] matrix)
@@ -189,7 +196,7 @@ namespace HullEdit
 
             if (m_chines != null)
             {
-                for (int ii = 0; ii < numChines * 2; ii++)
+                for (int ii = 0; ii < numChines; ii++)
                 {
                     Point3DCollection newChine;
                     Matrix.Multiply(m_chines[ii], matrix, out newChine);
@@ -203,6 +210,8 @@ namespace HullEdit
             RotateDrawing_Z(z);
             RotateDrawing_X(x);
             RotateDrawing_Y(y);
+
+            RepositionToZero();
         }
 
         public Size3D GetSize()
@@ -286,6 +295,8 @@ namespace HullEdit
 
         private void RepositionToZero()
         {
+            if (!IsValid) return;
+
             Point3D zero = GetMin();
 
             Vector3D zeroVect = new Vector3D(-zero.X, -zero.Y, -zero.Z);
@@ -329,6 +340,8 @@ namespace HullEdit
                 spline.GetPoints(points_per_chine, newChine);
                 m_chines.Add(newChine);
             }
+
+            RepositionToZero();
         }
 
         public void Scale(double x, double y, double z)
@@ -340,6 +353,8 @@ namespace HullEdit
             scale[2, 2] = z;
 
             UpdateWithMatrix(scale);
+
+            RepositionToZero();
         }
     }
 }

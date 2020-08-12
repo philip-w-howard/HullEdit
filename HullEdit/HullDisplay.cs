@@ -21,6 +21,8 @@ namespace HullEdit
         private double mActualHeight, mActualWidth;
 
         private Hull m_Hull;
+        public Hull hull{ get { return m_Hull; } }
+
 
         const int RECT_SIZE = 8;
 
@@ -62,7 +64,7 @@ namespace HullEdit
         {
             m_Hull = hull;
             IsEditable = false;
-            if (m_Hull.IsValid) m_Hull.PrepareChines(POINTS_PER_CHINE);
+            Draw();
         }
 
         protected override void OnRender(DrawingContext drawingContext)
