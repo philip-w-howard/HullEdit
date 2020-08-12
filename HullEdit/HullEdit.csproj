@@ -59,6 +59,7 @@
     <Compile Include="Geometry.cs" />
     <Compile Include="Hull.cs" />
     <Compile Include="HullDisplay.cs" />
+    <Compile Include="HullManip.cs" />
     <Compile Include="Panel.cs" />
     <Compile Include="PanelDisplay.cs" />
     <Compile Include="PanelsSetupWindow.xaml.cs">

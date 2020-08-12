@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,10 +9,13 @@ using System.Windows.Media.Media3D;
 
 namespace HullEdit
 {
-    class Bulkhead : INotifyPropertyChanged
+    public class Bulkhead : INotifyPropertyChanged
     {
         public enum BulkheadType { BOW, VERTICAL, TRANSOM };
-        public int numChines { get; private set; }
+        public int Count { get { return m_points.Count; } }
+        private double m_transom_angle;
+
+        public BulkheadType type { get; private set; }
 
         private Point3DCollection m_points;
 
@@ -27,65 +31,110 @@ namespace HullEdit
             }
         }
 
-        public string LoadFromHullFile(string filename)
+        public Bulkhead Copy()
         {
-            //m_IsValid = false;
+            Bulkhead bulkhead = new Bulkhead();
+            bulkhead.type = type;
+            bulkhead.m_IsValid = m_IsValid;
+            bulkhead.m_points = m_points.Clone();
 
-            //string[] lines = System.IO.File.ReadAllLines(filename);
-            //if (lines.Length < 1) return "Invalid file format";
-            //int num_chines = numChines;
+            return bulkhead;
+        }
 
-            //if (!int.TryParse(lines[0], out num_chines)) return "Invalid file format 1";
-            //numChines = num_chines;
-            //numBulkheads = 5;
-            //m_bulkheads = new Point3DCollection[numBulkheads];
-            //m_bulkheadType = new BulkheadType[numBulkheads];
+        public Bulkhead CopyWithReflection()
+        {
+            Bulkhead bulk = Copy();
 
-            //for (int bulkhead = 0; bulkhead < numBulkheads; bulkhead++)
-            //{
-            //    m_bulkheads[bulkhead] = new Point3DCollection(numChines);
-            //}
+            if (type != BulkheadType.BOW)
+            {
+                // FIXTHIS: reverse before adding?
+                // FIXTHIS: Eliminate duplicate at bottom/top?
+                foreach (Point3D p in m_points)
+                {
+                    // mirror the X
+                    Point3D point = new Point3D(-p.X, p.Y, p.Z);
+                    bulk.m_points.Add(point);
+                }
+            }
 
-            //m_bulkheadType[0] = BulkheadType.BOW;
-            //for (int bulkhead = 1; bulkhead < numBulkheads; bulkhead++)
-            //{
-            //    m_bulkheadType[bulkhead] = BulkheadType.VERTICAL;
-            //}
-            //m_bulkheadType[numBulkheads - 1] = BulkheadType.TRANSOM;
+            return bulk;
+        }
+        public Point3D GetPoint(int index)
+        {
+            return m_points[index];
+        }
 
-            //if (lines.Length < numBulkheads * numChines * 3 + 1) return "Invalid file format 2";
+        public void UpdatePoint(int chine, double x, double y, double z)
+        {
+            // FIXTHIS: handle TRANSOM by keeping it on the plane
+            if (type == BulkheadType.VERTICAL) z = 0;
+            if (type == BulkheadType.BOW) x = 0;
 
-            //int index = 1;
-            //for (int bulkhead = 0; bulkhead < numBulkheads; bulkhead++)
-            //{
-            //    for (int chine = 0; chine < numChines; chine++)
-            //    {
-            //        Point3D point = new Point3D();
-            //        double value;
-            //        if (!double.TryParse(lines[index], out value))
-            //            return "Invalid file format on line " + index;
-            //        point.X = value;
-            //        index++;
+            Point3D point = m_points[chine];
 
-            //        if (!double.TryParse(lines[index], out value))
-            //            return "Invalid file format on line " + index;
-            //        point.Y = value;
-            //        index++;
+            point.X += x;
+            point.Y += y;
+            point.Z += z;
 
-            //        if (!double.TryParse(lines[index], out value))
-            //            return "Invalid file format on line " + index;
-            //        point.Z = value;
-            //        index++;
+            m_points[chine] = point;
 
-            //        m_bulkheads[bulkhead].Add(point);
-            //    }
-            //}
+            Notify("Bulkhead");
+        }
 
-            //m_IsValid = true;
-            //HullData++;
-            //Notify("HullData");
+        public void ShiftTo(Vector3D zero)
+        {
+            for (int ii=0; ii<m_points.Count; ii++)
+            {
+                m_points[ii] += zero;
+            }
+        }
+        public string LoadFromHullFile(StreamReader file, int numChines, BulkheadType type)
+        {
+            m_IsValid = false;
+            this.type = type;
+            m_points = new Point3DCollection();
+
+            string line;
+            for (int chine = 0; chine < numChines; chine++)
+            {
+                Point3D point = new Point3D();
+                double value;
+                line = file.ReadLine();
+                if (!double.TryParse(line, out value)) return "Unable to read X value";
+                point.X = value;
+
+                line = file.ReadLine();
+                if (!double.TryParse(line, out value)) return "Unable to read Y value";
+                point.Y = value;
+
+                line = file.ReadLine();
+                if (!double.TryParse(line, out value)) return "Unable to read Z value";
+                point.Z = value;
+
+                m_points.Add(point);
+            }
+
+            m_IsValid = true;
+            Notify("Bulkhead");
 
             return "";
+        }
+
+        public void UpdateWithMatrix(double[,] matrix)
+        {
+            Point3DCollection result = new Point3DCollection(m_points.Count);   // temp array so we can compute in place
+
+            foreach (Point3D point in m_points)
+            {
+                Point3D m_points = new Point3D();
+                m_points.X = point.X * matrix[0, 0] + point.Y * matrix[1, 0] + point.Z * matrix[2, 0];
+                m_points.Y = point.X * matrix[0, 1] + point.Y * matrix[1, 1] + point.Z * matrix[2, 1];
+                m_points.Z = point.X * matrix[0, 2] + point.Y * matrix[1, 2] + point.Z * matrix[2, 2];
+
+                result.Add(point);
+            }
+
+            m_points = result;
         }
 
     }

@@ -150,7 +150,6 @@ namespace HullEdit
                 else
                     edge2.Add(intersection_b2);
 
-                ShiftTo(0, 0);
             }
 
             // NOTE: Should check for closed tail?
@@ -159,6 +158,7 @@ namespace HullEdit
                 m_panelPoints.Add(edge2[ii]);
             }
 
+            ShiftTo(0, 0);
         }
 
         public void HorizontalizePanel()

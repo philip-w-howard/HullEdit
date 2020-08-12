@@ -14,12 +14,8 @@ namespace HullEdit
 {
     class HullDisplay : System.Windows.Controls.Control
     {
-        private Point3DCollection[] m_chines;           // [chine]
-        private Point3DCollection[] m_drawnBulkheads;   // [bulkhead]
         private const int POINTS_PER_CHINE = 50;
 
-        private double m_rotate_x, m_rotate_y, m_rotate_z;
-        private double m_translate_x, m_translate_y, m_translate_z;
         private double m_scale = 1;
 
         private double mActualHeight, mActualWidth;
@@ -66,6 +62,7 @@ namespace HullEdit
         {
             m_Hull = hull;
             IsEditable = false;
+            if (m_Hull.IsValid) m_Hull.PrepareChines(POINTS_PER_CHINE);
         }
 
         protected override void OnRender(DrawingContext drawingContext)
@@ -81,26 +78,27 @@ namespace HullEdit
 
             for (int bulkhead = 0; bulkhead < m_Hull.numBulkheads; bulkhead++)
             {
-                for (int chine = 0; chine < m_drawnBulkheads[bulkhead].Count - 1; chine++)
+                Bulkhead bulk = m_Hull.GetBulkhead(bulkhead);
+                for (int chine = 0; chine < bulk.Count - 1; chine++)
                 {
-                    if (chine != m_drawnBulkheads[bulkhead].Count / 2 - 1)
-                    {
-                        Point p1 = new Point(m_drawnBulkheads[bulkhead][chine].X, m_drawnBulkheads[bulkhead][chine].Y);
-                        Point p2 = new Point(m_drawnBulkheads[bulkhead][chine + 1].X, m_drawnBulkheads[bulkhead][chine + 1].Y);
+                    Point p1 = new Point(bulk.GetPoint(chine).X, bulk.GetPoint(chine).Y);
+                    Point p2 = new Point(bulk.GetPoint(chine+1).X, bulk.GetPoint(chine+1).Y);
 
-                        drawingContext.DrawLine(pen, p1, p2);
-                    }
+                    drawingContext.DrawLine(pen, p1, p2);
                 }
             }
 
             pen = new Pen(System.Windows.Media.Brushes.Gray, 1.0);
 
-            for (int chine = 0; chine < m_Hull.numChines * 2; chine++)
+            for (int chine = 0; chine < m_Hull.numChines; chine++)
             {
-                for (int point = 0; point < m_chines[chine].Count - 1; point++)
+                Point3DCollection currChine = m_Hull.GetChine(chine);
+
+                // FIXTHIS: use a foreach and simply remember the previous point
+                for (int point = 0; point < currChine.Count - 1; point++)
                 {
-                    Point p1 = new Point(m_chines[chine][point].X, m_chines[chine][point].Y);
-                    Point p2 = new Point(m_chines[chine][point + 1].X, m_chines[chine][point + 1].Y);
+                    Point p1 = new Point(currChine[point].X, currChine[point].Y);
+                    Point p2 = new Point(currChine[point + 1].X, currChine[point + 1].Y);
 
                     drawingContext.DrawLine(pen, p1, p2);
                 }
@@ -121,8 +119,8 @@ namespace HullEdit
                     m_handle[ii] = new Rect();
                     m_handle[ii].Height = RECT_SIZE;
                     m_handle[ii].Width = RECT_SIZE;
-                    m_handle[ii].X = m_drawnBulkheads[SelectedBulkhead][ii].X - RECT_SIZE / 2;
-                    m_handle[ii].Y = m_drawnBulkheads[SelectedBulkhead][ii].Y - RECT_SIZE / 2;
+                    m_handle[ii].X = m_Hull.GetBulkhead(SelectedBulkhead).GetPoint(ii).X - RECT_SIZE / 2;
+                    m_handle[ii].Y = m_Hull.GetBulkhead(SelectedBulkhead).GetPoint(ii).Y - RECT_SIZE / 2;
                 }
             }
 
@@ -133,215 +131,21 @@ namespace HullEdit
             }
 
         }
-        private void LoadBulkheads()
+        public void Scale(double xSize, double ySize)
         {
-            // reset values that depend on the bulkheads
-            m_handle = null;
-            m_scale = 1.0;
-
-            m_drawnBulkheads = m_Hull.CopyBulkheads();
-
-            // Add chines for the other half of the hull
-            for (int bulkhead = 0; bulkhead < m_Hull.numBulkheads; bulkhead++)
-            {
-                for (int chine = 0; chine < m_Hull.numChines; chine++)
-                {
-                    // mirror the X
-                    Point3D point = m_drawnBulkheads[bulkhead][chine];
-                    point.X = -point.X;
-                    m_drawnBulkheads[bulkhead].Add(point);
-                }
-            }
-
-            m_chines = Geometry.PrepareChines(m_drawnBulkheads, POINTS_PER_CHINE);
-        }
-
-        public void Scale()
-        {
-            // Get size
-            double size_x = 0;
-            double size_y = 0;
-
-            double curr_size_x;
-            double curr_size_y;
-
-            Geometry.ComputeSize(m_drawnBulkheads, out curr_size_x, out curr_size_y);
-            size_x = Math.Max(size_x, curr_size_x);
-            size_y = Math.Max(size_y, curr_size_y);
-
-            Geometry.ComputeSize(m_chines, out curr_size_x, out curr_size_y);
-            size_x = Math.Max(size_x, curr_size_x);
-            size_y = Math.Max(size_y, curr_size_y);
+            Size3D hullSize = m_Hull.GetSize();
 
             // Scale all the points to fit in the canvas
-            double scale1 = mActualWidth / (size_x);
-            double scale2 = mActualHeight / (size_y);
+            double scale1 = xSize / hullSize.X;
+            double scale2 = ySize / hullSize.Y;
 
             double new_scale = 0.9 * Math.Min(scale1, scale2);
 
-            m_scale *= new_scale;
-            Debug.WriteLine("Scale: {0}", m_scale);
+            Debug.WriteLine("Scale: {0}", new_scale);
 
-            Geometry.ResizeShape(m_drawnBulkheads, new_scale);
-            Geometry.ResizeShape(m_chines, new_scale);
-
-            CenterTo(mActualWidth / 2, mActualHeight / 2, 0);
+            m_Hull.Scale(new_scale, new_scale, new_scale);
         }
 
-        protected void RotateDrawing_X(double angle)
-        {
-            double[,] rotate = new double[3, 3];
-
-            angle = angle * Math.PI / 180.0;
-
-            rotate[0, 0] = 1.0;
-            rotate[1, 1] = Math.Cos(angle);
-            rotate[2, 2] = Math.Cos(angle);
-            rotate[1, 2] = Math.Sin(angle);
-            rotate[2, 1] = -Math.Sin(angle);
-
-            CenterTo(0, 0, 0);
-
-            for (int ii = 0; ii < m_Hull.numBulkheads; ii++)
-            {
-                Matrix.Multiply(m_drawnBulkheads[ii], rotate, out m_drawnBulkheads[ii]);
-            }
-
-            for (int ii = 0; ii < m_Hull.numChines * 2; ii++)
-            {
-                Matrix.Multiply(m_chines[ii], rotate, out m_chines[ii]);
-            }
-        }
-
-        protected void RotateDrawing_Y(double angle)
-        {
-            double[,] rotate = new double[3, 3];
-
-            angle = angle * Math.PI / 180.0;
-
-            rotate[1, 1] = 1.0;
-            rotate[0, 0] = Math.Cos(angle);
-            rotate[2, 2] = Math.Cos(angle);
-            rotate[2, 0] = Math.Sin(angle);
-            rotate[0, 2] = -Math.Sin(angle);
-
-            CenterTo(0, 0, 0);
-
-            for (int ii = 0; ii < m_Hull.numBulkheads; ii++)
-            {
-                Matrix.Multiply(m_drawnBulkheads[ii], rotate, out m_drawnBulkheads[ii]);
-            }
-
-            for (int ii = 0; ii < m_Hull.numChines * 2; ii++)
-            {
-                Matrix.Multiply(m_chines[ii], rotate, out m_chines[ii]);
-            }
-        }
-
-        protected void RotateDrawing_Z(double angle)
-        {
-            double[,] rotate = new double[3, 3];
-
-            angle = angle * Math.PI / 180.0;
-
-            rotate[2, 2] = 1.0;
-            rotate[0, 0] = Math.Cos(angle);
-            rotate[1, 1] = Math.Cos(angle);
-            rotate[0, 1] = Math.Sin(angle);
-            rotate[1, 0] = -Math.Sin(angle);
-
-            CenterTo(0, 0, 0);
-
-            for (int ii = 0; ii < m_Hull.numBulkheads; ii++)
-            {
-                Matrix.Multiply(m_drawnBulkheads[ii], rotate, out m_drawnBulkheads[ii]);
-            }
-
-            for (int ii = 0; ii < m_Hull.numChines * 2; ii++)
-            {
-                Matrix.Multiply(m_chines[ii], rotate, out m_chines[ii]);
-            }
-        }
-
-        public void RotateTo(double x, double y, double z)
-        {
-            LoadBulkheads();
-
-            m_rotate_x = x;
-            m_rotate_y = y;
-            m_rotate_z = z;
-
-            // NOTE: Could optimize by multiplying the three rotation matrices before rotating the points
-            RotateDrawing_Z(z);
-            RotateDrawing_X(x);
-            RotateDrawing_Y(y);
-        }
-
-        private void CenterTo(double centerX, double centerY, double centerZ)
-        {
-            // Get size
-            double min_x = double.MaxValue;
-            double min_y = double.MaxValue;
-            double min_z = double.MaxValue;
-            double max_x = double.MinValue;
-            double max_y = double.MinValue;
-            double max_z = double.MinValue;
-
-            for (int bulkhead = 0; bulkhead < m_Hull.numBulkheads; bulkhead++)
-            {
-                for (int chine = 0; chine < m_drawnBulkheads[bulkhead].Count; chine++)
-                {
-                    double x = m_drawnBulkheads[bulkhead][chine].X;
-                    double y = m_drawnBulkheads[bulkhead][chine].Y;
-                    double z = m_drawnBulkheads[bulkhead][chine].Z;
-                    if (x > max_x) max_x = x;
-                    if (y > max_y) max_y = y;
-                    if (z > max_z) max_z = z;
-                    if (x < min_x) min_x = x;
-                    if (y < min_y) min_y = y;
-                    if (z < min_z) min_z = z;
-                }
-            }
-
-            m_translate_x = centerX - (max_x + min_x) / 2;
-            m_translate_y = centerY - (max_y + min_y) / 2;
-            m_translate_z = centerZ - (max_z + min_z) / 2;
-
-            Debug.WriteLine("CenterTo ({0},{1},{2}) Shift ({3},{4},{5})",
-                centerX, centerY, centerZ, m_translate_x, m_translate_y, m_translate_z);
-            TranslateTo(m_translate_x, m_translate_y, m_translate_z);
-        }
-
-        private void TranslateTo(double shiftX, double shiftY, double shiftZ)
-        {
-            for (int bulkhead = 0; bulkhead < m_Hull.numBulkheads; bulkhead++)
-            {
-                for (int chine = 0; chine < m_drawnBulkheads[bulkhead].Count; chine++)
-                {
-                    Point3D point = m_drawnBulkheads[bulkhead][chine];
-
-                    point.X += shiftX;
-                    point.Y += shiftY;
-                    point.Z += shiftZ;
-
-                    m_drawnBulkheads[bulkhead][chine] = point;
-                }
-            }
-
-            for (int chine = 0; chine < m_Hull.numChines * 2; chine++)
-            {
-                for (int ii = 0; ii < m_chines[chine].Count; ii++)
-                {
-                    Point3D point = m_chines[chine][ii];
-
-                    point.X += shiftX;
-                    point.Y += shiftY;
-                    point.Z += shiftZ;
-
-                    m_chines[chine][ii] = point;
-                }
-            }
-        }
 
         public void Draw()
         {
@@ -431,9 +235,10 @@ namespace HullEdit
             {
                 for (int chine = 0; chine < numChines - 1; chine++)
                 {
-                    if (IsNearLine(m_drawnBulkheads[bulkhead][chine].X, m_drawnBulkheads[bulkhead][chine].Y,
-                            m_drawnBulkheads[bulkhead][chine + 1].X, m_drawnBulkheads[bulkhead][chine + 1].Y,
-                            loc.X, loc.Y, 3))
+                    Point3D p1 = m_Hull.GetBulkhead(bulkhead).GetPoint(chine);
+                    Point3D p2 = m_Hull.GetBulkhead(bulkhead).GetPoint(chine+1);
+
+                    if (IsNearLine(p1.X, p1.Y, p2.X, p2.Y, loc.X, loc.Y, 3))
                     {
                         m_SelectedBulkhead = bulkhead;
                         m_handle = null;
@@ -441,33 +246,33 @@ namespace HullEdit
                         return true;
                     }
 
-                    // check for reflected bulkheads in front and top views
-                    if (m_rotate_x == 0 && m_rotate_y == 180 && m_rotate_z == 180)
-                    {
-                        // Front
-                        if (IsNearLine(m_drawnBulkheads[bulkhead][chine].X, m_drawnBulkheads[bulkhead][chine].Y,
-                                m_drawnBulkheads[bulkhead][chine + 1].X, m_drawnBulkheads[bulkhead][chine + 1].Y,
-                                mActualWidth - loc.X, loc.Y, 3))
-                        {
-                            m_SelectedBulkhead = bulkhead;
-                            m_handle = null;
-                            Draw();
-                            return true;
-                        }
-                    }
-                    else if (m_rotate_x == 0 && m_rotate_y == 90 && m_rotate_z == 90)
-                    {
-                        // Top
-                        if (IsNearLine(m_drawnBulkheads[bulkhead][chine].X, m_drawnBulkheads[bulkhead][chine].Y,
-                                m_drawnBulkheads[bulkhead][chine + 1].X, m_drawnBulkheads[bulkhead][chine + 1].Y,
-                                loc.X, loc.Y + mActualHeight / 2, 3))
-                        {
-                            m_SelectedBulkhead = bulkhead;
-                            m_handle = null;
-                            Draw();
-                            return true;
-                        }
-                    }
+                    //// check for reflected bulkheads in front and top views
+                    //if (m_rotate_x == 0 && m_rotate_y == 180 && m_rotate_z == 180)
+                    //{
+                    //    // Front
+                    //    if (IsNearLine(m_drawnBulkheads[bulkhead][chine].X, m_drawnBulkheads[bulkhead][chine].Y,
+                    //            m_drawnBulkheads[bulkhead][chine + 1].X, m_drawnBulkheads[bulkhead][chine + 1].Y,
+                    //            mActualWidth - loc.X, loc.Y, 3))
+                    //    {
+                    //        m_SelectedBulkhead = bulkhead;
+                    //        m_handle = null;
+                    //        Draw();
+                    //        return true;
+                    //    }
+                    //}
+                    //else if (m_rotate_x == 0 && m_rotate_y == 90 && m_rotate_z == 90)
+                    //{
+                    //    // Top
+                    //    if (IsNearLine(m_drawnBulkheads[bulkhead][chine].X, m_drawnBulkheads[bulkhead][chine].Y,
+                    //            m_drawnBulkheads[bulkhead][chine + 1].X, m_drawnBulkheads[bulkhead][chine + 1].Y,
+                    //            loc.X, loc.Y + mActualHeight / 2, 3))
+                    //    {
+                    //        m_SelectedBulkhead = bulkhead;
+                    //        m_handle = null;
+                    //        Draw();
+                    //        return true;
+                    //    }
+                    //}
                 }
             }
             return false;
@@ -495,48 +300,48 @@ namespace HullEdit
         }
         protected override void OnPreviewMouseUp(System.Windows.Input.MouseButtonEventArgs e)
         {
-            Point loc = e.GetPosition(this);
+            //Point loc = e.GetPosition(this);
 
-            if (m_Dragging)
-            {
-                double x, y, z;
+            //if (m_Dragging)
+            //{
+            //    double x, y, z;
 
-                if (m_rotate_x == 0 && m_rotate_y == 180 && m_rotate_z == 180)
-                {
-                    // Front
-                    x = -(m_dragStartX - loc.X) / m_scale;
-                    y = (m_dragStartY - loc.Y) / m_scale;
-                    z = 0;
-                }
-                else if (m_rotate_x == 0 && m_rotate_y == 90 && m_rotate_z == 180)
-                {
-                    // Side
-                    x = 0;
-                    y = (m_dragStartY - loc.Y) / m_scale;
-                    z = -(m_dragStartX - loc.X) / m_scale;
-                }
-                else if (m_rotate_x == 0 && m_rotate_y == 90 && m_rotate_z == 90)
-                {
-                    // Top
-                    x = -(m_dragStartY - loc.Y) / m_scale;
-                    y = 0;
-                    z = -(m_dragStartX - loc.X) / m_scale;
-                }
-                else
-                {
-                    x = 0;
-                    y = 0;
-                    z = 0;
-                }
+            //    if (m_rotate_x == 0 && m_rotate_y == 180 && m_rotate_z == 180)
+            //    {
+            //        // Front
+            //        x = -(m_dragStartX - loc.X) / m_scale;
+            //        y = (m_dragStartY - loc.Y) / m_scale;
+            //        z = 0;
+            //    }
+            //    else if (m_rotate_x == 0 && m_rotate_y == 90 && m_rotate_z == 180)
+            //    {
+            //        // Side
+            //        x = 0;
+            //        y = (m_dragStartY - loc.Y) / m_scale;
+            //        z = -(m_dragStartX - loc.X) / m_scale;
+            //    }
+            //    else if (m_rotate_x == 0 && m_rotate_y == 90 && m_rotate_z == 90)
+            //    {
+            //        // Top
+            //        x = -(m_dragStartY - loc.Y) / m_scale;
+            //        y = 0;
+            //        z = -(m_dragStartX - loc.X) / m_scale;
+            //    }
+            //    else
+            //    {
+            //        x = 0;
+            //        y = 0;
+            //        z = 0;
+            //    }
 
-                m_Hull.ShiftBulkheadPoint(SelectedBulkhead, m_DraggingHandle, x, y, z);
-                m_Dragging = false;
+            //    m_Hull.UpdateBulkheadPoint(SelectedBulkhead, m_DraggingHandle, x, y, z);
+            //    m_Dragging = false;
 
-                // Note: RotateTo reloads m_drawnBulkheads from the m_Hull
-                RotateTo(m_rotate_x, m_rotate_y, m_rotate_z);
-                Scale();
-                Draw();
-            }
+            //    // Note: RotateTo reloads m_drawnBulkheads from the m_Hull
+            //    RotateTo(m_rotate_x, m_rotate_y, m_rotate_z);
+            //    Scale();
+            //    Draw();
+            //}
         }
 
         protected override void OnPreviewMouseMove(MouseEventArgs e)
@@ -568,7 +373,7 @@ namespace HullEdit
 
                 if (m_Hull != null && m_Hull.IsValid)
                 {
-                    Scale();
+                    // FIXTHIS: Scale();
                 }
             }
             return finalSize;

@@ -1,4 +1,7 @@
 ﻿Features
+    Should HullDisplay keep a Hull, or just an array/list of bulkheads. Seems like it should be a Hull.
+	HullDisplay subclass Hull?
+
     Create a Bulkhead type that includes (BOW, VERTICAL, TRANSOM), points.
 		Hull becomes a collection of bulkheads
 

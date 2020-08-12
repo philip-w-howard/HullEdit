@@ -48,22 +48,15 @@ namespace HullEdit
             if (openFileDialog.ShowDialog() == true)
             {
                 if (myHull == null) myHull = new Hull();
-                string result = myHull.LoadFromHullFile(openFileDialog.FileName);
+                myHull.LoadFromHullFile(openFileDialog.FileName);
 
-                if (result != "")
-                    Console.WriteLine(result);
-                else
-                {
-                    //m_hullEditor = new HullEditor(myHull, 0, 0, 0, Perspective);
+                m_xAngle = 10;
+                m_yAngle = 30;
+                m_zAngle = 190;
 
-                    m_xAngle = 10;
-                    m_yAngle = 30;
-                    m_zAngle = 190;
+                UpdateDrawings();
 
-                    UpdateDrawings();
-
-                    PanelsMenu.IsEnabled = true;
-                }
+                PanelsMenu.IsEnabled = true;
             }
 
         }
@@ -77,20 +70,20 @@ namespace HullEdit
         {
             if (myHull != null && myHull.IsValid)
             {
-                FrontDisplay.RotateTo(0, 0, 180);
-                FrontDisplay.Scale();
+                //FrontDisplay.RotateTo(0, 0, 180);
+                //FrontDisplay.Scale();
                 FrontDisplay.Draw();
 
-                SideDisplay.RotateTo(0, 90, 180);
-                SideDisplay.Scale();
+                //SideDisplay.RotateTo(0, 90, 180);
+                //SideDisplay.Scale();
                 SideDisplay.Draw();
 
-                TopDisplay.RotateTo(0, 90, 90);
-                TopDisplay.Scale();
+                //TopDisplay.RotateTo(0, 90, 90);
+                //TopDisplay.Scale();
                 TopDisplay.Draw();
 
-                PerspectiveDisplay.RotateTo(m_xAngle, m_yAngle, m_zAngle);
-                PerspectiveDisplay.Scale();
+                //PerspectiveDisplay.RotateTo(m_xAngle, m_yAngle, m_zAngle);
+                //PerspectiveDisplay.Scale();
                 PerspectiveDisplay.Draw();
             }
         }
@@ -126,8 +119,8 @@ namespace HullEdit
                 m_zAngle = 180;
             }
 
-            PerspectiveDisplay.RotateTo(m_xAngle, m_yAngle, m_zAngle);
-            PerspectiveDisplay.Scale();
+            //PerspectiveDisplay.RotateTo(m_xAngle, m_yAngle, m_zAngle);
+            //PerspectiveDisplay.Scale();
             PerspectiveDisplay.IsEditable = true;
             PerspectiveDisplay.Draw();
         }
@@ -149,8 +142,8 @@ namespace HullEdit
             else if ((string)button.Content == "-Z")
                 m_zAngle -= 5;
 
-            PerspectiveDisplay.RotateTo(m_xAngle, m_yAngle, m_zAngle);
-            PerspectiveDisplay.Scale();
+            //PerspectiveDisplay.RotateTo(m_xAngle, m_yAngle, m_zAngle);
+            //PerspectiveDisplay.Scale();
 
             PerspectiveDisplay.IsEditable = false;
 
@@ -160,8 +153,8 @@ namespace HullEdit
         private void YClick(object sender, RoutedEventArgs e)
         {
             m_yAngle += 5;
-            PerspectiveDisplay.RotateTo(m_xAngle, m_yAngle, m_zAngle);
-            PerspectiveDisplay.Scale();
+            //PerspectiveDisplay.RotateTo(m_xAngle, m_yAngle, m_zAngle);
+            //PerspectiveDisplay.Scale();
 
             PerspectiveDisplay.IsEditable = false;
 
@@ -178,8 +171,8 @@ namespace HullEdit
         private void ZClick(object sender, RoutedEventArgs e)
         {
             m_zAngle += 5;
-            PerspectiveDisplay.RotateTo(m_xAngle, m_yAngle, m_zAngle);
-            PerspectiveDisplay.Scale();
+            //PerspectiveDisplay.RotateTo(m_xAngle, m_yAngle, m_zAngle);
+            //PerspectiveDisplay.Scale();
 
             PerspectiveDisplay.IsEditable = false;
 

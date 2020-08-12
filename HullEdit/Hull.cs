@@ -11,16 +11,28 @@ namespace HullEdit
 {
     public class Hull : INotifyPropertyChanged
     {
-        public enum BulkheadType { BOW, VERTICAL, TRANSOM };
+        private const int POINTS_PER_CHINE = 50;
+
         public int numBulkheads { get; private set; }
         public int numChines { get; private set; }
 
-        private Point3DCollection[] m_bulkheads;        // [bulkhead]
-        private BulkheadType[] m_bulkheadType;
+        private List<Bulkhead> m_bulkheads;
+        private List<Point3DCollection> m_chines;
+        public Bulkhead GetBulkhead(int index) { return m_bulkheads[index]; }
+        public Point3DCollection GetChine(int index) { return m_chines[index]; }
 
-        public BulkheadType GetBulkheadType(int index)
+        private bool m_IsValid;
+        public bool IsValid
         {
-            return m_bulkheadType[index];
+            get
+            {
+                if (!m_IsValid) return false;
+                foreach (Bulkhead bulk in m_bulkheads)
+                {
+                    if (!bulk.IsValid) return false;
+                }
+                return true;
+            }
         }
 
         public int HullData { get; set; }
@@ -34,14 +46,13 @@ namespace HullEdit
             }
         }
 
-        private bool m_IsValid;
-        public bool IsValid {  get { return m_IsValid; } }
-
         public Hull() { m_IsValid = false; }
 
-        public string LoadFromHullFile(string filename)
+        public void LoadFromHullFile(string filename)
         {
             m_IsValid = false;
+            m_chines = null;
+            m_bulkheads = new List<Bulkhead>();
 
             using (StreamReader file = File.OpenText(filename))
             {
@@ -49,119 +60,286 @@ namespace HullEdit
                 int num_chines = numChines;
 
                 line = file.ReadLine();
-                if (!int.TryParse(line, out num_chines)) return "Invalid file format 1";
+                if (!int.TryParse(line, out num_chines)) throw new Exception("Invalid HUL file format");
+
                 numChines = num_chines;
                 numBulkheads = 5;
-                m_bulkheads = new Point3DCollection[numBulkheads];
-                m_bulkheadType = new BulkheadType[numBulkheads];
 
-                for (int bulkhead = 0; bulkhead < numBulkheads; bulkhead++)
+                Bulkhead bulkhead = new Bulkhead();
+                bulkhead.LoadFromHullFile(file, numChines, Bulkhead.BulkheadType.BOW);
+                m_bulkheads.Add(bulkhead);
+
+                for (int ii = 1; ii < numBulkheads-1; ii++)
                 {
-                    m_bulkheads[bulkhead] = new Point3DCollection(numChines);
+                    bulkhead = new Bulkhead();
+                    bulkhead.LoadFromHullFile(file, numChines, Bulkhead.BulkheadType.VERTICAL);
+                    m_bulkheads.Add(bulkhead);
                 }
 
-                m_bulkheadType[0] = BulkheadType.BOW;
-                for (int bulkhead = 1; bulkhead < numBulkheads; bulkhead++)
-                {
-                    m_bulkheadType[bulkhead] = BulkheadType.VERTICAL;
-                }
-                m_bulkheadType[numBulkheads - 1] = BulkheadType.TRANSOM;
-
-                int index = 1;
-                for (int bulkhead = 0; bulkhead < numBulkheads; bulkhead++)
-                {
-                    for (int chine = 0; chine < numChines; chine++)
-                    {
-                        Point3D point = new Point3D();
-                        double value;
-                        line = file.ReadLine();
-                        if (!double.TryParse(line, out value))
-                            return "Invalid file format on line " + index;
-                        point.X = value;
-                        index++;
-
-                        line = file.ReadLine();
-                        if (!double.TryParse(line, out value))
-                            return "Invalid file format on line " + index;
-                        point.Y = value;
-                        index++;
-
-                        line = file.ReadLine();
-                        if (!double.TryParse(line, out value))
-                            return "Invalid file format on line " + index;
-                        point.Z = value;
-                        index++;
-
-                        m_bulkheads[bulkhead].Add(point);
-                    }
-                }
+                bulkhead = new Bulkhead();
+                bulkhead.LoadFromHullFile(file, numChines, Bulkhead.BulkheadType.TRANSOM);
+                m_bulkheads.Add(bulkhead);
             }
+            PrepareChines(POINTS_PER_CHINE);
+
             m_IsValid = true;
             HullData++;
             Notify("HullData");
-
-            return "";
         }
 
-        public Point3DCollection[] CopyBulkheads()
-        {
-            // not sure why "return m_bulkheads.Clone() does not work
-
-            Point3DCollection[] bulkheads = new Point3DCollection[numBulkheads];
-            for (int bulkhead = 0; bulkhead < numBulkheads; bulkhead++)
-            {
-                bulkheads[bulkhead] = m_bulkheads[bulkhead].Clone();
-            }
-            return bulkheads;
-
-        }
-
-        public Point3DCollection GetBulkhead(int index)
-        {
-            return m_bulkheads[index].Clone();
-        }
-
-        public Point3D GetBulkheadPoint(int bulkhead, int chine)
-        {
-            return m_bulkheads[bulkhead][chine];
-        }
-
-        //public void GetBulkheadPoints(int bulkhead, double[,] points)
+        //public List<Bulkhead> CopyBulkheads()
         //{
-        //    for (int ii=0; ii<numChines; ii++)
-        //    {
-        //        points[ii, 0] = m_drawnBulkheads[bulkhead][ii, 0];
-        //        points[ii, 1] = m_drawnBulkheads[bulkhead][ii, 1];
-        //    }
+        //    // not sure why "return m_bulkheads.Clone() does not work
+        //    List<Bulkhead> bulkheads = new List<Bulkhead>(m_bulkheads);
+        //    return bulkheads;
         //}
 
-        public void SetBulkheadPoint(int bulkhead, int chine, double x, double y, double z)
+        // Returns a list of "full" bulkheads (instead of the half bulkheads that are normally stored)
+        public Hull CopyToFullHull()
         {
-            Point3D point = new Point3D();
-            point.X = x;
-            point.Y = y;
-            point.Z = z;
+            Hull fullHull = new Hull();
+            fullHull.numBulkheads = numBulkheads;
+            fullHull.numChines = numChines;
+            fullHull.m_chines = null;
+            fullHull.m_bulkheads = new List<Bulkhead>();
 
-            m_bulkheads[bulkhead][chine] = point;
+            foreach (Bulkhead bulk in m_bulkheads)
+            {
+                fullHull.m_bulkheads.Add(bulk.CopyWithReflection());
+            }
 
+            return fullHull;
+        }
+
+        //public Bulkhead GetBulkhead(int index)
+        //{
+        //    return m_bulkheads[index].Copy();
+        //}
+
+        //public Point3D GetBulkheadPoint(int bulkhead, int chine)
+        //{
+        //    return m_bulkheads[bulkhead].GetPoint(chine);
+        //}
+
+        public void UpdateBulkheadPoint(int bulkhead, int chine, double x, double y, double z)
+        {
+            m_bulkheads[bulkhead].UpdatePoint(chine, x, y, z);
             HullData++;
             Notify("HullData");
         }
-        public void ShiftBulkheadPoint(int bulkhead, int chine, double x, double y, double z)
+
+        protected void RotateDrawing_X(double angle)
         {
-            if (m_bulkheadType[bulkhead] == BulkheadType.VERTICAL) z = 0;
-            if (m_bulkheadType[bulkhead] == BulkheadType.BOW) x = 0;
+            double[,] rotate = new double[3, 3];
 
-            Point3D point = m_bulkheads[bulkhead][chine];
+            angle = angle * Math.PI / 180.0;
 
-            point.X += x;
-            point.Y += y;
-            point.Z += z;
+            rotate[0, 0] = 1.0;
+            rotate[1, 1] = Math.Cos(angle);
+            rotate[2, 2] = Math.Cos(angle);
+            rotate[1, 2] = Math.Sin(angle);
+            rotate[2, 1] = -Math.Sin(angle);
 
-            m_bulkheads[bulkhead][chine] = point;
+            //CenterTo(0, 0, 0);
 
-            HullData++;
-            Notify("HullData");
+            UpdateWithMatrix(rotate);
+        }
+
+        protected void RotateDrawing_Y(double angle)
+        {
+            double[,] rotate = new double[3, 3];
+
+            angle = angle * Math.PI / 180.0;
+
+            rotate[1, 1] = 1.0;
+            rotate[0, 0] = Math.Cos(angle);
+            rotate[2, 2] = Math.Cos(angle);
+            rotate[2, 0] = Math.Sin(angle);
+            rotate[0, 2] = -Math.Sin(angle);
+
+            //CenterTo(0, 0, 0);
+
+            UpdateWithMatrix(rotate);
+        }
+
+        protected void RotateDrawing_Z(double angle)
+        {
+            double[,] rotate = new double[3, 3];
+
+            angle = angle * Math.PI / 180.0;
+
+            rotate[2, 2] = 1.0;
+            rotate[0, 0] = Math.Cos(angle);
+            rotate[1, 1] = Math.Cos(angle);
+            rotate[0, 1] = Math.Sin(angle);
+            rotate[1, 0] = -Math.Sin(angle);
+
+            //CenterTo(0, 0, 0);
+
+            UpdateWithMatrix(rotate);
+
+        }
+
+        private void UpdateWithMatrix(double [,] matrix)
+        {
+            for (int ii = 0; ii < numBulkheads; ii++)
+            {
+                m_bulkheads[ii].UpdateWithMatrix(matrix);
+            }
+
+            if (m_chines != null)
+            {
+                for (int ii = 0; ii < numChines * 2; ii++)
+                {
+                    Point3DCollection newChine;
+                    Matrix.Multiply(m_chines[ii], matrix, out newChine);
+                    m_chines[ii] = newChine;
+                }
+            }
+        }
+        public void Rotate(double x, double y, double z)
+        {
+            // NOTE: Could optimize by multiplying the three rotation matrices before rotating the points
+            RotateDrawing_Z(z);
+            RotateDrawing_X(x);
+            RotateDrawing_Y(y);
+        }
+
+        public Size3D GetSize()
+        {
+            double min_x = double.MaxValue;
+            double min_y = double.MaxValue;
+            double min_z = double.MaxValue;
+            double max_x = double.MinValue;
+            double max_y = double.MinValue;
+            double max_z = double.MinValue;
+
+            foreach (Bulkhead bulk in m_bulkheads)
+            {
+                for (int ii = 0; ii < bulk.Count; ii++)
+                {
+                    Point3D point = bulk.GetPoint(ii);
+                    max_x = Math.Max(max_x, point.X);
+                    max_y = Math.Max(max_y, point.Y);
+                    max_z = Math.Max(max_z, point.Z);
+
+                    min_x = Math.Min(min_x, point.X);
+                    min_y = Math.Min(min_y, point.Y);
+                    min_z = Math.Min(min_z, point.Z);
+                }
+
+            }
+
+            if (m_chines != null)
+            {
+                foreach (Point3DCollection chine in m_chines)
+                {
+                    foreach (Point3D point in chine)
+                    {
+                        max_x = Math.Max(max_x, point.X);
+                        max_y = Math.Max(max_y, point.Y);
+                        max_z = Math.Max(max_z, point.Z);
+
+                        min_x = Math.Min(min_x, point.X);
+                        min_y = Math.Min(min_y, point.Y);
+                        min_z = Math.Min(min_z, point.Z);
+                    }
+                }
+            }
+
+            return new Size3D(max_x - min_x, max_y - min_y, max_z - min_z);
+        }
+
+        protected Point3D GetMin()
+        {
+            double min_x = double.MaxValue;
+            double min_y = double.MaxValue;
+            double min_z = double.MaxValue;
+
+            foreach (Bulkhead bulk in m_bulkheads)
+            {
+                for (int ii = 0; ii < bulk.Count; ii++)
+                {
+                    Point3D point = bulk.GetPoint(ii);
+                    min_x = Math.Min(min_x, point.X);
+                    min_y = Math.Min(min_y, point.Y);
+                    min_z = Math.Min(min_z, point.Z);
+                }
+
+            }
+
+            if (m_chines != null)
+            {
+                foreach (Point3DCollection chine in m_chines)
+                {
+                    foreach (Point3D point in chine)
+                    {
+                        min_x = Math.Min(min_x, point.X);
+                        min_y = Math.Min(min_y, point.Y);
+                        min_z = Math.Min(min_z, point.Z);
+                    }
+                }
+            }
+
+            return new Point3D(min_x, min_y, min_z);
+        }
+
+        private void RepositionToZero()
+        {
+            Point3D zero = GetMin();
+
+            Vector3D zeroVect = new Vector3D(-zero.X, -zero.Y, -zero.Z);
+
+            foreach (Bulkhead bulk in m_bulkheads)
+            {
+                bulk.ShiftTo(zeroVect);
+            }
+
+            if (m_chines != null)
+            {
+                for (int ii=0; ii<m_chines.Count; ii++)
+                {
+                    Point3DCollection newChine = new Point3DCollection(m_chines.Count);
+                    foreach (Point3D point in m_chines[ii])
+                    {
+                        newChine.Add(point + zeroVect);
+                    }
+
+                    m_chines[ii] = newChine;
+                }
+            }
+        }
+
+        public void PrepareChines(int points_per_chine)
+        {
+            int nChines = m_bulkheads[0].Count;
+
+            m_chines = new List<Point3DCollection>();
+
+            for (int chine = 0; chine < nChines; chine++)
+            {
+                Point3DCollection newChine = new Point3DCollection(points_per_chine);
+                Point3DCollection chine_data = new Point3DCollection(m_bulkheads.Count);
+
+                for (int bulkhead = 0; bulkhead < m_bulkheads.Count; bulkhead++)
+                {
+                    chine_data.Add(m_bulkheads[bulkhead].GetPoint(chine));
+                }
+                Splines spline = new Splines(chine_data, Splines.RELAXED);
+                spline.GetPoints(points_per_chine, newChine);
+                m_chines.Add(newChine);
+            }
+        }
+
+        public void Scale(double x, double y, double z)
+        {
+            double[,] scale = new double[3, 3];
+
+            scale[0, 0] = x;
+            scale[1, 1] = y;
+            scale[2, 2] = z;
+
+            UpdateWithMatrix(scale);
         }
     }
 }

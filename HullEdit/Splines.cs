@@ -13,15 +13,15 @@ namespace HullEdit
         public const int RELAXED = 1;
         public const int CLAMPED = 2;
 
-        public Splines(int numPoints, int endCondition, Point3DCollection points)
+        public Splines(Point3DCollection points, int endCondition)
         {
-            m_numPoints = numPoints;
+            m_numPoints = points.Count;
             m_endCondition = endCondition;
             m_points = points;
 
-            m_m_matrix = new double[numPoints, numPoints];
-            m_b_matrix = new double[numPoints, 3];
-            m_chordLength = new double[numPoints - 1];
+            m_m_matrix = new double[m_numPoints, m_numPoints];
+            m_b_matrix = new double[m_numPoints, 3];
+            m_chordLength = new double[m_numPoints - 1];
 
             //********************************************
             ComputeChords();

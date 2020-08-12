@@ -229,7 +229,7 @@ namespace HullEdit
                 {
                     chine_data.Add(bulkheads[bulkhead][chine]);
                 }
-                Splines spline = new Splines(bulkheads.Length, Splines.RELAXED, chine_data);
+                Splines spline = new Splines(chine_data, Splines.RELAXED);
                 spline.GetPoints(points_per_chine, chines[chine]);
             }
 
