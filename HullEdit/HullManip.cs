@@ -75,7 +75,7 @@ namespace HullEdit
             InvalidateVisual();
         }
 
-        protected override void OnPreviewMouseDown(System.Windows.Input.MouseButtonEventArgs e)
+        protected override void OnPreviewMouseDown(MouseButtonEventArgs e)
         {
             UIElement content = (UIElement)this.Content;
             Point loc = e.GetPosition(content);
@@ -104,9 +104,10 @@ namespace HullEdit
                 e.Handled = true;
             }
         }
-        protected override void OnPreviewMouseUp(System.Windows.Input.MouseButtonEventArgs e)
+        protected override void OnPreviewMouseUp(MouseButtonEventArgs e)
         {
-            Point loc = e.GetPosition(this);
+            UIElement content = (UIElement)this.Content;
+            Point loc = e.GetPosition(content);
 
             if (m_Dragging)
             {
@@ -152,16 +153,19 @@ namespace HullEdit
 
         protected override void OnPreviewMouseMove(MouseEventArgs e)
         {
-            if (m_Dragging)
+            if (e.LeftButton == MouseButtonState.Pressed)
             {
-                // FIXTHIS: update location in HullDisplay
-                //Point loc = e.GetPosition(this);
-                //m_handle[m_DraggingHandle].X = loc.X - RECT_SIZE / 2;
-                //m_handle[m_DraggingHandle].Y = loc.Y - RECT_SIZE / 2;
+                UIElement content = (UIElement)this.Content;
+                Point loc = e.GetPosition(content);
 
-                //Draw();
+                if (m_Dragging)
+                {
+                    Debug.WriteLine("MouseMove {0} ({1})", m_DraggingHandle, loc);
+
+                    m_HullDisplay.MoveHandle(m_DraggingHandle, loc);
+                    Draw();
+                }
             }
-
         }
 
     }

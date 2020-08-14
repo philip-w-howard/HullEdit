@@ -94,7 +94,7 @@ namespace HullEdit
             if (m_SelectedBulkhead >= 0)
             {
                 // If necessary, create new handles for current SelectedBulkhead
-                if (m_SelectedBulkhead >= 0)
+                if (m_handles == null)
                 {
                     m_handles = new List<Rect>();
 
@@ -117,6 +117,16 @@ namespace HullEdit
             }
         }
 
+        public void MoveHandle(int index, Point loc)
+        {
+            Debug.WriteLine("HullDisplay.MoveHandle {0} from ({1}) to ({2})", index, m_handles[index].Location, loc);
+            Rect rect = m_handles[index];
+            rect.Location = loc;
+
+
+            m_handles[index] = rect;
+            Draw();
+        }
         public void Rotate(double x, double y, double z)
         {
             m_Hull.Rotate(x, y, z);
