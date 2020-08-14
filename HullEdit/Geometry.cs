@@ -130,6 +130,46 @@ namespace HullEdit
             }
         }
 
+        public static double[,] CreateRotateMatrix(double x, double y, double z)
+        {
+            double angle;
+            double[,] rotate_all, rotate_1;
+            rotate_all = new double[3, 3];
+            
+            // order is: Z, X, Y
+
+            angle = z * Math.PI / 180.0;
+
+            rotate_all[2, 2] = 1.0;
+            rotate_all[0, 0] = Math.Cos(angle);
+            rotate_all[1, 1] = Math.Cos(angle);
+            rotate_all[0, 1] = Math.Sin(angle);
+            rotate_all[1, 0] = -Math.Sin(angle);
+
+            angle = x * Math.PI / 180.0;
+
+            rotate_1 = new double[3, 3];
+            rotate_1[0, 0] = 1.0;
+            rotate_1[1, 1] = Math.Cos(angle);
+            rotate_1[2, 2] = Math.Cos(angle);
+            rotate_1[1, 2] = Math.Sin(angle);
+            rotate_1[2, 1] = -Math.Sin(angle);
+
+            Matrix.Multiply(rotate_all, rotate_1, out rotate_all);
+
+            angle = y * Math.PI / 180.0;
+
+            rotate_1 = new double[3, 3];
+            rotate_1[1, 1] = 1.0;
+            rotate_1[0, 0] = Math.Cos(angle);
+            rotate_1[2, 2] = Math.Cos(angle);
+            rotate_1[2, 0] = Math.Sin(angle);
+            rotate_1[0, 2] = -Math.Sin(angle);
+
+            Matrix.Multiply(rotate_all, rotate_1, out rotate_all);
+
+            return rotate_all;
+        }
         static public void ComputeSize(Point3DCollection points, out double size_x, out double size_y)
         {
             size_x = Double.NaN;

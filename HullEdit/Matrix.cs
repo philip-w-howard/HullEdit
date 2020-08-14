@@ -47,6 +47,21 @@ namespace HullEdit
 
             returnMatrix = result;
         }
+        public static void Multiply(List<Rect> left, double[,] right, out List<Rect> returnMatrix)
+        {
+            List<Rect> result = new List<Rect>(left.Count);   // temp array so we can compute in place
+
+            foreach (Rect rect in left)
+            {
+                Point point = new Point() ;
+                point.X = rect.Location.X * right[0, 0] + rect.Location.Y * right[1, 0];
+                point.Y = rect.Location.X * right[0, 1] + rect.Location.Y * right[1, 1];
+
+                result.Add(new Rect(point, rect.Size));
+            }
+
+            returnMatrix = result;
+        }
 
         public static void Multiply(PointCollection left, double[,] right, out PointCollection returnMatrix)
         {

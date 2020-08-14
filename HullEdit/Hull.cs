@@ -169,55 +169,6 @@ namespace HullEdit
             Notify("HullData");
         }
 
-        protected void RotateDrawing_X(double angle)
-        {
-            double[,] rotate = new double[3, 3];
-
-            angle = angle * Math.PI / 180.0;
-
-            rotate[0, 0] = 1.0;
-            rotate[1, 1] = Math.Cos(angle);
-            rotate[2, 2] = Math.Cos(angle);
-            rotate[1, 2] = Math.Sin(angle);
-            rotate[2, 1] = -Math.Sin(angle);
-
-            //CenterTo(0, 0, 0);
-
-            UpdateWithMatrix(rotate);
-        }
-
-        protected void RotateDrawing_Y(double angle)
-        {
-            double[,] rotate = new double[3, 3];
-
-            angle = angle * Math.PI / 180.0;
-
-            rotate[1, 1] = 1.0;
-            rotate[0, 0] = Math.Cos(angle);
-            rotate[2, 2] = Math.Cos(angle);
-            rotate[2, 0] = Math.Sin(angle);
-            rotate[0, 2] = -Math.Sin(angle);
-
-            //CenterTo(0, 0, 0);
-
-            UpdateWithMatrix(rotate);
-        }
-
-        protected void RotateDrawing_Z(double angle)
-        {
-            double[,] rotate = new double[3, 3];
-
-            angle = angle * Math.PI / 180.0;
-
-            rotate[2, 2] = 1.0;
-            rotate[0, 0] = Math.Cos(angle);
-            rotate[1, 1] = Math.Cos(angle);
-            rotate[0, 1] = Math.Sin(angle);
-            rotate[1, 0] = -Math.Sin(angle);
-
-            UpdateWithMatrix(rotate);
-        }
-
         private void UpdateWithMatrix(double [,] matrix)
         {
             for (int ii = 0; ii < numBulkheads; ii++)
@@ -237,10 +188,10 @@ namespace HullEdit
         }
         public void Rotate(double x, double y, double z)
         {
-            // NOTE: Could optimize by multiplying the three rotation matrices before rotating the points
-            RotateDrawing_Z(z);
-            RotateDrawing_X(x);
-            RotateDrawing_Y(y);
+            double[,] rotate;
+
+            rotate = Geometry.CreateRotateMatrix(x, y, z);
+            UpdateWithMatrix(rotate);
 
             RepositionToZero();
         }

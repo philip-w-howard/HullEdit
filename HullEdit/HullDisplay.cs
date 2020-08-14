@@ -15,11 +15,21 @@ namespace HullEdit
     public class HullDisplay : System.Windows.Controls.Control
     {
         private const int POINTS_PER_CHINE = 50;
+        private const int HANDLE_SIZE = 5;
+        private int m_SelectedBulkhead;
+        public static int NOT_SELECTED = -1;
+
+        public int SelectedBulkhead
+        {
+            get { return m_SelectedBulkhead; }
+            set { m_SelectedBulkhead = value; m_handles = null; }
+        }
 
         private double m_scale = 1;
 
         private Hull m_Hull;
         public Hull hull{ get { return m_Hull; } }
+        private List<Rect> m_handles;
 
         public int numChines { get { return m_Hull.numChines; } }
         public int numBulkheads { get { return m_Hull.numBulkheads; } }
@@ -27,6 +37,7 @@ namespace HullEdit
         public HullDisplay()
         {
             m_scale = 1;
+            m_SelectedBulkhead = NOT_SELECTED;
         }
 
         public void SetHull(Hull hull)
@@ -40,7 +51,7 @@ namespace HullEdit
         {
             if (m_Hull == null || !m_Hull.IsValid) return;
 
-            Debug.WriteLine("OnRender");
+            Debug.WriteLine("HullDisplay.OnRender");
 
             Rect background = new Rect(new Point(0, 0), new Point(ActualWidth, ActualHeight));
             drawingContext.DrawRectangle(new SolidColorBrush(Colors.White), null, background);
@@ -74,11 +85,47 @@ namespace HullEdit
                     drawingContext.DrawLine(pen, p1, p2);
                 }
             }
+
+            DrawHandles(drawingContext);
+        }
+
+        private void DrawHandles(DrawingContext drawingContext)
+        {
+            if (m_SelectedBulkhead >= 0)
+            {
+                // If necessary, create new handles for current SelectedBulkhead
+                if (m_SelectedBulkhead >= 0)
+                {
+                    m_handles = new List<Rect>();
+
+                    for (int ii = 0; ii < m_Hull.numChines; ii++)
+                    {
+                        Rect rect = new Rect();
+                        rect.Height = HANDLE_SIZE;
+                        rect.Width = HANDLE_SIZE;
+                        rect.X = m_Hull.GetBulkhead(m_SelectedBulkhead).GetPoint(ii).X - HANDLE_SIZE / 2;
+                        rect.Y = m_Hull.GetBulkhead(m_SelectedBulkhead).GetPoint(ii).Y - HANDLE_SIZE / 2;
+                        m_handles.Add(rect);
+                    }
+                }
+
+                // Draw handles
+                foreach (Rect rect in m_handles)
+                {
+                    drawingContext.DrawRectangle(new SolidColorBrush(Colors.White), new Pen(new SolidColorBrush(Colors.Red), 1), rect);
+                }
+            }
         }
 
         public void Rotate(double x, double y, double z)
         {
             m_Hull.Rotate(x, y, z);
+
+            if (m_handles != null)
+            {
+                double[,] rotate = Geometry.CreateRotateMatrix(x, y, z);
+                Matrix.Multiply(m_handles, rotate, out m_handles);
+            }
             InvalidateVisual();
         }
 
@@ -103,6 +150,21 @@ namespace HullEdit
             m_scale *= new_scale;
 
             m_Hull.Scale(new_scale, new_scale, new_scale);
+
+            if (m_handles != null)
+            {
+                List<Rect> newHandles = new List<Rect>();
+                foreach (Rect rect in m_handles)
+                {
+                    Point p = new Point();
+                    p.X = rect.Location.X * new_scale;
+                    p.Y = rect.Location.Y * new_scale;
+
+                    newHandles.Add(new Rect(p, rect.Size));
+                }
+
+                m_handles = newHandles;
+            }
         }
 
 
@@ -111,27 +173,25 @@ namespace HullEdit
             InvalidateVisual();
         }
 
-        //protected bool ClickedHandle(Point loc)
-        //{
-        //    if (m_handle == null || m_handle[0] == null) return false;
+        public bool ClickedHandle(Point loc, out int handleIndex)
+        {
+            handleIndex = 0;
 
-        //    for (int ii = 0; ii < m_handle.Length; ii++)
-        //    {
-        //        if (m_handle[ii].X <= loc.X && m_handle[ii].X + m_handle[ii].Width >= loc.X &&
-        //            m_handle[ii].Y <= loc.Y && m_handle[ii].Y + m_handle[ii].Height >= loc.Y)
-        //        {
-        //            m_DraggingHandle = ii;
-        //            m_Dragging = true;
-        //            m_dragStartX = loc.X;
-        //            m_dragStartY = loc.Y;
+            if (m_handles == null || m_handles[0] == null) return false;
 
-        //            //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-        //            return true;
-        //        }
-        //    }
+            foreach (Rect rect in m_handles)
+            {
+                if (rect.X <= loc.X && rect.X + rect.Width >= loc.X &&
+                    rect.Y <= loc.Y && rect.Y + rect.Height >= loc.Y)
+                {
+                    //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                    return true;
+                }
+                handleIndex++;
+            }
 
-        //    return false;
-        //}
+            return false;
+        }
 
         public bool NearBulkhead(Point loc, double margin, out int selectedBulkhead)
         {
@@ -152,85 +212,6 @@ namespace HullEdit
             }
             return false;
         }
-        //protected override void OnPreviewMouseDown(System.Windows.Input.MouseButtonEventArgs e)
-        //{
-        //    Point loc = e.GetPosition(this);
-
-        //    if (IsEditable)
-        //    {
-        //        if (ClickedHandle(loc))
-        //        {
-        //            Debug.WriteLine("Clicked handle");
-        //        }
-        //        else if (ClickedBulkhead(loc))
-        //        {
-        //            Debug.WriteLine("Clicked bulkhead");
-        //        }
-        //        else
-        //        {
-        //            Debug.WriteLine("Clicked nothing");
-        //        }
-        //        e.Handled = true;
-        //    }
-        //}
-        //protected override void OnPreviewMouseUp(System.Windows.Input.MouseButtonEventArgs e)
-        //{
-        //    //Point loc = e.GetPosition(this);
-
-        //    //if (m_Dragging)
-        //    //{
-        //    //    double x, y, z;
-
-        //    //    if (m_rotate_x == 0 && m_rotate_y == 180 && m_rotate_z == 180)
-        //    //    {
-        //    //        // Front
-        //    //        x = -(m_dragStartX - loc.X) / m_scale;
-        //    //        y = (m_dragStartY - loc.Y) / m_scale;
-        //    //        z = 0;
-        //    //    }
-        //    //    else if (m_rotate_x == 0 && m_rotate_y == 90 && m_rotate_z == 180)
-        //    //    {
-        //    //        // Side
-        //    //        x = 0;
-        //    //        y = (m_dragStartY - loc.Y) / m_scale;
-        //    //        z = -(m_dragStartX - loc.X) / m_scale;
-        //    //    }
-        //    //    else if (m_rotate_x == 0 && m_rotate_y == 90 && m_rotate_z == 90)
-        //    //    {
-        //    //        // Top
-        //    //        x = -(m_dragStartY - loc.Y) / m_scale;
-        //    //        y = 0;
-        //    //        z = -(m_dragStartX - loc.X) / m_scale;
-        //    //    }
-        //    //    else
-        //    //    {
-        //    //        x = 0;
-        //    //        y = 0;
-        //    //        z = 0;
-        //    //    }
-
-        //    //    m_Hull.UpdateBulkheadPoint(SelectedBulkhead, m_DraggingHandle, x, y, z);
-        //    //    m_Dragging = false;
-
-        //    //    // Note: RotateTo reloads m_drawnBulkheads from the m_Hull
-        //    //    RotateTo(m_rotate_x, m_rotate_y, m_rotate_z);
-        //    //    Scale();
-        //    //    Draw();
-        //    //}
-        //}
-
-        //protected override void OnPreviewMouseMove(MouseEventArgs e)
-        //{
-        //    if (m_Dragging)
-        //    {
-        //        Point loc = e.GetPosition(this);
-        //        m_handle[m_DraggingHandle].X = loc.X - RECT_SIZE / 2;
-        //        m_handle[m_DraggingHandle].Y = loc.Y - RECT_SIZE / 2;
-
-        //        Draw();
-        //    }
-
-        //}
 
         protected override Size MeasureOverride(Size availableSize)
         {
