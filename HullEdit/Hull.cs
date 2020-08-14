@@ -131,8 +131,21 @@ namespace HullEdit
                 copy.numBulkheads = numBulkheads;
                 copy.numChines = numChines;
                 copy.m_chines = null;
-                copy.m_bulkheads = new List<Bulkhead>(m_bulkheads);
+
+                // need to manually make a deep copy
+                copy.m_bulkheads = new List<Bulkhead>();
+                foreach (Bulkhead bulk in m_bulkheads)
+                {
+                    copy.m_bulkheads.Add(bulk.Copy());
+                }
+
+                // need to manually make a deep copy
                 copy.m_chines = new List<Point3DCollection>(m_chines);
+                foreach (Point3DCollection chine in m_chines)
+                {
+                    copy.m_chines.Add(chine.Clone());
+                }
+
                 copy.m_IsValid = true;
                 copy.RepositionToZero();
             }

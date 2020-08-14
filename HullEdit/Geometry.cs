@@ -73,6 +73,63 @@ namespace HullEdit
             return 0;
         }
 
+        // Determine if the point (p3_x,p3_y) is near the line defined by (p1_x, p1_y) and (p2_x, p2_y)
+        static public bool IsNearLine(double p1_x, double p1_y, double p2_x, double p2_y, double p3_x, double p3_y, double delta)
+        {
+            if (p1_x == p2_x) // vertical line
+            {
+                // is point along segment?
+                if ((p1_y <= p3_y && p2_y >= p3_y) || (p1_y >= p3_y && p2_y <= p3_y))
+                {
+                    if (Math.Abs(p1_x - p3_x) <= delta) return true;
+                }
+
+                return false;
+            }
+            else if (p1_y == p2_y) // horizontal line
+            {
+                // is point along segment?
+                if ((p1_x <= p3_x && p2_x >= p3_x) || (p1_x >= p3_x && p2_x <= p3_x))
+                {
+                    if (Math.Abs(p1_y - p3_y) <= delta) return true;
+                }
+
+                return false;
+            }
+            else // sloped line
+            {
+                double m1, m2;
+                double b1, b2;
+                double x, y;
+
+                // compute slope between first two points:
+                m1 = (p2_y - p1_y) / (p2_x - p1_x);
+
+                // y intercept for first line
+                b1 = -m1 * p1_x + p1_y;
+
+                // compute slope of second (perpendicular) line
+                m2 = -1 / m1;
+
+                // y intercept for second (perpendicular) line
+                b2 = -m2 * p3_x + p3_y;
+
+                // Itersection of the two lines
+                x = (b2 - b1) / (m1 - m2);
+                y = m1 * x + b1;
+
+                // is the intersection NOT within the line segment?
+                if ((x <= p1_x && x <= p2_x) || (x >= p1_x && x >= p2_x)) return false;
+                if ((y <= p1_y && y <= p2_y) || (y >= p1_y && y >= p2_y)) return false;
+
+                // Is the intersection within delta of the point?
+                double distance = Math.Sqrt((x - p3_x) * (x - p3_x) + (y - p3_y) * (y - p3_y));
+                if (distance <= delta) return true;
+
+                return false;
+            }
+        }
+
         static public void ComputeSize(Point3DCollection points, out double size_x, out double size_y)
         {
             size_x = Double.NaN;
@@ -215,25 +272,5 @@ namespace HullEdit
             }
         }
 
-        public static Point3DCollection[] PrepareChines(Point3DCollection[] bulkheads, int points_per_chine)
-        {
-            int nChines = bulkheads[0].Count;
-
-            Point3DCollection[] chines = new Point3DCollection[nChines];
-            Point3DCollection chine_data = new Point3DCollection(bulkheads.Length);
-            for (int chine = 0; chine < nChines; chine++)
-            {
-                chines[chine] = new Point3DCollection(points_per_chine);
-                chine_data.Clear();
-                for (int bulkhead = 0; bulkhead < bulkheads.Length; bulkhead++)
-                {
-                    chine_data.Add(bulkheads[bulkhead][chine]);
-                }
-                Splines spline = new Splines(chine_data, Splines.RELAXED);
-                spline.GetPoints(points_per_chine, chines[chine]);
-            }
-
-            return chines;
-        }
     }
 }

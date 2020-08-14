@@ -24,17 +24,26 @@ namespace HullEdit
     public partial class MainWindow : Window
     {
         private Hull myHull;
-        private double m_xAngle, m_yAngle, m_zAngle;
-
         public MainWindow()
         {
             InitializeComponent();
             myHull = new Hull();
 
             FrontDisplay.SetHull(myHull);
+            FrontManip.SetHull(myHull);
+            FrontManip.SetHullDisplay(FrontDisplay);
+
             TopDisplay.SetHull(myHull);
+            TopManip.SetHull(myHull);
+            TopManip.SetHullDisplay(TopDisplay);
+
             SideDisplay.SetHull(myHull);
+            SideManip.SetHull(myHull);
+            SideManip.SetHullDisplay(SideDisplay);
+
             PerspectiveDisplay.SetHull(myHull);
+            PerspectiveManip.SetHull(myHull);
+            PerspectiveManip.SetHullDisplay(PerspectiveDisplay);
 
             myHull.PropertyChanged += hull_PropertyChanged;
         }
@@ -54,22 +63,22 @@ namespace HullEdit
                 Hull displayHull = myHull.CopyToFullHull();
                 displayHull.Rotate(0, 0, 180);
                 FrontDisplay.SetHull(displayHull);
-                FrontDisplay.Draw();
+                FrontManip.Draw();
 
                 displayHull = myHull.CopyToFullHull();
                 displayHull.Rotate(0, 90, 180);
                 SideDisplay.SetHull(displayHull);
-                SideDisplay.Draw();
+                SideManip.Draw();
 
                 displayHull = myHull.CopyToFullHull();
                 displayHull.Rotate(0, 90, 90);
                 TopDisplay.SetHull(displayHull);
-                TopDisplay.Draw();
+                TopManip.Draw();
 
                 displayHull = myHull.CopyToFullHull();
                 displayHull.Rotate(10, 30, 190);
                 PerspectiveDisplay.SetHull(displayHull);
-                PerspectiveDisplay.Draw();
+                PerspectiveManip.Draw();
 
                 PanelsMenu.IsEnabled = true;
             }
@@ -87,43 +96,46 @@ namespace HullEdit
             {
                 //FrontDisplay.RotateTo(0, 0, 180);
                 //FrontDisplay.Scale();
-                FrontDisplay.Draw();
+                FrontManip.Draw();
 
                 //SideDisplay.RotateTo(0, 90, 180);
                 //SideDisplay.Scale();
-                SideDisplay.Draw();
+                SideManip.Draw();
 
                 //TopDisplay.RotateTo(0, 90, 90);
                 //TopDisplay.Scale();
-                TopDisplay.Draw();
+                TopManip.Draw();
 
                 //PerspectiveDisplay.RotateTo(m_xAngle, m_yAngle, m_zAngle);
                 //PerspectiveDisplay.Scale();
-                PerspectiveDisplay.Draw();
+                PerspectiveManip.Draw();
             }
         }
 
         private void HullMouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            PerspectiveDisplay.IsEditable = false;
+            PerspectiveManip.IsEditable = false;
 
             Debug.WriteLine("HullMouseDown");
 
-            if (sender == FrontDisplay)
+            if (sender == FrontManip)
             {
                 PerspectiveDisplay.SetHull(FrontDisplay.hull.Copy());
+                PerspectiveManip.perspective = HullManip.PerspectiveType.FRONT;
             }
-            else if (sender == TopDisplay)
+            else if (sender == TopManip)
             {
                 PerspectiveDisplay.SetHull(TopDisplay.hull.Copy());
+                PerspectiveManip.perspective = HullManip.PerspectiveType.TOP;
             }
-            else if (sender == SideDisplay)
+            else if (sender == SideManip)
             {
                 PerspectiveDisplay.SetHull(SideDisplay.hull.Copy());
+                PerspectiveManip.perspective = HullManip.PerspectiveType.SIDE;
             }
 
-            PerspectiveDisplay.IsEditable = true;
-            PerspectiveDisplay.Draw();
+            PerspectiveManip.IsEditable = true;
+            PerspectiveManip.Draw();
         }
 
         private void RotateClick(object sender, RoutedEventArgs e)
@@ -131,21 +143,19 @@ namespace HullEdit
             Button button = (Button)sender;
 
             if ((string)button.Content == "+X")
-                PerspectiveDisplay.hull.Rotate(5, 0, 0);
+                PerspectiveManip.Rotate(5, 0, 0);
             else if ((string)button.Content == "-X")
-                PerspectiveDisplay.hull.Rotate(-5, 0, 0);
+                PerspectiveManip.Rotate(-5, 0, 0);
             else if ((string)button.Content == "+Y")
-                PerspectiveDisplay.hull.Rotate(0, 5, 0);
+                PerspectiveManip.Rotate(0, 5, 0);
             else if ((string)button.Content == "-Y")
-                PerspectiveDisplay.hull.Rotate(0, -5, 0);
+                PerspectiveManip.Rotate(0, -5, 0);
             else if ((string)button.Content == "+Z")
-                PerspectiveDisplay.hull.Rotate(0, 0, 5);
+                PerspectiveManip.Rotate(0, 0, 5);
             else if ((string)button.Content == "-Z")
-                PerspectiveDisplay.hull.Rotate(0, 0, -5);
+                PerspectiveManip.Rotate(0, 0, -5);
 
-            PerspectiveDisplay.IsEditable = false;
-
-            PerspectiveDisplay.Draw();
+            PerspectiveManip.Draw();
         }
 
         private void PanelsClick(object sender, RoutedEventArgs e)
