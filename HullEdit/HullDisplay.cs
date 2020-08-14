@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
@@ -12,7 +14,7 @@ using System.Windows.Shapes;
 
 namespace HullEdit
 {
-    public class HullDisplay : System.Windows.Controls.Control
+    public class HullDisplay : Control, INotifyPropertyChanged
     {
         private const int POINTS_PER_CHINE = 50;
         private const int HANDLE_SIZE = 5;
@@ -26,10 +28,20 @@ namespace HullEdit
         }
 
         private double m_scale = 1;
+        public double Scale {  get { return m_scale; } }
 
         private Hull m_Hull;
         public Hull hull{ get { return m_Hull; } }
         private List<Rect> m_handles;
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        void Notify(string propName)
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(propName));
+            }
+        }
 
         public int numChines { get { return m_Hull.numChines; } }
         public int numBulkheads { get { return m_Hull.numBulkheads; } }
@@ -50,8 +62,6 @@ namespace HullEdit
         protected override void OnRender(DrawingContext drawingContext)
         {
             if (m_Hull == null || !m_Hull.IsValid) return;
-
-            Debug.WriteLine("HullDisplay.OnRender");
 
             Rect background = new Rect(new Point(0, 0), new Point(ActualWidth, ActualHeight));
             drawingContext.DrawRectangle(new SolidColorBrush(Colors.White), null, background);
@@ -119,7 +129,6 @@ namespace HullEdit
 
         public void MoveHandle(int index, Point loc)
         {
-            Debug.WriteLine("HullDisplay.MoveHandle {0} from ({1}) to ({2})", index, m_handles[index].Location, loc);
             Rect rect = m_handles[index];
             rect.Location = loc;
 
@@ -145,7 +154,7 @@ namespace HullEdit
 
             return new Size(hullSize.X, hullSize.Y);
         }
-        protected void Scale(Size size)
+        protected void Rescale(Size size)
         {
             Size3D hullSize = m_Hull.GetSize();
 
@@ -154,8 +163,6 @@ namespace HullEdit
             double scale2 = size.Height / hullSize.Y;
 
             double new_scale = 0.9 * Math.Min(scale1, scale2);
-
-            Debug.WriteLine("Scale: {0}", new_scale);
 
             m_scale *= new_scale;
 
@@ -225,11 +232,9 @@ namespace HullEdit
 
         protected override Size MeasureOverride(Size availableSize)
         {
-            Debug.WriteLine("HullDisplay.MeasureOverride {0} {1}", availableSize.Width, availableSize.Height);
-
             if (m_Hull.IsValid)
             {
-                Scale(availableSize);
+                Rescale(availableSize);
                 return availableSize;
             }
             else
@@ -239,11 +244,9 @@ namespace HullEdit
         }
         protected override Size ArrangeOverride(Size finalSize)
         {
-            Debug.WriteLine("HullDisplay.ArrangeOverride {0} {1}", finalSize.Width, finalSize.Height);
-
             if (m_Hull != null && m_Hull.IsValid)
             {
-                Scale(finalSize);
+                Rescale(finalSize);
                 return size2d();
             }
             else

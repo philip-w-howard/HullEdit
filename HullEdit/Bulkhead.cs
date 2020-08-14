@@ -94,6 +94,21 @@ namespace HullEdit
             Notify("Bulkhead");
         }
 
+        public void UpdateMirroredPoint(int chine, double x, double y, double z)
+        {
+            if (chine >= m_points.Count)
+            {
+                chine = chine - m_points.Count;
+                x = -x;
+            }
+            else
+            {
+                chine = (m_points.Count -1) - chine;
+            }
+
+            UpdatePoint(chine, x, y, z);
+        }
+
         public void ShiftTo(Vector3D zero)
         {
             for (int ii=0; ii<m_points.Count; ii++)

@@ -166,7 +166,14 @@ namespace HullEdit
         {
             m_bulkheads[bulkhead].UpdatePoint(chine, x, y, z);
             HullData++;
-            Notify("HullData");
+            Notify("BulkheadData");
+        }
+
+        public void UpdateMirroredBulkheadPoint(int bulkhead, int chine, double x, double y, double z)
+        {
+            m_bulkheads[bulkhead].UpdateMirroredPoint(chine, x, y, z);
+            HullData++;
+            Notify("BulkheadData");
         }
 
         private void UpdateWithMatrix(double [,] matrix)

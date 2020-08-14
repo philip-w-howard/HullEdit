@@ -48,6 +48,50 @@ namespace HullEdit
             myHull.PropertyChanged += hull_PropertyChanged;
         }
 
+        private void UpdateDisplays()
+        {
+            Hull displayHull = myHull.CopyToFullHull();
+            displayHull.Rotate(0, 0, 180);
+            FrontDisplay.SetHull(displayHull);
+            FrontManip.Draw();
+
+            displayHull = myHull.CopyToFullHull();
+            displayHull.Rotate(0, 90, 180);
+            SideDisplay.SetHull(displayHull);
+            SideManip.Draw();
+
+            displayHull = myHull.CopyToFullHull();
+            displayHull.Rotate(0, 90, 90);
+            TopDisplay.SetHull(displayHull);
+            TopManip.Draw();
+
+            if (PerspectiveManip.perspective == HullManip.PerspectiveType.FRONT)
+            {
+                PerspectiveDisplay.SetHull(FrontDisplay.hull.Copy());
+                PerspectiveManip.perspective = HullManip.PerspectiveType.FRONT;
+                PerspectiveManip.IsEditable = true;
+            }
+            else if (PerspectiveManip.perspective == HullManip.PerspectiveType.TOP)
+            {
+                PerspectiveDisplay.SetHull(TopDisplay.hull.Copy());
+                PerspectiveManip.perspective = HullManip.PerspectiveType.TOP;
+                PerspectiveManip.IsEditable = true;
+            }
+            else if (PerspectiveManip.perspective == HullManip.PerspectiveType.SIDE)
+            {
+                PerspectiveDisplay.SetHull(SideDisplay.hull.Copy());
+                PerspectiveManip.perspective = HullManip.PerspectiveType.SIDE;
+                PerspectiveManip.IsEditable = true;
+            }
+            else // must be PERSPECTIVE
+            {
+                displayHull = myHull.CopyToFullHull();
+                displayHull.Rotate(10, 30, 190);
+                PerspectiveDisplay.SetHull(displayHull);
+                PerspectiveManip.Draw();
+            }
+        }
+
         private void openClick(object sender, RoutedEventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
@@ -59,26 +103,9 @@ namespace HullEdit
                 if (myHull == null) myHull = new Hull();
                 myHull.LoadFromHullFile(openFileDialog.FileName);
 
-                
-                Hull displayHull = myHull.CopyToFullHull();
-                displayHull.Rotate(0, 0, 180);
-                FrontDisplay.SetHull(displayHull);
-                FrontManip.Draw();
+                PerspectiveManip.perspective = HullManip.PerspectiveType.PERSPECTIVE;
 
-                displayHull = myHull.CopyToFullHull();
-                displayHull.Rotate(0, 90, 180);
-                SideDisplay.SetHull(displayHull);
-                SideManip.Draw();
-
-                displayHull = myHull.CopyToFullHull();
-                displayHull.Rotate(0, 90, 90);
-                TopDisplay.SetHull(displayHull);
-                TopManip.Draw();
-
-                displayHull = myHull.CopyToFullHull();
-                displayHull.Rotate(10, 30, 190);
-                PerspectiveDisplay.SetHull(displayHull);
-                PerspectiveManip.Draw();
+                UpdateDisplays();
 
                 PanelsMenu.IsEnabled = true;
             }
@@ -115,8 +142,6 @@ namespace HullEdit
         private void HullMouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             PerspectiveManip.IsEditable = false;
-
-            Debug.WriteLine("HullMouseDown");
 
             if (sender == FrontManip)
             {
@@ -167,6 +192,11 @@ namespace HullEdit
 
         void hull_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
+            if (e.PropertyName == "BulkheadData")
+            {
+                Debug.WriteLine("Update chines");
+                UpdateDisplays();
+            }
             UpdateDrawings();
         }
     }

@@ -45,7 +45,6 @@ namespace HullEdit
                 double z = m_points[ii].Z - m_points[ii + 1].Z;
 
                 m_chordLength[ii] = Math.Sqrt(x * x + y * y + z * z);
-//                Debug.WriteLine("{0} {1}", ii, m_chordLength[ii]);
             }
         }
 

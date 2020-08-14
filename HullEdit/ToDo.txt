@@ -1,9 +1,8 @@
 ﻿Features
-    Should HullDisplay keep a Hull, or just an array/list of bulkheads. Seems like it should be a Hull.
-	HullDisplay subclass Hull?
+	Compute planes for transom bulkheads
+		limit point movement to within this plane.
 
-    Create a Bulkhead type that includes (BOW, VERTICAL, TRANSOM), points.
-		Hull becomes a collection of bulkheads
+	Update bulkhead when dropping handle
 
     Include bulkheads in panels
 		Create Panel from 3D bulkhead shape
@@ -29,9 +28,6 @@
 	Handle transom correctly.
 
 	Spline bulkhead for bow/stern (Not in Carson Hull)
-
-	Compute planes for transom bulkheads
-		limit point movement to within this plane.
 
 	Add/position bulkheads
 	Splines.GetAt(coord)

@@ -84,7 +84,6 @@ namespace HullEdit
             {
                 if (m_HullDisplay.ClickedHandle(loc, out m_DraggingHandle))
                 {
-                    Debug.WriteLine("Clicked handle");
                     m_Dragging = true;
                     m_dragStartX = loc.X;
                     m_dragStartY = loc.Y;
@@ -93,13 +92,11 @@ namespace HullEdit
                 }
                 else if (m_HullDisplay.NearBulkhead(loc, CLICK_WIDTH, out m_SelectedBulkhead))
                 {
-                    Debug.WriteLine("Clicked bulkhead");
                     m_HullDisplay.SelectedBulkhead = m_SelectedBulkhead;
                     Draw();
                 }
                 else
                 {
-                    Debug.WriteLine("Clicked nothing");
                 }
                 e.Handled = true;
             }
@@ -111,42 +108,41 @@ namespace HullEdit
 
             if (m_Dragging)
             {
-                //double x, y, z;
+                double x, y, z;
 
-                //if (m_rotate_x == 0 && m_rotate_y == 180 && m_rotate_z == 180)
-                //{
-                //    // Front
-                //    x = -(m_dragStartX - loc.X) / m_scale;
-                //    y = (m_dragStartY - loc.Y) / m_scale;
-                //    z = 0;
-                //}
-                //else if (m_rotate_x == 0 && m_rotate_y == 90 && m_rotate_z == 180)
-                //{
-                //    // Side
-                //    x = 0;
-                //    y = (m_dragStartY - loc.Y) / m_scale;
-                //    z = -(m_dragStartX - loc.X) / m_scale;
-                //}
-                //else if (m_rotate_x == 0 && m_rotate_y == 90 && m_rotate_z == 90)
-                //{
-                //    // Top
-                //    x = -(m_dragStartY - loc.Y) / m_scale;
-                //    y = 0;
-                //    z = -(m_dragStartX - loc.X) / m_scale;
-                //}
-                //else
-                //{
-                //    x = 0;
-                //    y = 0;
-                //    z = 0;
-                //}
+                if (perspective == PerspectiveType.FRONT)
+                {
+                    // Front
+                    x = -(m_dragStartX - loc.X) / m_HullDisplay.Scale;
+                    y = (m_dragStartY - loc.Y) / m_HullDisplay.Scale;
+                    z = 0;
+                }
+                else if (perspective == PerspectiveType.SIDE)
+                {
+                    // Side
+                    x = 0;
+                    y = (m_dragStartY - loc.Y) / m_HullDisplay.Scale;
+                    z = -(m_dragStartX - loc.X) / m_HullDisplay.Scale;
+                }
+                else if (perspective == PerspectiveType.TOP)
+                {
+                    // Top
+                    x = (m_dragStartY - loc.Y) / m_HullDisplay.Scale;
+                    y = 0;
+                    z = -(m_dragStartX - loc.X) / m_HullDisplay.Scale;
+                }
+                else
+                {
+                    x = 0;
+                    y = 0;
+                    z = 0;
+                }
 
-                //m_Hull.UpdateBulkheadPoint(SelectedBulkhead, m_DraggingHandle, x, y, z);
+                m_Hull.UpdateMirroredBulkheadPoint(m_SelectedBulkhead, m_DraggingHandle, x, y, z);
+                //zzz
                 m_Dragging = false;
 
-                // Note: RotateTo reloads m_drawnBulkheads from the m_Hull
-                //RotateTo(m_rotate_x, m_rotate_y, m_rotate_z);
-                //Scale();
+                //FIXTHIS: need to recompute chines?
                 Draw();
             }
         }
@@ -160,8 +156,6 @@ namespace HullEdit
 
                 if (m_Dragging)
                 {
-                    Debug.WriteLine("MouseMove {0} ({1})", m_DraggingHandle, loc);
-
                     m_HullDisplay.MoveHandle(m_DraggingHandle, loc);
                     Draw();
                 }
