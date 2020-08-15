@@ -54,6 +54,7 @@ namespace HullEdit
 
         public void SetHull(Hull hull)
         {
+            Debug.WriteLine("HullDisplay.SetHull: ({0})", hull.GetSize());
             m_Hull = hull;
             m_scale = 1;
             Draw();
@@ -164,6 +165,7 @@ namespace HullEdit
 
             double new_scale = 0.9 * Math.Min(scale1, scale2);
 
+            Debug.WriteLine("HullDsiplay.Rescale: ({0}) {1} {2} {3} ({4})", size, m_scale, new_scale, m_scale * new_scale, hullSize);
             m_scale *= new_scale;
 
             m_Hull.Scale(new_scale, new_scale, new_scale);
@@ -188,6 +190,7 @@ namespace HullEdit
         public void Draw()
         {
             InvalidateVisual();
+            Debug.WriteLine("HullDisplay.Draw");
         }
 
         public bool ClickedHandle(Point loc, out int handleIndex)
@@ -234,7 +237,7 @@ namespace HullEdit
         {
             if (m_Hull.IsValid)
             {
-                Rescale(availableSize);
+ //               Rescale(availableSize); FIXTHIS: Is this needed?
                 return availableSize;
             }
             else

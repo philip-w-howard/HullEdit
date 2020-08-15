@@ -49,7 +49,6 @@ namespace HullEdit
             {
                 Point3DCollection newPoints = new Point3DCollection();
 
-                // FIXTHIS: reverse before adding?
                 // FIXTHIS: Eliminate duplicate at bottom/top?
                 foreach (Point3D p in m_points)
                 {
@@ -77,17 +76,63 @@ namespace HullEdit
             return m_points[index];
         }
 
+        double NewZPoint(Point3D basePoint, Point3D newPoint)
+        {
+            return basePoint.Z + (newPoint.Y - basePoint.Y) * Math.Cos(m_transom_angle) / Math.Sin(m_transom_angle);
+        }
         public void UpdatePoint(int chine, double x, double y, double z)
         {
-            // FIXTHIS: handle TRANSOM by keeping it on the plane
-            if (type == BulkheadType.VERTICAL) z = 0;
-            if (type == BulkheadType.BOW) x = 0;
-
+            Point3D basePoint = m_points[0];
             Point3D point = m_points[chine];
 
-            point.X += x;
-            point.Y += y;
-            point.Z += z;
+            switch (type)
+            {
+                case BulkheadType.BOW:
+                    point.X = 0;                    // force all points to be on the X axix
+                    point.Y += y;
+                    point.Z += z;
+                    break;
+                case BulkheadType.VERTICAL:
+                    point.X += x;
+                    point.Y += y;
+                    point.Z = basePoint.Z;          // force all points to be vertical relative to base point
+                    break;
+                case BulkheadType.TRANSOM:
+                    if (x == 0 && y==0 && z==0)
+                    {
+                        // Simply force Z to be on the plane of the transom
+                        if (chine != 0)
+                        {
+                            point.Z = NewZPoint(basePoint, point);
+                        }
+                    }
+                    else if (x == 0)
+                    {
+                        // assume updating from side view
+                        // Believe the user's y coordinate and then compute Z to be on the plain.
+                        point.Y += y;
+                        point.Z = NewZPoint(basePoint, point);
+                    }
+                    else if (y == 0)
+                    {
+                        // assume updating from top view
+                        // Can't update Z or Y from top view
+                        point.X += x;
+                    }
+                    else if (z == 0)
+                    {
+                        // assume updating from front view
+                        // can update both x and y
+                        point.X += x;
+                        point.Y += y;
+                        point.Z = NewZPoint(basePoint, point);
+                    }
+                    else
+                    {
+                        throw new Exception("Perspective updates not implemented");
+                    }
+                    break;
+            }
 
             m_points[chine] = point;
 
@@ -117,7 +162,7 @@ namespace HullEdit
                 m_points[ii] += zero;
             }
         }
-        public string LoadFromHullFile(StreamReader file, int numChines, BulkheadType type)
+        public void LoadFromHullFile(StreamReader file, int numChines, BulkheadType type)
         {
             m_IsValid = false;
             this.type = type;
@@ -129,26 +174,64 @@ namespace HullEdit
                 Point3D point = new Point3D();
                 double value;
                 line = file.ReadLine();
-                if (!double.TryParse(line, out value)) return "Unable to read X value";
+                if (!double.TryParse(line, out value)) throw new Exception("Unable to read bulkhead X value");
                 point.X = value;
 
                 line = file.ReadLine();
-                if (!double.TryParse(line, out value)) return "Unable to read Y value";
+                if (!double.TryParse(line, out value)) throw new Exception("Unable to read bulkhead Y value");
                 point.Y = value;
 
                 line = file.ReadLine();
-                if (!double.TryParse(line, out value)) return "Unable to read Z value";
+                if (!double.TryParse(line, out value)) throw new Exception("Unable to read bulkhead Z value");
                 point.Z = value;
 
                 m_points.Add(point);
             }
 
+            ComputeAngle();
+            StraightenBulkhead();
+
             m_IsValid = true;
             Notify("Bulkhead");
-
-            return "";
         }
 
+        protected void ComputeAngle()
+        {
+            m_transom_angle = 0;
+            if (type == BulkheadType.TRANSOM)
+            {
+                double delta, max_delta;
+                int max_index = 1;
+
+                // find greatest delta_z
+                max_delta = 0;
+                for (int ii = 1; ii < m_points.Count; ii++)
+                {
+                    delta = Math.Abs(m_points[ii - 1].Z - m_points[ii].Z);
+                    if (delta > max_delta)
+                    {
+                        delta = max_delta;
+                        max_index = ii;
+                    }
+                }
+
+                double delta_y = m_points[0].Y - m_points[max_index].Y;
+                double delta_z = m_points[0].Z - m_points[max_index].Z;
+
+                if (delta_z == 0)
+                    type = BulkheadType.VERTICAL;
+                else
+                    m_transom_angle = Math.Atan2(delta_y, delta_z);
+            }
+        }
+
+        public void StraightenBulkhead()
+        {
+            for (int chine=0; chine<m_points.Count; chine++)
+            {
+                // FIXTHIS: uncomment after UpdatePoint works with TRANSOM points. UpdatePoint(chine, 0, 0, 0);
+            }
+        }
         public void UpdateWithMatrix(double[,] matrix)
         {
             Point3DCollection result = new Point3DCollection(m_points.Count);   // temp array so we can compute in place
@@ -164,7 +247,8 @@ namespace HullEdit
             }
 
             m_points = result;
-        }
 
+            Notify("Bulkhead");
+        }
     }
 }

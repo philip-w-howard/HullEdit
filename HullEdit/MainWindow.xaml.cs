@@ -53,33 +53,39 @@ namespace HullEdit
             Hull displayHull = myHull.CopyToFullHull();
             displayHull.Rotate(0, 0, 180);
             FrontDisplay.SetHull(displayHull);
-            FrontManip.Draw();
-
-            displayHull = myHull.CopyToFullHull();
-            displayHull.Rotate(0, 90, 180);
-            SideDisplay.SetHull(displayHull);
-            SideManip.Draw();
+            Debug.WriteLine("Front size: ({0})", displayHull.GetSize());
 
             displayHull = myHull.CopyToFullHull();
             displayHull.Rotate(0, 90, 90);
             TopDisplay.SetHull(displayHull);
-            TopManip.Draw();
+
+            displayHull = myHull.CopyToFullHull();
+            displayHull.Rotate(0, 90, 180);
+            SideDisplay.SetHull(displayHull);
 
             if (PerspectiveManip.perspective == HullManip.PerspectiveType.FRONT)
             {
-                PerspectiveDisplay.SetHull(FrontDisplay.hull.Copy());
+                displayHull = myHull.CopyToFullHull();
+                displayHull.Rotate(0, 0, 180);
+                Debug.WriteLine("Perspective Front size: ({0})", displayHull.GetSize());
+                PerspectiveDisplay.SetHull(displayHull);
+                Debug.WriteLine("Perspective Front size: ({0})", displayHull.GetSize());
                 PerspectiveManip.perspective = HullManip.PerspectiveType.FRONT;
                 PerspectiveManip.IsEditable = true;
             }
             else if (PerspectiveManip.perspective == HullManip.PerspectiveType.TOP)
             {
-                PerspectiveDisplay.SetHull(TopDisplay.hull.Copy());
+                displayHull = myHull.CopyToFullHull();
+                displayHull.Rotate(0, 90, 90);
+                PerspectiveDisplay.SetHull(displayHull);
                 PerspectiveManip.perspective = HullManip.PerspectiveType.TOP;
                 PerspectiveManip.IsEditable = true;
             }
             else if (PerspectiveManip.perspective == HullManip.PerspectiveType.SIDE)
             {
-                PerspectiveDisplay.SetHull(SideDisplay.hull.Copy());
+                displayHull = myHull.CopyToFullHull();
+                displayHull.Rotate(0, 90, 180);
+                PerspectiveDisplay.SetHull(displayHull);
                 PerspectiveManip.perspective = HullManip.PerspectiveType.SIDE;
                 PerspectiveManip.IsEditable = true;
             }
@@ -88,8 +94,11 @@ namespace HullEdit
                 displayHull = myHull.CopyToFullHull();
                 displayHull.Rotate(10, 30, 190);
                 PerspectiveDisplay.SetHull(displayHull);
-                PerspectiveManip.Draw();
             }
+            FrontManip.Draw();
+            TopManip.Draw();
+            SideManip.Draw();
+            PerspectiveManip.Draw();
         }
 
         private void openClick(object sender, RoutedEventArgs e)
@@ -145,20 +154,18 @@ namespace HullEdit
 
             if (sender == FrontManip)
             {
-                PerspectiveDisplay.SetHull(FrontDisplay.hull.Copy());
                 PerspectiveManip.perspective = HullManip.PerspectiveType.FRONT;
             }
             else if (sender == TopManip)
             {
-                PerspectiveDisplay.SetHull(TopDisplay.hull.Copy());
                 PerspectiveManip.perspective = HullManip.PerspectiveType.TOP;
             }
             else if (sender == SideManip)
             {
-                PerspectiveDisplay.SetHull(SideDisplay.hull.Copy());
                 PerspectiveManip.perspective = HullManip.PerspectiveType.SIDE;
             }
 
+            UpdateDisplays();
             PerspectiveManip.IsEditable = true;
             PerspectiveManip.Draw();
         }

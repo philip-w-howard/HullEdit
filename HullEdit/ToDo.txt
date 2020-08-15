@@ -1,6 +1,5 @@
 ﻿Features
-	Compute planes for transom bulkheads
-		limit point movement to within this plane.
+	Does Bulkhead need to implement INotifyPropertyChanged?
 
     Include bulkheads in panels
 		Create Panel from 3D bulkhead shape
@@ -45,7 +44,7 @@ Code/Implementation Enhancements
 
 Bugs
 	going to a small window size sometimes obscures the perspective view (appears to be drawn off-screen).
-
+	First move in Front view seems to be doubled.
 ??????????????????????????????????
 For later version???
 Rectangle
