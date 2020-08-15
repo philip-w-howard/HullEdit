@@ -13,6 +13,9 @@ namespace HullEdit
 {
     public class PanelDisplay : Button
     {
+        protected const int DEFAULT_WIDTH = 600;
+        protected const int DEFAULT_HEIGHT = 400;
+
         protected Panel m_panel;
         public double X { get; set; }
         public double Y { get; set; }
@@ -52,6 +55,16 @@ namespace HullEdit
         }
         protected override Size MeasureOverride(Size availableSize)
         {
+            Debug.WriteLine("PanelDisplay.MeasureOverride {0}", availableSize);
+
+            if (double.IsInfinity(availableSize.Width) || double.IsInfinity(availableSize.Height))
+            {
+                availableSize.Width = DEFAULT_WIDTH;
+                availableSize.Height = DEFAULT_HEIGHT;
+            }
+
+            if (m_panel == null) return availableSize;
+
             Size size = m_panel.GetSize();
 
             Width = size.Width;

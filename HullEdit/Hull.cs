@@ -18,6 +18,7 @@ namespace HullEdit
 
         private List<Bulkhead> m_bulkheads;
         private List<Point3DCollection> m_chines;
+
         public Bulkhead GetBulkhead(int index) { return m_bulkheads[index]; }
         public Point3DCollection GetChine(int index) { return m_chines[index]; }
 
@@ -88,13 +89,6 @@ namespace HullEdit
             Notify("HullData");
         }
 
-        //public List<Bulkhead> CopyBulkheads()
-        //{
-        //    // not sure why "return m_bulkheads.Clone() does not work
-        //    List<Bulkhead> bulkheads = new List<Bulkhead>(m_bulkheads);
-        //    return bulkheads;
-        //}
-
         // Returns a list of "full" bulkheads (instead of the half bulkheads that are normally stored)
         public Hull CopyToFullHull()
         {
@@ -152,17 +146,7 @@ namespace HullEdit
             return copy;
         }
 
-        //public Bulkhead GetBulkhead(int index)
-        //{
-        //    return m_bulkheads[index].Copy();
-        //}
-
-        //public Point3D GetBulkheadPoint(int bulkhead, int chine)
-        //{
-        //    return m_bulkheads[bulkhead].GetPoint(chine);
-        //}
-
-        public void UpdateBulkheadPoint(int bulkhead, int chine, double x, double y, double z)
+         public void UpdateBulkheadPoint(int bulkhead, int chine, double x, double y, double z)
         {
             m_bulkheads[bulkhead].UpdatePoint(chine, x, y, z);
             HullData++;

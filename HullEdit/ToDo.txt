@@ -2,8 +2,6 @@
 	Compute planes for transom bulkheads
 		limit point movement to within this plane.
 
-	Update bulkhead when dropping handle
-
     Include bulkheads in panels
 		Create Panel from 3D bulkhead shape
 

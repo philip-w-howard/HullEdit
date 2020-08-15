@@ -13,26 +13,24 @@ namespace HullEdit
     public class Panels
     {
         private const int POINTS_PER_CHINE = 50;
-        private Panel[] m_panels;
+        private List<Panel> m_panels;
         private List<Panel> m_bulkheads;
 
-        public Panel[] panels { get { return m_panels; } }
+        public List<Panel> panels { get { return m_panels; } }
         public List<Panel> bulkheads {  get { return m_bulkheads; } }
 
         public Panels(Hull hull)
         {
-            Point3DCollection[] chines;
             int numPanels = hull.numChines - 1;
 
-            m_panels = new Panel[numPanels];
+            m_panels = new List<Panel>();
 
-            // FIXTHIS chines = Geometry.PrepareChines(hull.CopyBulkheads(), POINTS_PER_CHINE);
-
-            //for (int ii=0; ii<numPanels; ii++)
-            //{
-            //    m_panels[ii] = new Panel(chines[ii], chines[ii + 1]);
-            //    m_panels[ii].scale = 3;
-            //}
+            for (int ii = 0; ii < numPanels; ii++)
+            {
+                Panel panel = new Panel(hull.GetChine(ii), hull.GetChine(ii + 1));
+                panel.scale = 3;
+                m_panels.Add(panel);
+            }
 
             //*********************************
             // bulkheads:
