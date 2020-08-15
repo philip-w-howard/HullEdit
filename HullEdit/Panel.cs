@@ -47,8 +47,6 @@ namespace HullEdit
             m_panelPoints = new PointCollection();
             foreach (Point3D point in points)
             {
-                // FIXTHIS: need to correct for angle on TRANSOM bulkheads
-                // FIXTHIS: here or in panels?
                 m_panelPoints.Add(new Point(point.X, point.Y));
             }
         }

@@ -14,6 +14,7 @@ namespace HullEdit
         public enum BulkheadType { BOW, VERTICAL, TRANSOM };
         public int Count { get { return m_points.Count; } }
         private double m_transom_angle;
+        public double TransomAngle { get; }
 
         public BulkheadType type { get; private set; }
 
@@ -109,7 +110,7 @@ namespace HullEdit
                     else if (x == 0)
                     {
                         // assume updating from side view
-                        // Believe the user's y coordinate and then compute Z to be on the plain.
+                        // Believe the user's y coordinate and then compute Z to be on the plane.
                         point.Y += y;
                         point.Z = NewZPoint(basePoint, point);
                     }

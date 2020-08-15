@@ -46,16 +46,21 @@ namespace HullEdit
             for (int bulkhead=0; bulkhead< fullHull.numBulkheads; bulkhead++)
             {
                 int numChines = fullHull.numChines;
-                Point3D point;
 
                 if (fullHull.GetBulkhead(bulkhead).type != Bulkhead.BulkheadType.BOW)
                 {
                     Bulkhead bulk = fullHull.GetBulkhead(bulkhead);
                     Point3DCollection points = new Point3DCollection();
 
-                    // Add reflection
+                    Point3D basePoint = bulk.GetPoint(0);
+
                     for (int chine = 0; chine < numChines; chine++)
                     {
+                        Point3D point = bulk.GetPoint(chine);
+                        if (bulk.type == Bulkhead.BulkheadType.TRANSOM)
+                        {
+                            point.Y = basePoint.Y + (point.Y - basePoint.Y) / Math.Sin(bulk.TransomAngle);
+                        }
                         points.Add(bulk.GetPoint(chine));
                     }
 
