@@ -34,6 +34,7 @@ namespace HullEdit
         // Develop the panel from two chines
         public Panel(Point3DCollection chine1, Point3DCollection chine2)
         {
+            scale = 1;
             Panelize(chine1, chine2);
             HorizontalizePanel();
             ShiftTo(0, 0);
@@ -43,7 +44,13 @@ namespace HullEdit
         // NOTE: This assumes the bulkhead is within a plane.
         public Panel(Point3DCollection points)
         {
-
+            m_panelPoints = new PointCollection();
+            foreach (Point3D point in points)
+            {
+                // FIXTHIS: need to correct for angle on TRANSOM bulkheads
+                // FIXTHIS: here or in panels?
+                m_panelPoints.Add(new Point(point.X, point.Y));
+            }
         }
 
         protected void Panelize(Point3DCollection chine1, Point3DCollection chine2)

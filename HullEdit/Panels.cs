@@ -13,6 +13,8 @@ namespace HullEdit
     public class Panels
     {
         private const int POINTS_PER_CHINE = 50;
+        private const double DEFAULT_SCALE = 3;
+
         private List<Panel> m_panels;
         private List<Panel> m_bulkheads;
 
@@ -28,7 +30,7 @@ namespace HullEdit
             for (int ii = 0; ii < numPanels; ii++)
             {
                 Panel panel = new Panel(hull.GetChine(ii), hull.GetChine(ii + 1));
-                panel.scale = 3;
+                panel.scale = DEFAULT_SCALE;
                 m_panels.Add(panel);
             }
 
@@ -39,29 +41,31 @@ namespace HullEdit
             if (hull.GetBulkhead(numBulkheads - 1).type == Bulkhead.BulkheadType.BOW) numBulkheads--;
 
             m_bulkheads = new List<Panel>();
-            for (int bulkhead=0; bulkhead<hull.numBulkheads; bulkhead++)
+            Hull fullHull = hull.CopyToFullHull();
+
+            for (int bulkhead=0; bulkhead< fullHull.numBulkheads; bulkhead++)
             {
-                int numChines = hull.numChines;
+                int numChines = fullHull.numChines;
                 Point3D point;
 
-                //if (hull.GetBulkhead(bulkhead).type != Bulkhead.BulkheadType.BOW)
-                //{
-                //    Point3DCollection points = hull.GetBulkhead(bulkhead);
+                if (fullHull.GetBulkhead(bulkhead).type != Bulkhead.BulkheadType.BOW)
+                {
+                    Bulkhead bulk = fullHull.GetBulkhead(bulkhead);
+                    Point3DCollection points = new Point3DCollection();
 
-                //    // Add reflection
-                //    for (int chine = numChines - 1; chine >= 0; chine--)
-                //    {
-                //        point = new Point3D();
-                //        point = hull.GetBulkheadPoint(bulkhead, chine);
-                //        point.X = -points[chine].X;
-                //        points.Add(point);
-                //    }
+                    // Add reflection
+                    for (int chine = 0; chine < numChines; chine++)
+                    {
+                        points.Add(bulk.GetPoint(chine));
+                    }
 
-                //    // close the shape
-                //    if (points[0].X != 0) points.Add(points[0]);
+                    // close the shape
+                    if (points[0].X != 0) points.Add(points[0]);
 
-                //    m_bulkheads.Add(new Panel(points));
-                //}
+                    Panel panel = new Panel(points);
+                    panel.scale = DEFAULT_SCALE;
+                    m_bulkheads.Add(panel);
+                }
             }
 
 
