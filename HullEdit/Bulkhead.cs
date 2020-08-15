@@ -96,17 +96,18 @@ namespace HullEdit
 
         public void UpdateMirroredPoint(int chine, double x, double y, double z)
         {
+            int actualChine;
             if (chine >= m_points.Count)
             {
-                chine = chine - m_points.Count;
+                actualChine = chine - m_points.Count;
                 x = -x;
             }
             else
             {
-                chine = (m_points.Count -1) - chine;
+                actualChine = (m_points.Count -1) - chine;
             }
 
-            UpdatePoint(chine, x, y, z);
+            UpdatePoint(actualChine, x, y, z);
         }
 
         public void ShiftTo(Vector3D zero)

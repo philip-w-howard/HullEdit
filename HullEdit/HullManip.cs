@@ -75,10 +75,20 @@ namespace HullEdit
             InvalidateVisual();
         }
 
+        protected override void OnRender(DrawingContext drawingContext)
+        {
+            
+            if (m_Hull == null || !m_Hull.IsValid) return;
+
+            Rect background = new Rect(new Point(0, 0), new Point(ActualWidth, ActualHeight));
+            drawingContext.DrawRectangle(this.Background, null, background);
+        }
+
         protected override void OnPreviewMouseDown(MouseButtonEventArgs e)
         {
             UIElement content = (UIElement)this.Content;
             Point loc = e.GetPosition(content);
+            int bulkhead;
 
             if (IsEditable)
             {
@@ -87,16 +97,17 @@ namespace HullEdit
                     m_Dragging = true;
                     m_dragStartX = loc.X;
                     m_dragStartY = loc.Y;
-
-
+                    Debug.WriteLine("clicked handle {0}", m_DraggingHandle);
                 }
-                else if (m_HullDisplay.NearBulkhead(loc, CLICK_WIDTH, out m_SelectedBulkhead))
+                else if (m_HullDisplay.NearBulkhead(loc, CLICK_WIDTH, out bulkhead))
                 {
+                    m_SelectedBulkhead = bulkhead;
                     m_HullDisplay.SelectedBulkhead = m_SelectedBulkhead;
                     Draw();
                 }
                 else
                 {
+                    m_Dragging = false;
                 }
                 e.Handled = true;
             }
@@ -106,6 +117,7 @@ namespace HullEdit
             UIElement content = (UIElement)this.Content;
             Point loc = e.GetPosition(content);
 
+            Debug.WriteLine("dropped handle {0} {1}", m_DraggingHandle, m_Dragging);
             if (m_Dragging)
             {
                 double x, y, z;
@@ -139,7 +151,7 @@ namespace HullEdit
                 }
 
                 m_Hull.UpdateMirroredBulkheadPoint(m_SelectedBulkhead, m_DraggingHandle, x, y, z);
-                //zzz
+                
                 m_Dragging = false;
 
                 //FIXTHIS: need to recompute chines?

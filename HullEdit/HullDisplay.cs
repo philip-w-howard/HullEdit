@@ -64,7 +64,7 @@ namespace HullEdit
             if (m_Hull == null || !m_Hull.IsValid) return;
 
             Rect background = new Rect(new Point(0, 0), new Point(ActualWidth, ActualHeight));
-            drawingContext.DrawRectangle(new SolidColorBrush(Colors.White), null, background);
+            drawingContext.DrawRectangle(this.Background, null, background);
 
             Pen pen = new Pen(System.Windows.Media.Brushes.Black, 1.0);
 
