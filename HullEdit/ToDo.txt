@@ -1,18 +1,14 @@
 ﻿Features
-	Does Bulkhead need to implement INotifyPropertyChanged?
-
-    Include bulkheads in panels
-		Create Panel from 3D bulkhead shape
+	Save
+		HUL format
+		AVS format
+		Save panels
 
 	cut layout
-		panel(chine1, chine2)
-			Handle end
-
-		panels(hull)
-			high resolution chines
-
-		Include bulkheads, etc.
-		Position, rotate, flip panels
+		Drag panels
+		Rotate panels
+		Flip panels
+		Add selected panels
 		Setup dialog: size, number, arrangement of sheets
 
 	Status bar at the bottom showing x,y,z location, etc.
@@ -20,6 +16,7 @@
 	DONE: Data binding to force redraw on edit?
 		DOABLE? This should also remove SetHull?
 
+	Panels that start at a point (instead of an edge). See 16'SPORT.HUL
 
 	Dynamically update views while moving handle.
 	Handle transom correctly.
@@ -34,17 +31,18 @@
 	Undo/Redo capability
 
 Code/Implementation Enhancements
+	Does Bulkhead need to implement INotifyPropertyChanged?
 	Use foreach loops where appropriate
 		Started, need to finish.
 	MVC: Model (data) View (appearance) Control (user interaction): should be separate classes.
 
 	EXCEPTIONS:
-		LoadFromHullFile instead of returning a string
+		Throw appropriate ones, and handle all of them.
 
 
 Bugs
 	going to a small window size sometimes obscures the perspective view (appears to be drawn off-screen).
-	First move in Front view seems to be doubled.
+	
 ??????????????????????????????????
 For later version???
 Rectangle

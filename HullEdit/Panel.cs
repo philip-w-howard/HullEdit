@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -12,7 +13,7 @@ using System.Windows.Shapes;
 
 namespace HullEdit
 {
-    public class Panel
+    public class Panel : INotifyPropertyChanged
     {
         public double scale { get; set; }
 
@@ -21,6 +22,15 @@ namespace HullEdit
         public int NumPoints { get { return m_panelPoints.Count; } }
 
         protected PointCollection m_panelPoints;
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        void Notify(string propName)
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(propName));
+            }
+        }
 
         public Point point(int index)
         {
@@ -193,6 +203,7 @@ namespace HullEdit
             Matrix.Multiply(m_panelPoints, rotate, out m_panelPoints);
 
             ShiftTo(0, 0);
+            Notify("Panel.Rotate");
         }
         private void ShiftTo(double x, double y)
         {

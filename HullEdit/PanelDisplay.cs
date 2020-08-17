@@ -17,6 +17,7 @@ namespace HullEdit
         protected const int DEFAULT_HEIGHT = 400;
 
         protected Panel m_panel;
+
         public double X { get; set; }
         public double Y { get; set; }
 
@@ -51,7 +52,7 @@ namespace HullEdit
             PathGeometry drawing = new PathGeometry();
             drawing.Figures = actualPath;
 
-            drawingContext.DrawGeometry(new System.Windows.Media.SolidColorBrush(Colors.White), new Pen(System.Windows.Media.Brushes.Black, 1.0), drawing);
+            drawingContext.DrawGeometry(Background, new Pen(Foreground, 1.0), drawing);
         }
         protected override Size MeasureOverride(Size availableSize)
         {
@@ -78,6 +79,14 @@ namespace HullEdit
             Debug.WriteLine("PanelDisplay ArrangeOverride {0} {1}", finalSize.Width, finalSize.Height);
 
             return finalSize;
+        }
+
+        public void Rotate(double angle)
+        {
+            Size size = m_panel.GetSize();
+
+            m_panel.Rotate(new Point(size.Width/2, size.Height/2), angle);
+            InvalidateVisual();
         }
     }
 }

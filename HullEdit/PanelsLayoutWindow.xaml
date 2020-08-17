@@ -22,7 +22,7 @@
             </ToolBar>
         </ToolBarTray>
         <ScrollViewer>
-            <Canvas Name="canvas" />
+            <Canvas Name="canvas" Background="White" PreviewMouseDown="Panel_PreviewMouseDown" PreviewMouseMove="Panel_PreviewMouseMove" PreviewMouseUp="Panel_PreviewMouseUp" />
         </ScrollViewer>
     </DockPanel>
 </Window>

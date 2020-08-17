@@ -113,7 +113,7 @@ namespace HullEdit
                 myHull.LoadFromHullFile(openFileDialog.FileName);
 
                 PerspectiveManip.perspective = HullManip.PerspectiveType.PERSPECTIVE;
-
+                PerspectiveManip.IsEditable = false;
                 UpdateDisplays();
 
                 PanelsMenu.IsEnabled = true;
