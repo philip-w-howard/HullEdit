@@ -6,6 +6,13 @@
         xmlns:local="clr-namespace:HullEdit"
         mc:Ignorable="d"
         Title="PanelsWindow" Height="450" Width="800">
+    <Window.Resources>
+        <ContextMenu x:Key="EditMenu">
+            <MenuItem Header="_Horizontal Flip Selected" Click="HorizontalFlipClick"/>
+            <MenuItem Header="_Vertical Flip Selected" Click="VerticalFlipClick"/>
+            <MenuItem Header="_Duplicate Selected" Click="DuplicateClick"/>
+        </ContextMenu>
+    </Window.Resources>
     <DockPanel>
         <ToolBarTray Background="White" DockPanel.Dock="Top">
             <ToolBar Band="0 " BandIndex="1">
@@ -22,7 +29,17 @@
             </ToolBar>
         </ToolBarTray>
         <ScrollViewer>
-            <Canvas Name="canvas" Background="White" PreviewMouseDown="Panel_PreviewMouseDown" PreviewMouseMove="Panel_PreviewMouseMove" PreviewMouseUp="Panel_PreviewMouseUp" />
+            <Canvas Name="canvas" Background="White" 
+                    PreviewMouseDown="Panel_PreviewMouseDown" PreviewMouseMove="Panel_PreviewMouseMove" PreviewMouseUp="Panel_PreviewMouseUp" 
+                    >
+                <Canvas.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="_Horizontal Flip Selected" Click="HorizontalFlipClick"/>
+                        <MenuItem Header="_Vertical Flip Selected" Click="VerticalFlipClick"/>
+                        <MenuItem Header="_Duplicate Selected" Click="DuplicateClick"/>
+                    </ContextMenu>
+                </Canvas.ContextMenu>
+            </Canvas>
         </ScrollViewer>
     </DockPanel>
 </Window>

@@ -63,13 +63,22 @@ namespace HullEdit
 
             panel.X = x;
             panel.Y = y;
+
+            DisplayPanel(panel);
+        }
+
+        public void DisplayPanel(PanelDisplay panel)
+        {
+            panel.Background = DEFAULT_BACKGROUND;
+            panel.Foreground = DEFAULT_FOREGROUND;
+
             panel.PreviewMouseDown += Panel_PreviewMouseDown;
             panel.PreviewMouseMove += Panel_PreviewMouseMove;
 
             m_displayPanels.Add(panel);
             canvas.Children.Add(panel);
-            Canvas.SetLeft(panel, x);
-            Canvas.SetTop(panel, y);
+            Canvas.SetLeft(panel, panel.X);
+            Canvas.SetTop(panel, panel.Y);
         }
 
         private void Panel_PreviewMouseUp(object sender, MouseButtonEventArgs e)
@@ -121,27 +130,49 @@ namespace HullEdit
             // If the conversion fails, we didn't select a panel
             PanelDisplay selectedPanel = sender as PanelDisplay;
 
-            if (selectedPanel != null)
+            if (e.LeftButton == MouseButtonState.Pressed)
             {
-                // Unselect all panels
-                foreach (PanelDisplay panel in m_displayPanels)
+                if (selectedPanel != null)
                 {
-                    panel.Foreground = DEFAULT_FOREGROUND;
+                    // Unselect all panels
+                    foreach (PanelDisplay panel in m_displayPanels)
+                    {
+                        panel.Foreground = DEFAULT_FOREGROUND;
+                    }
+
+                    m_selectedPanel = selectedPanel;
+                    m_selectedPanel.Foreground = SELECTED_FOREGROUND;
+                    m_dragLoc = e.GetPosition(canvas);
                 }
 
-                m_selectedPanel = selectedPanel;
-                m_selectedPanel.Foreground = SELECTED_FOREGROUND;
-                m_dragLoc= e.GetPosition(canvas);
+                Debug.WriteLine("MouseDown 1 {0} {1}", m_dragging, m_rotating);
+                if (m_selectedPanel != null && selectedPanel == m_selectedPanel)
+                    m_dragging = true;
+                else if (m_selectedPanel != null)
+                    m_rotating = true;
+
+                Debug.WriteLine("MouseDown 2 {0} {1}", m_dragging, m_rotating);
             }
+            //else if (e.RightButton == MouseButtonState.Pressed)
+            //{
+            //    ContextMenu menu = new ContextMenu();
+            //    MenuItem item = new MenuItem();
+            //    item.Header = "_Vertical Flip";
+            //    item.Click += VerticalFlipClick;
+            //    menu.Items.Add(item);
 
-            Debug.WriteLine("MouseDown 1 {0} {1}", m_dragging, m_rotating);
-            if (m_selectedPanel != null && selectedPanel == m_selectedPanel)
-                m_dragging = true;
-            else if (m_selectedPanel != null)
-                m_rotating = true;
+            //    item = new MenuItem();
+            //    item.Header = "_Horizontal Flip";
+            //    item.Click += HorizontalFlipClick;
+            //    menu.Items.Add(item);
 
-            Debug.WriteLine("MouseDown 2 {0} {1}", m_dragging, m_rotating);
-            //e.Handled = true;
+            //    item = new MenuItem();
+            //    item.Header = "_Duplicate";
+            //    item.Click += DuplicateClick;
+            //    menu.Items.Add(item);
+
+            //    menu.Show()
+            //}
         }
 
         private void openClick(object sender, RoutedEventArgs e)
@@ -162,6 +193,38 @@ namespace HullEdit
         private void LayoutClick(object sender, RoutedEventArgs e)
         {
 
+        }
+
+        private void HorizontalFlipClick(object sender, RoutedEventArgs e)
+        {
+            if (m_selectedPanel != null)
+            {
+                m_selectedPanel.HorizontalFlip();
+                Debug.WriteLine("Horizontal Flip");
+                //InvalidateVisual();
+            }
+        }
+        private void VerticalFlipClick(object sender, RoutedEventArgs e)
+        {
+            if (m_selectedPanel != null)
+            {
+                m_selectedPanel.VerticalFlip();
+                Debug.WriteLine("Vertical Flip");
+                InvalidateVisual();
+            }
+        }
+
+        private void DuplicateClick(object sender, RoutedEventArgs e)
+        {
+            if (m_selectedPanel != null)
+            {
+                PanelDisplay panel = m_selectedPanel.Copy();
+                DisplayPanel(panel);
+                m_selectedPanel.Foreground = DEFAULT_FOREGROUND;
+                panel.Foreground = SELECTED_FOREGROUND;
+
+                m_selectedPanel = panel;
+            }
         }
     }
 }

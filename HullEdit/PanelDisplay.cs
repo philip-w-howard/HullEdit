@@ -54,6 +54,15 @@ namespace HullEdit
 
             drawingContext.DrawGeometry(Background, new Pen(Foreground, 1.0), drawing);
         }
+
+        public PanelDisplay Copy()
+        {
+            PanelDisplay newDisplay = new PanelDisplay(m_panel.Copy());
+            newDisplay.X = this.X;
+            newDisplay.Y = this.Y;
+
+            return newDisplay;
+        }
         protected override Size MeasureOverride(Size availableSize)
         {
             Debug.WriteLine("PanelDisplay.MeasureOverride {0}", availableSize);
@@ -86,6 +95,18 @@ namespace HullEdit
             Size size = m_panel.GetSize();
 
             m_panel.Rotate(new Point(size.Width/2, size.Height/2), angle);
+            InvalidateVisual();
+        }
+
+        public void HorizontalFlip()
+        {
+            m_panel.HorizontalFlip();
+            InvalidateVisual();
+        }
+
+        public void VerticalFlip()
+        {
+            m_panel.VerticalFlip();
             InvalidateVisual();
         }
     }

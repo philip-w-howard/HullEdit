@@ -41,6 +41,11 @@ namespace HullEdit
             return p;
         }
 
+        public Panel()
+        {
+            scale = 1;
+        }
+
         // Develop the panel from two chines
         public Panel(Point3DCollection chine1, Point3DCollection chine2)
         {
@@ -61,6 +66,15 @@ namespace HullEdit
             }
         }
 
+        public Panel Copy()
+        {
+            Panel newPanel = new Panel();
+
+            newPanel.m_panelPoints = m_panelPoints.Clone();
+            newPanel.scale = this.scale;
+
+            return newPanel;
+        }
         protected void Panelize(Point3DCollection chine1, Point3DCollection chine2)
         {
             double r1, r2;
@@ -229,5 +243,38 @@ namespace HullEdit
 
             return new Size(size_x*scale, size_y*scale);
         }
+
+        public void VerticalFlip()
+        {
+            PointCollection points = new PointCollection();
+
+            foreach (Point p in m_panelPoints)
+            {
+                Point newPoint = p;
+                newPoint.Y = -newPoint.Y;
+                points.Add(newPoint);
+            }
+
+            m_panelPoints = points;
+            ShiftTo(0, 0);
+            Notify("panel.flip");
+        }
+
+        public void HorizontalFlip()
+        {
+            PointCollection points = new PointCollection();
+
+            foreach (Point p in m_panelPoints)
+            {
+                Point newPoint = p;
+                newPoint.X = -newPoint.X;
+                points.Add(newPoint);
+            }
+
+            m_panelPoints = points;
+            ShiftTo(0, 0);
+            Notify("panel.flip");
+        }
     }
 }
+
