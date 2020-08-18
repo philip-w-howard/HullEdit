@@ -37,6 +37,7 @@ namespace HullEdit
         private PanelDisplay m_selectedPanel;
         Panels m_panels;
         ObservableCollection<PanelDisplay> m_displayPanels = new ObservableCollection<PanelDisplay>();
+        private PanelSetupWindow setupWindow;
 
         Point m_dragLoc;
 
@@ -57,6 +58,9 @@ namespace HullEdit
                     panelList.Add("Bulkhead " + ii);
                 }
             }
+
+            setupWindow = new PanelSetupWindow();
+            setupWindow.ShowDialog();
         }
 
 
@@ -168,12 +172,14 @@ namespace HullEdit
 
         private void openClick(object sender, RoutedEventArgs e)
         {
-
+            canvas.Height = canvas.ActualHeight + 200;
+            canvas.Width = canvas.ActualWidth + 200;
         }
 
         private void saveClick(object sender, RoutedEventArgs e)
         {
-
+            canvas.Height -= 200;
+            canvas.Width -= 200;
         }
 
         private void ZoomClick(object sender, RoutedEventArgs e)
@@ -183,7 +189,7 @@ namespace HullEdit
 
         private void LayoutClick(object sender, RoutedEventArgs e)
         {
-
+            setupWindow.ShowDialog();
         }
 
         private void HorizontalFlipClick(object sender, RoutedEventArgs e)

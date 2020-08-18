@@ -5,9 +5,11 @@
 		Save panels
 
 	cut layout
-		Rotate panels: works but should always rotate about the center.
-		Add selected panels
 		Setup dialog: size, number, arrangement of sheets
+		Display sheets and scale accordingly
+		put scale in appropriate place
+		Dynamically change size of canvas. Write SetCanvasSize method that gets called on update.
+		Ability to split panels in two
 
 	Status bar at the bottom showing x,y,z location, etc.
 
@@ -17,7 +19,6 @@
 	Panels that start at a point (instead of an edge). See 16'SPORT.HUL
 
 	Dynamically update views while moving handle.
-	Handle transom correctly.
 
 	Spline bulkhead for bow/stern (Not in Carson Hull)
 

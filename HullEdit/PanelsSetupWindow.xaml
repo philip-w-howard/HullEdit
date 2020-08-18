@@ -7,6 +7,29 @@
         mc:Ignorable="d"
         Title="PanelSetupWindow" Height="450" Width="800">
     <Grid>
-        
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Label Grid.Row="0" Grid.Column="1">Width</Label>
+        <Label Grid.Row="0" Grid.Column="2">Height</Label>
+
+        <Label Grid.Row="1" Grid.Column="0">Panel Size</Label>
+        <TextBox Name="PanelWidth_Input" Grid.Row="1" Grid.Column="1"/>
+        <TextBox Name="PanelHeight_Input" Grid.Row="1" Grid.Column="2"/>
+
+        <Label Grid.Row="2" Grid.Column="0">Panel Arrangement</Label>
+        <TextBox Name="NumWidth_Input" Grid.Row="2" Grid.Column="1"/>
+        <TextBox Name="NumHeight_Input" Grid.Row="2" Grid.Column="2"/>
+
+        <Button Grid.Row="3" Grid.Column="1" Click="OK_Click">OK</Button>
+        <Button Grid.Row="3" Grid.Column="2" Click="Cancel_Click">Cancel</Button>
     </Grid>
 </Window>

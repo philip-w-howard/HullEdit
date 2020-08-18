@@ -30,7 +30,7 @@
                 </Menu>
             </ToolBar>
         </ToolBarTray>
-        <ScrollViewer>
+        <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
             <Canvas Name="canvas" Background="White" 
                     PreviewMouseDown="Panel_PreviewMouseDown" PreviewMouseMove="Panel_PreviewMouseMove" PreviewMouseUp="Panel_PreviewMouseUp" 
                     >
