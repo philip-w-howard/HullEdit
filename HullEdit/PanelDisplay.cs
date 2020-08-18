@@ -23,7 +23,7 @@ namespace HullEdit
 
         public PanelDisplay(Panel p)
         {
-            m_panel = p;
+            m_panel = p.Copy();
         }
 
         // Draw the panel.

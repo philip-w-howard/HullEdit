@@ -16,6 +16,11 @@ using System.Windows.Shapes;
 
 namespace HullEdit
 {
+    class ItemList : ObservableCollection<String>
+    {
+        public ItemList() : base()
+        { }
+    }
     /// <summary>
     /// Interaction logic for PanelsWindow.xaml
     /// </summary>
@@ -40,6 +45,18 @@ namespace HullEdit
             m_panels = panels;
             InitializeComponent();
 
+            ItemList panelList = (ItemList)this.FindResource("PanelList");
+            if (panelList != null)
+            {
+                for (int ii = 1; ii <= m_panels.panels.Count; ii++)
+                {
+                    panelList.Add("Panel " + ii);
+                }
+                for (int ii = 1; ii <= m_panels.bulkheads.Count; ii++)
+                {
+                    panelList.Add("Bulkhead " + ii);
+                }
+            }
             double y = 10;
             foreach (Panel p in panels.panels)
             {
@@ -74,6 +91,12 @@ namespace HullEdit
 
             panel.PreviewMouseDown += Panel_PreviewMouseDown;
             panel.PreviewMouseMove += Panel_PreviewMouseMove;
+
+            ContextMenu menu = (ContextMenu)this.FindResource("EditMenu");
+            if (menu != null)
+            {
+                panel.ContextMenu = menu;
+            }
 
             m_displayPanels.Add(panel);
             canvas.Children.Add(panel);
@@ -130,7 +153,7 @@ namespace HullEdit
             // If the conversion fails, we didn't select a panel
             PanelDisplay selectedPanel = sender as PanelDisplay;
 
-            if (e.LeftButton == MouseButtonState.Pressed)
+ //           if (e.LeftButton == MouseButtonState.Pressed)
             {
                 if (selectedPanel != null)
                 {
@@ -153,26 +176,6 @@ namespace HullEdit
 
                 Debug.WriteLine("MouseDown 2 {0} {1}", m_dragging, m_rotating);
             }
-            //else if (e.RightButton == MouseButtonState.Pressed)
-            //{
-            //    ContextMenu menu = new ContextMenu();
-            //    MenuItem item = new MenuItem();
-            //    item.Header = "_Vertical Flip";
-            //    item.Click += VerticalFlipClick;
-            //    menu.Items.Add(item);
-
-            //    item = new MenuItem();
-            //    item.Header = "_Horizontal Flip";
-            //    item.Click += HorizontalFlipClick;
-            //    menu.Items.Add(item);
-
-            //    item = new MenuItem();
-            //    item.Header = "_Duplicate";
-            //    item.Click += DuplicateClick;
-            //    menu.Items.Add(item);
-
-            //    menu.Show()
-            //}
         }
 
         private void openClick(object sender, RoutedEventArgs e)
@@ -197,6 +200,8 @@ namespace HullEdit
 
         private void HorizontalFlipClick(object sender, RoutedEventArgs e)
         {
+            Debug.WriteLine("Horizontal flip: {0}", sender);
+
             if (m_selectedPanel != null)
             {
                 m_selectedPanel.HorizontalFlip();
@@ -214,7 +219,7 @@ namespace HullEdit
             }
         }
 
-        private void DuplicateClick(object sender, RoutedEventArgs e)
+        private void CopyClick(object sender, RoutedEventArgs e)
         {
             if (m_selectedPanel != null)
             {
@@ -225,6 +230,56 @@ namespace HullEdit
 
                 m_selectedPanel = panel;
             }
+        }
+        private void DeleteClick(object sender, RoutedEventArgs e)
+        {
+            if (m_selectedPanel != null)
+            {
+                m_displayPanels.Remove(m_selectedPanel);
+                canvas.Children.Remove(m_selectedPanel);
+            }
+        }
+
+        private void AddClick(object sender, RoutedEventArgs e)
+        {
+            Debug.WriteLine("Add Click {0} {1}", sender, PanelSelection.SelectedValue);
+            string selection = PanelSelection.SelectedValue as String;
+            Point loc = Mouse.GetPosition(canvas);
+
+            if (selection != null)
+            {
+                string[] words = selection.Split();
+                if (words.Length == 2)
+                {
+                    int index = Int32.Parse(words[1]);
+                    Panel panel = null;
+
+                    // Figure out what panel was selected
+                    if (words[0] == "Panel")
+                    {
+                        panel = m_panels.panels[index - 1];
+                    }
+                    else if (words[0] == "Bulkhead")
+                    {
+                        panel = m_panels.bulkheads[index - 1];
+                    }
+
+                    if (panel != null)
+                    {
+                        // Move over by half the size so new panel shows up centered on the mouse
+                        Size size = panel.GetSize();
+                        loc.X -= size.Width / 2;
+                        loc.Y -= size.Height / 2;
+
+                        DisplayPanel(panel, loc.X, loc.Y);
+                    }
+                }
+            }
+        }
+
+        private void PanelSelection_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            Debug.WriteLine("Selection Click {0}", sender);
         }
     }
 }

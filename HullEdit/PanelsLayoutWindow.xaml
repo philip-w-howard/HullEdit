@@ -8,10 +8,12 @@
         Title="PanelsWindow" Height="450" Width="800">
     <Window.Resources>
         <ContextMenu x:Key="EditMenu">
-            <MenuItem Header="_Horizontal Flip Selected" Click="HorizontalFlipClick"/>
-            <MenuItem Header="_Vertical Flip Selected" Click="VerticalFlipClick"/>
-            <MenuItem Header="_Duplicate Selected" Click="DuplicateClick"/>
+            <MenuItem Header="_Horizontal Flip" Click="HorizontalFlipClick"/>
+            <MenuItem Header="_Vertical Flip" Click="VerticalFlipClick"/>
+            <MenuItem Header="_Copy" Click="CopyClick"/>
+            <MenuItem Header="_Delete" Click="DeleteClick"/>
         </ContextMenu>
+        <local:ItemList x:Key="PanelList"/>
     </Window.Resources>
     <DockPanel>
         <ToolBarTray Background="White" DockPanel.Dock="Top">
@@ -33,10 +35,10 @@
                     PreviewMouseDown="Panel_PreviewMouseDown" PreviewMouseMove="Panel_PreviewMouseMove" PreviewMouseUp="Panel_PreviewMouseUp" 
                     >
                 <Canvas.ContextMenu>
-                    <ContextMenu>
-                        <MenuItem Header="_Horizontal Flip Selected" Click="HorizontalFlipClick"/>
-                        <MenuItem Header="_Vertical Flip Selected" Click="VerticalFlipClick"/>
-                        <MenuItem Header="_Duplicate Selected" Click="DuplicateClick"/>
+                    <ContextMenu >
+                        <MenuItem Header="_Add" Click="AddClick">
+                            <ComboBox x:Name="PanelSelection" DataContext="{DynamicResource PanelList}" ItemsSource="{Binding}" SelectedIndex="0" SelectionChanged="PanelSelection_SelectionChanged"/>
+                        </MenuItem>
                     </ContextMenu>
                 </Canvas.ContextMenu>
             </Canvas>

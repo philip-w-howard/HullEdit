@@ -6,7 +6,6 @@
 
 	cut layout
 		Rotate panels: works but should always rotate about the center.
-		Flip panels
 		Add selected panels
 		Setup dialog: size, number, arrangement of sheets
 
