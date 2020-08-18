@@ -57,18 +57,6 @@ namespace HullEdit
                     panelList.Add("Bulkhead " + ii);
                 }
             }
-            double y = 10;
-            foreach (Panel p in panels.panels)
-            {
-                DisplayPanel(p, 10, y);
-                y += 40;
-            }
-
-            foreach (Panel p in panels.bulkheads)
-            {
-                DisplayPanel(p, 10, y);
-                y += 40;
-            }
         }
 
 
@@ -277,9 +265,21 @@ namespace HullEdit
             }
         }
 
-        private void PanelSelection_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void AddAllClick(object sender, RoutedEventArgs e)
         {
-            Debug.WriteLine("Selection Click {0}", sender);
+            double y = 10;
+            foreach (Panel p in m_panels.panels)
+            {
+                DisplayPanel(p, 10, y);
+                y += 40;
+            }
+
+            foreach (Panel p in m_panels.bulkheads)
+            {
+                DisplayPanel(p, 10, y);
+                y += 40;
+            }
+
         }
     }
 }

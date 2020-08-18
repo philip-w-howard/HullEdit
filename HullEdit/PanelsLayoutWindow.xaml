@@ -36,8 +36,9 @@
                     >
                 <Canvas.ContextMenu>
                     <ContextMenu >
+                        <MenuItem Header="Add All" Click="AddAllClick" />
                         <MenuItem Header="_Add" Click="AddClick">
-                            <ComboBox x:Name="PanelSelection" DataContext="{DynamicResource PanelList}" ItemsSource="{Binding}" SelectedIndex="0" SelectionChanged="PanelSelection_SelectionChanged"/>
+                            <ComboBox x:Name="PanelSelection" DataContext="{DynamicResource PanelList}" ItemsSource="{Binding}" SelectedIndex="0" />
                         </MenuItem>
                     </ContextMenu>
                 </Canvas.ContextMenu>
