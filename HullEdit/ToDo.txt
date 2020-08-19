@@ -38,6 +38,8 @@ Code/Implementation Enhancements
 	EXCEPTIONS:
 		Throw appropriate ones, and handle all of them.
 
+	WPF can do rotations. Do I need to do them manually?
+	WPF can do scaling, but it seems to scale pen widths. Can I use WPF scaling without managing pen widths?
 
 Bugs
 	going to a small window size sometimes obscures the perspective view (appears to be drawn off-screen).

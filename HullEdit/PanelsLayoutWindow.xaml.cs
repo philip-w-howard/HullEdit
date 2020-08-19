@@ -41,10 +41,10 @@ namespace HullEdit
             set
             {
                 m_scale = value;
-                foreach (PanelDisplay panel in m_displayPanels)
-                {
-                    panel.scale = m_scale;
-                }
+                //foreach (PanelDisplay panel in m_displayPanels)
+                //{
+                //    panel.scale = m_scale;
+                //}
             }
         }
 
@@ -130,6 +130,8 @@ namespace HullEdit
                     m_dragLoc = loc;
                     Canvas.SetLeft(m_selectedPanel, m_selectedPanel.X);
                     Canvas.SetTop(m_selectedPanel, m_selectedPanel.Y);
+                    ResizeCanvas();
+
                 }
                 else if (m_selectedPanel != null && m_rotating)
                 {
@@ -148,6 +150,8 @@ namespace HullEdit
                             m_selectedPanel.Rotate(-ROTATE_STEP);
 
                     }
+                    ResizeCanvas();
+
                 }
             }
         }
@@ -199,11 +203,18 @@ namespace HullEdit
         private void ZoomClick(object sender, RoutedEventArgs e)
         {
             scale += 1;
+            ScaleTransform scaler = new ScaleTransform();
+            scaler.ScaleX = scale;
+            scaler.ScaleY = scale;
+            canvas.LayoutTransform = scaler;
+
+            ResizeCanvas();
         }
 
         private void LayoutClick(object sender, RoutedEventArgs e)
         {
             setupWindow.ShowDialog();
+            ResizeCanvas();
         }
 
         private void HorizontalFlipClick(object sender, RoutedEventArgs e)
@@ -214,6 +225,7 @@ namespace HullEdit
             {
                 m_selectedPanel.HorizontalFlip();
                 Debug.WriteLine("Horizontal Flip");
+                ResizeCanvas();
                 //InvalidateVisual();
             }
         }
@@ -223,7 +235,8 @@ namespace HullEdit
             {
                 m_selectedPanel.VerticalFlip();
                 Debug.WriteLine("Vertical Flip");
-                InvalidateVisual();
+                ResizeCanvas();
+                //InvalidateVisual();
             }
         }
 
@@ -245,6 +258,7 @@ namespace HullEdit
             {
                 m_displayPanels.Remove(m_selectedPanel);
                 canvas.Children.Remove(m_selectedPanel);
+                ResizeCanvas();
             }
         }
 
@@ -280,6 +294,7 @@ namespace HullEdit
                         loc.Y -= size.Height / 2;
 
                         DisplayPanel(panel, loc.X, loc.Y);
+                        ResizeCanvas();
                     }
                 }
             }
@@ -291,15 +306,45 @@ namespace HullEdit
             foreach (Panel p in m_panels.panels)
             {
                 DisplayPanel(p, 10, y);
-                y += 40;
+                y += 15;
             }
 
             foreach (Panel p in m_panels.bulkheads)
             {
                 DisplayPanel(p, 10, y);
-                y += 40;
+                y += 15;
             }
 
+            ResizeCanvas();
+        }
+
+        private void ResizeCanvas()
+        {
+            double maxX = viewerGrid.ActualWidth;
+            double maxY = viewerGrid.ActualHeight;
+
+            //maxX = viewer.ActualWidth/scale;
+            //maxY = viewer.ActualHeight/scale;
+
+            foreach (PanelDisplay panel in m_displayPanels)
+            {
+                Size size = panel.size;
+                maxX = Math.Max(maxX, size.Width + panel.X);
+                maxY = Math.Max(maxY, size.Height + panel.Y);
+            }
+
+            canvas.Width = maxX;
+            canvas.Height = maxY;
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            ResizeCanvas();
+        }
+
+        private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            ResizeCanvas();
         }
     }
 }

@@ -36,6 +36,11 @@ namespace HullEdit
             return point;
         }
 
+        public Size size
+        {
+            get { return m_panel.GetSize(); }
+        }
+
         // Draw the panel.
         // This requires a horrible hierarchy of classes, but it allows us to draw a filled figure,
         // which makes it clickable.

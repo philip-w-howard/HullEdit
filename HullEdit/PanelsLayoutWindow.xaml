@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:HullEdit"
         mc:Ignorable="d"
-        Title="PanelsWindow" Height="450" Width="800">
+        Title="PanelsWindow" Height="450" Width="800" Loaded="Window_Loaded" SizeChanged="Window_SizeChanged">
     <Window.Resources>
         <ContextMenu x:Key="EditMenu">
             <MenuItem Header="_Horizontal Flip" Click="HorizontalFlipClick"/>
@@ -30,19 +30,25 @@
                 </Menu>
             </ToolBar>
         </ToolBarTray>
-        <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-            <Canvas Name="canvas" Background="White" 
-                    PreviewMouseDown="Panel_PreviewMouseDown" PreviewMouseMove="Panel_PreviewMouseMove" PreviewMouseUp="Panel_PreviewMouseUp" 
-                    >
-                <Canvas.ContextMenu>
+        <Grid Name="viewerGrid">
+            <ScrollViewer Name="viewer" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" HorizontalAlignment="Left" VerticalAlignment="Top">
+                <ScrollViewer.ContextMenu>
                     <ContextMenu >
                         <MenuItem Header="Add All" Click="AddAllClick" />
                         <MenuItem Header="_Add" Click="AddClick">
                             <ComboBox x:Name="PanelSelection" DataContext="{DynamicResource PanelList}" ItemsSource="{Binding}" SelectedIndex="0" />
                         </MenuItem>
                     </ContextMenu>
-                </Canvas.ContextMenu>
-            </Canvas>
-        </ScrollViewer>
+                </ScrollViewer.ContextMenu>
+
+                <Canvas Name="canvas" Background="Gray"
+                        PreviewMouseDown="Panel_PreviewMouseDown" PreviewMouseMove="Panel_PreviewMouseMove" PreviewMouseUp="Panel_PreviewMouseUp" 
+                        >
+                     <Canvas.LayoutTransform>
+                        <ScaleTransform ScaleX="1" ScaleY="1"/>
+                    </Canvas.LayoutTransform>
+                </Canvas>
+            </ScrollViewer>
+        </Grid>
     </DockPanel>
 </Window>
