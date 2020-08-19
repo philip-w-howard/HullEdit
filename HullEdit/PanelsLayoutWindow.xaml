@@ -31,7 +31,7 @@
             </ToolBar>
         </ToolBarTray>
         <Grid Name="viewerGrid">
-            <ScrollViewer Name="viewer" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" HorizontalAlignment="Left" VerticalAlignment="Top">
+            <ScrollViewer Name="viewer" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" HorizontalAlignment="Left" VerticalAlignment="Top" >
                 <ScrollViewer.ContextMenu>
                     <ContextMenu >
                         <MenuItem Header="Add All" Click="AddAllClick" />
@@ -41,7 +41,7 @@
                     </ContextMenu>
                 </ScrollViewer.ContextMenu>
 
-                <Canvas Name="canvas" Background="Gray"
+                <Canvas Name="canvas" Background="Gray" MouseWheel="viewer_MouseWheel"
                         PreviewMouseDown="Panel_PreviewMouseDown" PreviewMouseMove="Panel_PreviewMouseMove" PreviewMouseUp="Panel_PreviewMouseUp" 
                         >
                      <Canvas.LayoutTransform>

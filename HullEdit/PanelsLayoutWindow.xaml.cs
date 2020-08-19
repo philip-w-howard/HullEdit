@@ -29,6 +29,7 @@ namespace HullEdit
         private Brush DEFAULT_BACKGROUND = Brushes.White;
         private Brush DEFAULT_FOREGROUND = Brushes.Black;
         private Brush SELECTED_FOREGROUND = Brushes.Red;
+        private double SCALE_MOVE = 0.25;
         private double MIN_ROTATE_DRAG = 3;
         private double ROTATE_STEP = Math.PI / 180;
         private bool m_dragging;
@@ -41,6 +42,10 @@ namespace HullEdit
             set
             {
                 m_scale = value;
+                ScaleTransform scaler = new ScaleTransform();
+                scaler.ScaleX = scale;
+                scaler.ScaleY = scale;
+                canvas.LayoutTransform = scaler;
                 //foreach (PanelDisplay panel in m_displayPanels)
                 //{
                 //    panel.scale = m_scale;
@@ -203,10 +208,6 @@ namespace HullEdit
         private void ZoomClick(object sender, RoutedEventArgs e)
         {
             scale += 1;
-            ScaleTransform scaler = new ScaleTransform();
-            scaler.ScaleX = scale;
-            scaler.ScaleY = scale;
-            canvas.LayoutTransform = scaler;
 
             ResizeCanvas();
         }
@@ -320,8 +321,8 @@ namespace HullEdit
 
         private void ResizeCanvas()
         {
-            double maxX = viewerGrid.ActualWidth;
-            double maxY = viewerGrid.ActualHeight;
+            double maxX = viewerGrid.ActualWidth/scale;
+            double maxY = viewerGrid.ActualHeight/scale;
 
             //maxX = viewer.ActualWidth/scale;
             //maxY = viewer.ActualHeight/scale;
@@ -332,6 +333,8 @@ namespace HullEdit
                 maxX = Math.Max(maxX, size.Width + panel.X);
                 maxY = Math.Max(maxY, size.Height + panel.Y);
             }
+
+            Debug.WriteLine("Resize: Prev: {0} Viewer: {1} New: {2}", canvas.ActualHeight, viewerGrid.ActualHeight, maxY);
 
             canvas.Width = maxX;
             canvas.Height = maxY;
@@ -345,6 +348,21 @@ namespace HullEdit
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             ResizeCanvas();
+        }
+
+        private void viewer_MouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
+            {
+                if (e.Delta > 0)
+                    scale += scale * SCALE_MOVE;
+                else if (e.Delta < 0)
+                    scale -= scale * SCALE_MOVE;
+                Debug.WriteLine("Zoom {0} {1}", e.Delta, scale);
+                ResizeCanvas();
+                e.Handled = true;
+            }
+            //base.MouseWheel(sender, e);
         }
     }
 }
