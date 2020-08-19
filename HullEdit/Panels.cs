@@ -13,7 +13,6 @@ namespace HullEdit
     public class Panels
     {
         private const int POINTS_PER_CHINE = 50;
-        private const double DEFAULT_SCALE = 3;
 
         private List<Panel> m_panels;
         private List<Panel> m_bulkheads;
@@ -30,7 +29,6 @@ namespace HullEdit
             for (int ii = 0; ii < numPanels; ii++)
             {
                 Panel panel = new Panel(hull.GetChine(ii), hull.GetChine(ii + 1));
-                panel.scale = DEFAULT_SCALE;
                 m_panels.Add(panel);
             }
 
@@ -68,7 +66,6 @@ namespace HullEdit
                     if (points[0].X != 0) points.Add(points[0]);
 
                     Panel panel = new Panel(points);
-                    panel.scale = DEFAULT_SCALE;
                     m_bulkheads.Add(panel);
                 }
             }

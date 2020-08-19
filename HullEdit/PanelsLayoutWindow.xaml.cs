@@ -34,6 +34,20 @@ namespace HullEdit
         private bool m_dragging;
         private bool m_rotating;
 
+        private double m_scale;
+        private double scale
+        {
+            get { return m_scale; }
+            set
+            {
+                m_scale = value;
+                foreach (PanelDisplay panel in m_displayPanels)
+                {
+                    panel.scale = m_scale;
+                }
+            }
+        }
+
         private PanelDisplay m_selectedPanel;
         Panels m_panels;
         ObservableCollection<PanelDisplay> m_displayPanels = new ObservableCollection<PanelDisplay>();
@@ -43,6 +57,7 @@ namespace HullEdit
 
         public PanelsLayoutWindow(Panels panels)
         {
+            m_scale = 1;
             m_panels = panels;
             InitializeComponent();
 
@@ -63,10 +78,9 @@ namespace HullEdit
             setupWindow.ShowDialog();
         }
 
-
         public void DisplayPanel(Panel p, double x, double y)
         {
-            PanelDisplay panel = new PanelDisplay(p);
+            PanelDisplay panel = new PanelDisplay(p, m_scale);
             panel.Background = DEFAULT_BACKGROUND;
             panel.Foreground = DEFAULT_FOREGROUND;
 
@@ -184,7 +198,7 @@ namespace HullEdit
 
         private void ZoomClick(object sender, RoutedEventArgs e)
         {
-
+            scale += 1;
         }
 
         private void LayoutClick(object sender, RoutedEventArgs e)

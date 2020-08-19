@@ -16,14 +16,24 @@ namespace HullEdit
         protected const int DEFAULT_WIDTH = 600;
         protected const int DEFAULT_HEIGHT = 400;
 
+        public double scale { get; set; }
+
         protected Panel m_panel;
 
         public double X { get; set; }
         public double Y { get; set; }
 
-        public PanelDisplay(Panel p)
+        public PanelDisplay(Panel p, double scale)
         {
             m_panel = p.Copy();
+            this.scale = scale;
+        }
+
+        private Point ScaledPoint(Point point)
+        {
+            point.X *= scale;
+            point.Y *= scale;
+            return point;
         }
 
         // Draw the panel.
@@ -38,12 +48,12 @@ namespace HullEdit
             for (int ii = 1; ii < m_panel.NumPoints; ii++)
             {
                 line = new LineSegment();
-                line.Point = m_panel.point(ii);
+                line.Point = ScaledPoint(m_panel.point(ii));
                 lines.Add(line);
             }
 
             PathFigure path = new PathFigure();
-            path.StartPoint = m_panel.point(0);
+            path.StartPoint = ScaledPoint(m_panel.point(0));
             path.Segments = lines;
 
             PathFigureCollection actualPath = new PathFigureCollection();
@@ -57,7 +67,7 @@ namespace HullEdit
 
         public PanelDisplay Copy()
         {
-            PanelDisplay newDisplay = new PanelDisplay(m_panel.Copy());
+            PanelDisplay newDisplay = new PanelDisplay(m_panel.Copy(), scale);
             newDisplay.X = this.X;
             newDisplay.Y = this.Y;
 

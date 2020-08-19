@@ -15,8 +15,6 @@ namespace HullEdit
 {
     public class Panel : INotifyPropertyChanged
     {
-        public double scale { get; set; }
-
         private const double MIN_EDGE_LENGTH = 0.1;
 
         public int NumPoints { get { return m_panelPoints.Count; } }
@@ -35,21 +33,19 @@ namespace HullEdit
         public Point point(int index)
         {
             Point p = new Point();
-            p.X = m_panelPoints[index].X * scale;
-            p.Y = m_panelPoints[index].Y * scale;
+            p.X = m_panelPoints[index].X;
+            p.Y = m_panelPoints[index].Y;
 
             return p;
         }
 
         public Panel()
         {
-            scale = 1;
         }
 
         // Develop the panel from two chines
         public Panel(Point3DCollection chine1, Point3DCollection chine2)
         {
-            scale = 1;
             Panelize(chine1, chine2);
             HorizontalizePanel();
             ShiftTo(0, 0);
@@ -71,7 +67,6 @@ namespace HullEdit
             Panel newPanel = new Panel();
 
             newPanel.m_panelPoints = m_panelPoints.Clone();
-            newPanel.scale = this.scale;
 
             return newPanel;
         }
@@ -81,8 +76,6 @@ namespace HullEdit
             Point intersection_a1, intersection_a2;
             Point intersection_b1, intersection_b2;
             PointCollection edge2 = new PointCollection();
-
-            scale = 1.0;
 
             m_panelPoints = new PointCollection();
 
@@ -236,12 +229,13 @@ namespace HullEdit
 
         public Size GetSize()
         {
+            // FIXTHIS: ComputeSize should return a size
             double size_x;
             double size_y;
 
             Geometry.ComputeSize(m_panelPoints, out size_x, out size_y);
 
-            return new Size(size_x*scale, size_y*scale);
+            return new Size(size_x, size_y);
         }
 
         public void VerticalFlip()
