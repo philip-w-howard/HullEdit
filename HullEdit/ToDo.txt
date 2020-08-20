@@ -7,9 +7,9 @@
 	cut layout
 		Setup dialog: size, number, arrangement of sheets
 		Display sheets and scale accordingly
-		put scale in appropriate place
-		Dynamically change size of canvas. Write SetCanvasSize method that gets called on update.
 		Ability to split panels in two
+
+		Fix ability to re-show the Setup Dialog.
 
 	Status bar at the bottom showing x,y,z location, etc.
 

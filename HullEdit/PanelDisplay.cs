@@ -16,7 +16,12 @@ namespace HullEdit
         protected const int DEFAULT_WIDTH = 600;
         protected const int DEFAULT_HEIGHT = 400;
 
-        public double scale { get; set; }
+        private double m_scale;
+        public double scale
+        {
+            get { return m_scale; }
+            set { m_scale = value; InvalidateVisual(); }
+        }
 
         protected Panel m_panel;
 
@@ -38,7 +43,13 @@ namespace HullEdit
 
         public Size size
         {
-            get { return m_panel.GetSize(); }
+            get
+            {
+                Size s = m_panel.GetSize();
+                s.Width *= scale;
+                s.Height *= scale;
+                return s;
+            }
         }
 
         // Draw the panel.
@@ -46,6 +57,7 @@ namespace HullEdit
         // which makes it clickable.
         protected override void OnRender(DrawingContext drawingContext)
         {
+            Debug.WriteLine("PanelDisplay.OnRender");
             // Need a PathGeometry
             LineSegment line = new LineSegment();
             PathSegmentCollection lines = new PathSegmentCollection();
@@ -75,6 +87,7 @@ namespace HullEdit
             PanelDisplay newDisplay = new PanelDisplay(m_panel.Copy(), scale);
             newDisplay.X = this.X;
             newDisplay.Y = this.Y;
+            newDisplay.scale = this.scale;
 
             return newDisplay;
         }
@@ -90,13 +103,13 @@ namespace HullEdit
 
             if (m_panel == null) return availableSize;
 
-            Size size = m_panel.GetSize();
+            Size s = size;
 
-            Width = size.Width;
-            Height = size.Height;
+            Width = s.Width;
+            Height = s.Height;
 
             Debug.WriteLine("PanelDisplay MeasureOverride {0} {1}", Width, Height);
-            return size;
+            return s;
         }
         protected override Size ArrangeOverride(Size finalSize)
         {

@@ -36,6 +36,14 @@ namespace HullEdit
         private bool m_rotating;
 
         private double m_scale;
+
+        // values from setup window
+        private double m_panelWidth;
+        private double m_panelHeight;
+        private int m_NumHorizontalPanels;
+        private int m_NumVerticalPanels;
+        private double m_overallScale;
+
         private double scale
         {
             get { return m_scale; }
@@ -46,17 +54,12 @@ namespace HullEdit
                 scaler.ScaleX = scale;
                 scaler.ScaleY = scale;
                 canvas.LayoutTransform = scaler;
-                //foreach (PanelDisplay panel in m_displayPanels)
-                //{
-                //    panel.scale = m_scale;
-                //}
             }
         }
 
         private PanelDisplay m_selectedPanel;
         Panels m_panels;
         ObservableCollection<PanelDisplay> m_displayPanels = new ObservableCollection<PanelDisplay>();
-        private PanelSetupWindow setupWindow;
 
         Point m_dragLoc;
 
@@ -79,13 +82,12 @@ namespace HullEdit
                 }
             }
 
-            setupWindow = new PanelSetupWindow();
-            setupWindow.ShowDialog();
+            UpdatePanelLayout();
         }
 
         public void DisplayPanel(Panel p, double x, double y)
         {
-            PanelDisplay panel = new PanelDisplay(p, m_scale);
+            PanelDisplay panel = new PanelDisplay(p, m_overallScale);
             panel.Background = DEFAULT_BACKGROUND;
             panel.Foreground = DEFAULT_FOREGROUND;
 
@@ -115,6 +117,61 @@ namespace HullEdit
             Canvas.SetTop(panel, panel.Y);
         }
 
+        private void UpdatePanelLayout()
+        {
+            // FIXTHIS: need to use data binding for this
+            double oldScale = m_overallScale;
+
+            PanelSetupWindow setup = new PanelSetupWindow();
+            setup.ShowDialog();
+
+            m_panelWidth = setup.PanelWidth;
+            m_panelHeight = setup.PanelHeight;
+            m_NumHorizontalPanels = setup.NumPanelsHorizontal;
+            m_NumVerticalPanels = setup.NumPanelsVertical;
+            m_overallScale = setup.OverallScale;
+
+            double scaleRatio = m_overallScale / oldScale;
+
+            canvas.Children.Clear();
+
+            Point sheetLoc = new Point(0, 0);
+            double panelWidth = m_panelWidth * m_overallScale;
+            double panelHeight = m_panelHeight * m_overallScale;
+
+            for (int row=0; row< m_NumVerticalPanels; row++)
+            {
+                for (int col=0; col< m_NumHorizontalPanels; col++)
+                {
+                    Rectangle rect = new Rectangle();
+                    rect.Width = panelWidth;
+                    rect.Height = panelHeight;
+                    rect.Stroke = new SolidColorBrush(Colors.Blue);
+                    rect.Fill = new SolidColorBrush(Colors.White);
+                    Canvas.SetLeft(rect, sheetLoc.X);
+                    Canvas.SetTop(rect, sheetLoc.Y);
+                    canvas.Children.Add(rect);
+
+                    sheetLoc.X += panelWidth;
+                }
+
+                sheetLoc.X = 0;
+                sheetLoc.Y += panelHeight;
+            }
+
+            foreach (PanelDisplay panel in m_displayPanels)
+            {
+                panel.scale = m_overallScale;
+                panel.X *= scaleRatio;
+                panel.Y *= scaleRatio;
+
+                canvas.Children.Add(panel);
+                Canvas.SetLeft(panel, panel.X);
+                Canvas.SetTop(panel, panel.Y);
+            }
+
+            InvalidateVisual();
+        }
         private void Panel_PreviewMouseUp(object sender, MouseButtonEventArgs e)
         {
             m_dragging = false;
@@ -214,7 +271,7 @@ namespace HullEdit
 
         private void LayoutClick(object sender, RoutedEventArgs e)
         {
-            setupWindow.ShowDialog();
+            UpdatePanelLayout();
             ResizeCanvas();
         }
 

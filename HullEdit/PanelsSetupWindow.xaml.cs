@@ -14,6 +14,15 @@ using System.Windows.Shapes;
 
 namespace HullEdit
 {
+    public class SetupData
+    {
+        public double panelWidth { get; set; }
+        public double panelHeight { get; set; }
+        public int numPanelsHorizontal { get; set; }
+        public int numPanelsVertical { get; set; }
+        public double overallScale { get; set; }
+    };
+
     /// <summary>
     /// Interaction logic for PanelLayoutWindow.xaml
     /// </summary>
@@ -25,22 +34,16 @@ namespace HullEdit
         public int NumPanelsHorizontal { get; private set; }
         public int NumPanelsVertical { get; private set; }
 
+        public double OverallScale { get; private set; }
+
         public PanelSetupWindow()
         {
-            PanelWidth = 96;
-            PanelHeight = 48;
-            NumPanelsHorizontal = 1;
-            NumPanelsVertical = 1;
-
             InitializeComponent();
 
-            PanelWidth_Input.Text = "" + PanelWidth;
-            PanelHeight_Input.Text = "" + PanelHeight;
-            NumWidth_Input.Text = "" + NumPanelsHorizontal;
-            NumHeight_Input.Text = "" + NumPanelsVertical;
+            UpdateProperties();
         }
 
-        private void OK_Click(object sender, RoutedEventArgs e)
+        private void UpdateProperties()
         {
             double size;
             int intSize;
@@ -48,7 +51,11 @@ namespace HullEdit
             if (Double.TryParse(PanelHeight_Input.Text, out size)) PanelHeight = size;
             if (Int32.TryParse(NumWidth_Input.Text, out intSize)) NumPanelsHorizontal = intSize;
             if (Int32.TryParse(NumHeight_Input.Text, out intSize)) NumPanelsVertical = intSize;
-
+            if (Double.TryParse(OverallScale_Input.Text, out size)) OverallScale = size;
+        }
+        private void OK_Click(object sender, RoutedEventArgs e)
+        {
+            UpdateProperties();
             Close();
         }
         private void Cancel_Click(object sender, RoutedEventArgs e)
