@@ -35,7 +35,7 @@
         </Grid>
         <StackPanel Orientation="Horizontal">
             <Label>Overall Scale:</Label>
-            <TextBox Name="OverallScale_Input" Width="20"  Text="{Binding overallScale}" />
+            <TextBox Name="OverallScale_Input" Width="20" Text="{Binding overallScale}" />
         </StackPanel>
         <StackPanel Orientation="Horizontal">
             <Button Click="OK_Click" Margin="5">OK</Button>

@@ -5,11 +5,8 @@
 		Save panels
 
 	cut layout
-		Setup dialog: size, number, arrangement of sheets
 		Display sheets and scale accordingly
 		Ability to split panels in two
-
-		Fix ability to re-show the Setup Dialog.
 
 	Status bar at the bottom showing x,y,z location, etc.
 

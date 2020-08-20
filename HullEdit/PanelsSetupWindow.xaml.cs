@@ -20,7 +20,7 @@ namespace HullEdit
         public double panelHeight { get; set; }
         public int numPanelsHorizontal { get; set; }
         public int numPanelsVertical { get; set; }
-        public double overallScale { get; set; }
+        public String overallScale { get; set; }
     };
 
     /// <summary>

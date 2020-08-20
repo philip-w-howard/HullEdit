@@ -381,6 +381,9 @@ namespace HullEdit
             double maxX = viewerGrid.ActualWidth/scale;
             double maxY = viewerGrid.ActualHeight/scale;
 
+            maxX = Math.Max(maxX, m_NumHorizontalPanels * m_panelWidth * m_overallScale);
+            maxY = Math.Max(maxY, m_NumVerticalPanels * m_panelHeight * m_overallScale);
+
             //maxX = viewer.ActualWidth/scale;
             //maxY = viewer.ActualHeight/scale;
 
