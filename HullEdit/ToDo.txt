@@ -5,7 +5,6 @@
 		Save panels
 
 	cut layout
-		Display sheets and scale accordingly
 		Ability to split panels in two
 
 	Status bar at the bottom showing x,y,z location, etc.
@@ -31,6 +30,7 @@ Code/Implementation Enhancements
 	Use foreach loops where appropriate
 		Started, need to finish.
 	MVC: Model (data) View (appearance) Control (user interaction): should be separate classes.
+	MVVM Model, View, ViewModel: VM translates model for the view.
 
 	EXCEPTIONS:
 		Throw appropriate ones, and handle all of them.

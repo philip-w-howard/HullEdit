@@ -4,6 +4,6 @@
              xmlns:local="clr-namespace:HullEdit"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
+        <local:SetupData x:Key="MySetupData" panelWidth="96" panelHeight="48" numPanelsHorizontal="3" numPanelsVertical="2" overallScale="3" />
     </Application.Resources>
 </Application>
