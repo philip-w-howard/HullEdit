@@ -6,9 +6,6 @@
         xmlns:local="clr-namespace:HullEdit"
         mc:Ignorable="d"
         Title="PanelSetupWindow" Height="200" Width="300">
-    <Window.Resources>
-        <!--<local:SetupData x:Key="MySetupData" panelWidth="96" panelHeight="48" numPanelsHorizontal="3" numPanelsVertical="2" overallScale="3" />-->
-    </Window.Resources>
     <StackPanel DataContext="{DynamicResource MySetupData}">
         <Grid Width="200" HorizontalAlignment="Left">
             <Grid.ColumnDefinitions>

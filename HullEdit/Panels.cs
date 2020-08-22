@@ -12,7 +12,7 @@ namespace HullEdit
 {
     public class Panels
     {
-        private const int POINTS_PER_CHINE = 50;
+        private const int POINTS_PER_CHINE = 500;
 
         private List<Panel> m_panels;
         private List<Panel> m_bulkheads;
@@ -22,13 +22,16 @@ namespace HullEdit
 
         public Panels(Hull hull)
         {
-            int numPanels = hull.numChines - 1;
+            Hull highResHull = hull.Copy();
+            highResHull.PrepareChines(POINTS_PER_CHINE);
+
+            int numPanels = highResHull.numChines - 1;
 
             m_panels = new List<Panel>();
 
             for (int ii = 0; ii < numPanels; ii++)
             {
-                Panel panel = new Panel(hull.GetChine(ii), hull.GetChine(ii + 1));
+                Panel panel = new Panel(highResHull.GetChine(ii), highResHull.GetChine(ii + 1));
                 m_panels.Add(panel);
             }
 
