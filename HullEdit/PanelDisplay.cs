@@ -16,6 +16,9 @@ namespace HullEdit
         protected const int DEFAULT_WIDTH = 600;
         protected const int DEFAULT_HEIGHT = 400;
 
+        public enum OutputFormatType { DECIMAL_FULL, DECIMAL_2, DECIMAL_3, DECIMAL_4, EIGHTHS, SIXTEENTHS, DECIMAL_8THS, DECIMAL_16THS };
+        public OutputFormatType OutputFormat { get; set; }
+
         private double m_scale;
         public double scale
         {
@@ -32,6 +35,7 @@ namespace HullEdit
         {
             m_panel = p.Copy();
             this.scale = scale;
+            OutputFormat = OutputFormatType.SIXTEENTHS;
         }
 
         private Point ScaledPoint(Point point)
@@ -88,6 +92,7 @@ namespace HullEdit
             newDisplay.X = this.X;
             newDisplay.Y = this.Y;
             newDisplay.scale = this.scale;
+            newDisplay.OutputFormat = this.OutputFormat;
 
             return newDisplay;
         }
@@ -136,6 +141,47 @@ namespace HullEdit
         {
             m_panel.VerticalFlip();
             InvalidateVisual();
+        }
+
+        private String formatPoint(Point point)
+        {
+            point.X += X;
+            point.Y += Y;
+
+            String result = "";
+            int value;
+            int ones;
+            int fraction;
+            switch (OutputFormat)
+            {
+                case OutputFormatType.SIXTEENTHS:
+                    value = (int)Math.Round(point.X * 16);
+                    ones = value / 16;
+                    fraction = value % 16;
+                    result += ones + " " + fraction + "/16, ";
+
+                    value = (int)Math.Round(point.Y * 16.0);
+                    ones = value / 16;
+                    fraction = value % 16;
+                    result += ones + " " + fraction + "/16\n";
+                    break;
+                default:
+                    result += point.X + ", ";
+                    result += point.Y + "/n";
+                    break;
+            }
+            return result;
+        }
+        public override string ToString()
+        {
+            String result = "\n";
+
+            for (int ii=0; ii<m_panel.NumPoints; ii++)
+            {
+                result += formatPoint(m_panel.point(ii));
+            }
+
+            return result;
         }
     }
 }
