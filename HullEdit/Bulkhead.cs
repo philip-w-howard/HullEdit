@@ -77,7 +77,7 @@ namespace HullEdit
             return m_points[index];
         }
 
-        double NewZPoint(Point3D basePoint, Point3D newPoint)
+        private double NewZPoint(Point3D basePoint, Point3D newPoint)
         {
             return basePoint.Z + (newPoint.Y - basePoint.Y) * Math.Cos(m_transom_angle) / Math.Sin(m_transom_angle);
         }

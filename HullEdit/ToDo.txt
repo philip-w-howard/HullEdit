@@ -26,6 +26,9 @@
 	Undo/Redo capability
 
 Code/Implementation Enhancements
+    Serializability:
+		Mark object as [Serializable()]
+		Can mark individual fields as [NonSerialized()]
 	Does Bulkhead need to implement INotifyPropertyChanged?
 	Use foreach loops where appropriate
 		Started, need to finish.
@@ -62,3 +65,69 @@ Rectangle
 	IsManipulationEnabled
 	ManipulationStarting, Started, Delta, IniertiaStarting, Completed, BoundaryFeedback
 
+********************************************
+Serialization stuff
+        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            /*
+        public int numBulkheads { get; private set; }
+        public int numChines { get; private set; }
+
+        private List<Bulkhead> m_bulkheads;
+        private List<Point3DCollection> m_chines;
+
+        public Bulkhead GetBulkhead(int index) { return m_bulkheads[index]; }
+        public Point3DCollection GetChine(int index) { return m_chines[index]; }
+
+        private bool m_IsValid;
+        public bool IsValid
+
+            */
+            info.AddValue("isValid", m_IsValid, typeof(bool));
+            if (IsValid)
+            {
+                info.AddValue("numBulkheads", numBulkheads, typeof(int));
+                info.AddValue("numChines", numChines, typeof(int));
+                info.AddValue("bulkheads", m_bulkheads, typeof(List<Bulkhead>));
+            }
+        }
+
+        public XmlSchema GetSchema()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ReadXml(XmlReader reader)
+        {
+            m_IsValid = (bool)info.GetValue("isValid", typeof(bool));
+            if (m_IsValid)
+            {
+                numBulkheads = (int)info.GetValue("numBulkheads", typeof(int));
+                numChines = (int)info.GetValue("nunChines", typeof(int));
+                m_bulkheads = (List<Bulkhead>)info.GetValue("bulkheads", typeof(List<Bulkhead>));
+            }
+        }
+
+        public void WriteXml(XmlWriter writer)
+        {
+            writer.WriteAttributeString("isValid", m_IsValid.ToString());
+
+            if (IsValid)
+            {
+                writer.WriteElementString("numBulkheads", "" + numBulkheads);
+                writer.WriteElementString("numChines", "" + numChines);
+                //writer.WriteValue(m_bulkheads);
+            }
+
+        }
+
+        public Hull(SerializationInfo info, StreamingContext context)
+        {
+            m_IsValid = (bool)info.GetValue("isValid", typeof(bool));
+            if (m_IsValid)
+            {
+                numBulkheads = (int)info.GetValue("numBulkheads", typeof(int));
+                numChines = (int)info.GetValue("nunChines", typeof(int));
+                m_bulkheads = (List<Bulkhead>)info.GetValue("bulkheads", typeof(List<Bulkhead>));
+            }
+        }

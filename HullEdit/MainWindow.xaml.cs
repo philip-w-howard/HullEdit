@@ -3,7 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -123,6 +126,25 @@ namespace HullEdit
 
         private void saveClick(object sender, RoutedEventArgs e)
         {
+            if (myHull == null || !myHull.IsValid) return;
+
+            SaveFileDialog saveDlg = new SaveFileDialog();
+
+            saveDlg.Filter = "AVS Hull files (*.avsh)|*.avsh|All files (*.*)|*.*";
+            saveDlg.FilterIndex = 0;
+            saveDlg.RestoreDirectory = true;
+
+            Nullable<bool> result = saveDlg.ShowDialog();
+            if (result == true)
+            {
+                //System.Xml.Serialization.XmlSerializer writer = new System.Xml.Serialization.XmlSerializer(typeof(Hull));
+                IFormatter formatter = new BinaryFormatter();
+                //IFormatter formatter = new SoapFormatter();
+
+                FileStream s = new FileStream(saveDlg.FileName, FileMode.Create);
+                formatter.Serialize(s, myHull);
+                s.Close();
+            }
 
         }
 
