@@ -17,6 +17,8 @@ namespace HullEdit
     {
         private const double MIN_EDGE_LENGTH = 0.1;
 
+        public string name { get; set; }
+
         public int NumPoints { get { return m_panelPoints.Count; } }
 
         protected PointCollection m_panelPoints;
@@ -60,13 +62,15 @@ namespace HullEdit
             {
                 m_panelPoints.Add(new Point(point.X, point.Y));
             }
+            ShiftTo(0, 0);
         }
 
         public Panel Copy()
         {
             Panel newPanel = new Panel();
 
-            newPanel.m_panelPoints = m_panelPoints.Clone();
+            newPanel.m_panelPoints = this.m_panelPoints.Clone();
+            newPanel.name = this.name;
 
             return newPanel;
         }

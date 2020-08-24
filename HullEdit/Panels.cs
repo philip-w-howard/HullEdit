@@ -32,6 +32,7 @@ namespace HullEdit
             for (int ii = 0; ii < numPanels; ii++)
             {
                 Panel panel = new Panel(highResHull.GetChine(ii), highResHull.GetChine(ii + 1));
+                panel.name = "Chine " + (ii + 1);
                 m_panels.Add(panel);
             }
 
@@ -69,6 +70,7 @@ namespace HullEdit
                     if (points[0].X != 0) points.Add(points[0]);
 
                     Panel panel = new Panel(points);
+                    panel.name = "Bulkhead " + (bulkhead + 1);
                     m_bulkheads.Add(panel);
                 }
             }

@@ -145,8 +145,8 @@ namespace HullEdit
 
         private String formatPoint(Point point)
         {
-            point.X += X;
-            point.Y += Y;
+            point.X += X/scale;
+            point.Y += Y/scale;
 
             String result = "";
             int value;
@@ -175,6 +175,9 @@ namespace HullEdit
         public override string ToString()
         {
             String result = "\n";
+
+            if (m_panel.name != null && m_panel.name.Length > 0) result += m_panel.name;
+            result += " (" + X + ", " + Y + ")\n";
 
             for (int ii=0; ii<m_panel.NumPoints; ii++)
             {
