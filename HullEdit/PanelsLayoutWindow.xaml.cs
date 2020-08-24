@@ -1,7 +1,9 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -423,6 +425,27 @@ namespace HullEdit
                 e.Handled = true;
             }
             //base.MouseWheel(sender, e);
+        }
+
+        private void outputClick(object sender, RoutedEventArgs e)
+        {
+            SaveFileDialog saveDlg = new SaveFileDialog();
+
+            saveDlg.Filter = "txt files (*.txt)|*.txt|All files (*.*)|*.*";
+            saveDlg.FilterIndex = 2;
+            saveDlg.RestoreDirectory = true;
+
+            Nullable<bool> result = saveDlg.ShowDialog();
+            if (result == true)
+            {
+                using (System.IO.StreamWriter output = new System.IO.StreamWriter(saveDlg.FileName))
+                {
+                    foreach (PanelDisplay panel in m_displayPanels)
+                    {
+                        output.Write(panel.ToString());
+                    }
+                }
+            }
         }
     }
 }

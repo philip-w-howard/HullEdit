@@ -12,7 +12,7 @@ namespace HullEdit
 {
     public class Panels
     {
-        private const int POINTS_PER_CHINE = 500;
+        private const int POINTS_PER_CHINE = 50;
 
         private List<Panel> m_panels;
         private List<Panel> m_bulkheads;
