@@ -43,8 +43,8 @@ namespace HullEdit
             }
         }
 
-        public int numChines { get { return m_Hull.numChines; } }
-        public int numBulkheads { get { return m_Hull.numBulkheads; } }
+        public int numChines { get { return m_Hull.numChines(); } }
+        public int numBulkheads { get { return m_Hull.numBulkheads(); } }
 
         public HullDisplay()
         {
@@ -69,7 +69,7 @@ namespace HullEdit
 
             Pen pen = new Pen(System.Windows.Media.Brushes.Black, 1.0);
 
-            for (int bulkhead = 0; bulkhead < m_Hull.numBulkheads; bulkhead++)
+            for (int bulkhead = 0; bulkhead < m_Hull.numBulkheads(); bulkhead++)
             {
                 Bulkhead bulk = m_Hull.GetBulkhead(bulkhead);
                 for (int chine = 0; chine < bulk.Count - 1; chine++)
@@ -83,7 +83,7 @@ namespace HullEdit
 
             pen = new Pen(System.Windows.Media.Brushes.Gray, 1.0);
 
-            for (int chine = 0; chine < m_Hull.numChines; chine++)
+            for (int chine = 0; chine < m_Hull.numChines(); chine++)
             {
                 Point3DCollection currChine = m_Hull.GetChine(chine);
 
@@ -109,7 +109,7 @@ namespace HullEdit
                 {
                     m_handles = new List<Rect>();
 
-                    for (int ii = 0; ii < m_Hull.numChines; ii++)
+                    for (int ii = 0; ii < m_Hull.numChines(); ii++)
                     {
                         Rect rect = new Rect();
                         rect.Height = HANDLE_SIZE;

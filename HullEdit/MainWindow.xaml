@@ -11,8 +11,9 @@
             <ToolBar Band="0 " BandIndex="1">
                 <Menu >
                     <MenuItem Header="_File">
-                        <MenuItem Header="Open" Click="openClick"/>
-                        <MenuItem Header="Save" Click="saveClick"/>
+                        <MenuItem Header="_Open" Click="openClick"/>
+                        <MenuItem Header="_Save" Click="saveClick"/>
+                        <MenuItem Header="_Import Carlson HUL file" Click="importClick"/>
                     </MenuItem>
                     <MenuItem Header="_Tools">
                         <MenuItem Name="PanelsMenu" Header="_Panels" Click="PanelsClick" IsEnabled="False"/>

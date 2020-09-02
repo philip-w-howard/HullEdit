@@ -13,16 +13,27 @@ namespace HullEdit
     {
         private const int POINTS_PER_CHINE = 50;
 
-        public int numBulkheads { get; private set; }
-        public int numChines { get; private set; }
+        public int numBulkheads()
+        {
+            if (!IsValid) return 0;
+            if (m_bulkheads == null) return 0;
+            return m_bulkheads.Count;
+        }
 
-        private List<Bulkhead> m_bulkheads;
+        public int numChines()
+        {
+            if (numBulkheads() == 0) return 0;
+
+            return m_bulkheads[0].Count;
+        }
+
+        public List<Bulkhead> m_bulkheads;
         private List<Point3DCollection> m_chines;
 
         public Bulkhead GetBulkhead(int index) { return m_bulkheads[index]; }
         public Point3DCollection GetChine(int index) { return m_chines[index]; }
 
-        private bool m_IsValid;
+        public bool m_IsValid;
         public bool IsValid
         {
             get
@@ -58,27 +69,25 @@ namespace HullEdit
             using (StreamReader file = File.OpenText(filename))
             {
                 string line;
-                int num_chines = numChines;
+                int num_chines;
+                int numBulkheads = 5;
 
                 line = file.ReadLine();
                 if (!int.TryParse(line, out num_chines)) throw new Exception("Invalid HUL file format");
 
-                numChines = num_chines;
-                numBulkheads = 5;
-
                 Bulkhead bulkhead = new Bulkhead();
-                bulkhead.LoadFromHullFile(file, numChines, Bulkhead.BulkheadType.BOW);
+                bulkhead.LoadFromHullFile(file, num_chines, Bulkhead.BulkheadType.BOW);
                 m_bulkheads.Add(bulkhead);
 
                 for (int ii = 1; ii < numBulkheads-1; ii++)
                 {
                     bulkhead = new Bulkhead();
-                    bulkhead.LoadFromHullFile(file, numChines, Bulkhead.BulkheadType.VERTICAL);
+                    bulkhead.LoadFromHullFile(file, num_chines, Bulkhead.BulkheadType.VERTICAL);
                     m_bulkheads.Add(bulkhead);
                 }
 
                 bulkhead = new Bulkhead();
-                bulkhead.LoadFromHullFile(file, numChines, Bulkhead.BulkheadType.TRANSOM);
+                bulkhead.LoadFromHullFile(file, num_chines, Bulkhead.BulkheadType.TRANSOM);
                 m_bulkheads.Add(bulkhead);
             }
             PrepareChines(POINTS_PER_CHINE);
@@ -96,8 +105,6 @@ namespace HullEdit
 
             if (IsValid)
             {
-                fullHull.numBulkheads = numBulkheads;
-                fullHull.numChines = numChines;
                 fullHull.m_chines = null;
                 fullHull.m_bulkheads = new List<Bulkhead>();
 
@@ -105,9 +112,6 @@ namespace HullEdit
                 {
                     fullHull.m_bulkheads.Add(bulk.CopyWithReflection());
                 }
-
-
-                fullHull.numChines = fullHull.m_bulkheads[0].Count;
 
                 fullHull.m_IsValid = true;
 
@@ -122,8 +126,6 @@ namespace HullEdit
 
             if (IsValid)
             {
-                copy.numBulkheads = numBulkheads;
-                copy.numChines = numChines;
                 copy.m_chines = null;
 
                 // need to manually make a deep copy
@@ -162,14 +164,14 @@ namespace HullEdit
 
         private void UpdateWithMatrix(double [,] matrix)
         {
-            for (int ii = 0; ii < numBulkheads; ii++)
+            for (int ii = 0; ii < numBulkheads(); ii++)
             {
                 m_bulkheads[ii].UpdateWithMatrix(matrix);
             }
 
             if (m_chines != null)
             {
-                for (int ii = 0; ii < numChines; ii++)
+                for (int ii = 0; ii < numChines(); ii++)
                 {
                     Point3DCollection newChine;
                     Matrix.Multiply(m_chines[ii], matrix, out newChine);

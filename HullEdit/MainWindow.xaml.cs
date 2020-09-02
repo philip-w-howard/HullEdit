@@ -104,7 +104,7 @@ namespace HullEdit
             PerspectiveManip.Draw();
         }
 
-        private void openClick(object sender, RoutedEventArgs e)
+        private void importClick(object sender, RoutedEventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.Filter = "Hull files (*.hul)|*.hul|All files (*.*)|*.*";
@@ -124,6 +124,36 @@ namespace HullEdit
 
         }
 
+        private void openClick(object sender, RoutedEventArgs e)
+        {
+            // destroy any previous hull
+            myHull = null;
+
+            OpenFileDialog openDlg = new OpenFileDialog();
+
+            openDlg.Filter = "AVS Hull files (*.avsh)|*.avsh|All files (*.*)|*.*";
+            openDlg.FilterIndex = 0;
+            openDlg.RestoreDirectory = true;
+
+            Nullable<bool> result = openDlg.ShowDialog();
+            if (result == true)
+            {
+                Hull tempHull;
+
+                System.Xml.Serialization.XmlSerializer serializer = new System.Xml.Serialization.XmlSerializer(typeof(Hull));
+
+                using (Stream reader = new FileStream(openDlg.FileName, FileMode.Open))
+                {
+                    // Call the Deserialize method to restore the object's state.
+                    tempHull = (Hull)serializer.Deserialize(reader);
+                    myHull = tempHull;
+                    PerspectiveManip.perspective = HullManip.PerspectiveType.PERSPECTIVE;
+                    PerspectiveManip.IsEditable = false;
+                    UpdateDisplays();
+                }
+            }
+        }
+
         private void saveClick(object sender, RoutedEventArgs e)
         {
             if (myHull == null || !myHull.IsValid) return;
@@ -137,15 +167,13 @@ namespace HullEdit
             Nullable<bool> result = saveDlg.ShowDialog();
             if (result == true)
             {
-                //System.Xml.Serialization.XmlSerializer writer = new System.Xml.Serialization.XmlSerializer(typeof(Hull));
-                IFormatter formatter = new BinaryFormatter();
-                //IFormatter formatter = new SoapFormatter();
+                System.Xml.Serialization.XmlSerializer writer = new System.Xml.Serialization.XmlSerializer(typeof(Hull));
 
-                FileStream s = new FileStream(saveDlg.FileName, FileMode.Create);
-                formatter.Serialize(s, myHull);
-                s.Close();
+                using (FileStream output = new FileStream(saveDlg.FileName, FileMode.Create))
+                {
+                    writer.Serialize(output, myHull);
+                }
             }
-
         }
 
         private void UpdateDrawings()

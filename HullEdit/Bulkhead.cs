@@ -13,14 +13,14 @@ namespace HullEdit
     {
         public enum BulkheadType { BOW, VERTICAL, TRANSOM };
         public int Count { get { return m_points.Count; } }
-        private double m_transom_angle;
-        public double TransomAngle { get; }
+        public double m_transom_angle;
+        public double TransomAngle { get { return m_transom_angle; } }
 
-        public BulkheadType type { get; private set; }
+        public BulkheadType type { get; set; }
 
-        private Point3DCollection m_points;
+        public Point3DCollection m_points;
 
-        private bool m_IsValid;
+        public bool m_IsValid;
         public bool IsValid { get { return m_IsValid; } }
 
         public event PropertyChangedEventHandler PropertyChanged;

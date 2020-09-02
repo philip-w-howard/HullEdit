@@ -25,7 +25,7 @@ namespace HullEdit
             Hull highResHull = hull.Copy();
             highResHull.PrepareChines(POINTS_PER_CHINE);
 
-            int numPanels = highResHull.numChines - 1;
+            int numPanels = highResHull.numChines() - 1;
 
             m_panels = new List<Panel>();
 
@@ -38,16 +38,16 @@ namespace HullEdit
 
             //*********************************
             // bulkheads:
-            int numBulkheads = hull.numBulkheads;
+            int numBulkheads = hull.numBulkheads();
 
             if (hull.GetBulkhead(numBulkheads - 1).type == Bulkhead.BulkheadType.BOW) numBulkheads--;
 
             m_bulkheads = new List<Panel>();
             Hull fullHull = hull.CopyToFullHull();
 
-            for (int bulkhead=0; bulkhead< fullHull.numBulkheads; bulkhead++)
+            for (int bulkhead=0; bulkhead< fullHull.numBulkheads(); bulkhead++)
             {
-                int numChines = fullHull.numChines;
+                int numChines = fullHull.numChines();
 
                 if (fullHull.GetBulkhead(bulkhead).type != Bulkhead.BulkheadType.BOW)
                 {
