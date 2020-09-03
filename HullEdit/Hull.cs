@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media.Media3D;
 
+
 namespace HullEdit
 {
+    [DataContract()]
     public class Hull : INotifyPropertyChanged
     {
         private const int POINTS_PER_CHINE = 50;
@@ -27,13 +30,15 @@ namespace HullEdit
             return m_bulkheads[0].Count;
         }
 
+        [DataMember(Name = "bulkheads")]
         public List<Bulkhead> m_bulkheads;
         private List<Point3DCollection> m_chines;
 
         public Bulkhead GetBulkhead(int index) { return m_bulkheads[index]; }
         public Point3DCollection GetChine(int index) { return m_chines[index]; }
 
-        public bool m_IsValid;
+        [DataMember(Name = "isValid")]
+        internal bool m_IsValid;
         public bool IsValid
         {
             get

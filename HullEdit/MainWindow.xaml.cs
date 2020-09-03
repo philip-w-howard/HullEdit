@@ -18,6 +18,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Xml;
 
 namespace HullEdit
 {
@@ -167,12 +168,17 @@ namespace HullEdit
             Nullable<bool> result = saveDlg.ShowDialog();
             if (result == true)
             {
-                System.Xml.Serialization.XmlSerializer writer = new System.Xml.Serialization.XmlSerializer(typeof(Hull));
-
-                using (FileStream output = new FileStream(saveDlg.FileName, FileMode.Create))
+                var ser = new DataContractSerializer(typeof(Hull));
+                using (XmlWriter xw = XmlWriter.Create(saveDlg.FileName))
                 {
-                    writer.Serialize(output, myHull);
+                    ser.WriteObject(xw, myHull);
                 }
+                //System.Xml.Serialization.XmlSerializer writer = new System.Xml.Serialization.XmlSerializer(typeof(Hull));
+
+                //using (FileStream output = new FileStream(saveDlg.FileName, FileMode.Create))
+                //{
+                //    writer.Serialize(output, myHull);
+                //}
             }
         }
 
