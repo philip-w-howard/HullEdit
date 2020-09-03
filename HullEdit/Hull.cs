@@ -338,5 +338,24 @@ namespace HullEdit
 
             RepositionToZero();
         }
+        public class SerializableHull
+        {
+            public List<Bulkhead.SerializableBulkhead> bulkheads;
+            public bool isValid;
+
+            public SerializableHull()
+            { }
+
+            public SerializableHull(Hull hull)
+            {
+                isValid = hull.m_IsValid;
+                bulkheads = new List<Bulkhead.SerializableBulkhead>();
+
+                foreach (Bulkhead bulkhead in hull.m_bulkheads)
+                {
+                    bulkheads.Add(new Bulkhead.SerializableBulkhead(bulkhead));
+                }
+            }
+        }
     }
 }

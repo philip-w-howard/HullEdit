@@ -260,5 +260,26 @@ namespace HullEdit
 
             Notify("Bulkhead");
         }
+
+        public class SerializableBulkhead
+        {
+            public double transom_angle;
+            public BulkheadType bulkheadType;
+            public Point3DCollection points;
+            public bool isValid;
+
+            public SerializableBulkhead()
+            {
+            }
+
+            public SerializableBulkhead(Bulkhead bulkhead)
+            {
+                transom_angle = bulkhead.TransomAngle;
+                bulkheadType = bulkhead.type;
+                isValid = bulkhead.IsValid;
+                points = new Point3DCollection();
+                if (isValid) points = bulkhead.m_points.Clone();
+            }
+        }
     }
 }

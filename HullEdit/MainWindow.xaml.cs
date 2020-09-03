@@ -168,17 +168,19 @@ namespace HullEdit
             Nullable<bool> result = saveDlg.ShowDialog();
             if (result == true)
             {
-                var ser = new DataContractSerializer(typeof(Hull));
-                using (XmlWriter xw = XmlWriter.Create(saveDlg.FileName))
-                {
-                    ser.WriteObject(xw, myHull);
-                }
-                //System.Xml.Serialization.XmlSerializer writer = new System.Xml.Serialization.XmlSerializer(typeof(Hull));
-
-                //using (FileStream output = new FileStream(saveDlg.FileName, FileMode.Create))
+                //var ser = new DataContractSerializer(typeof(Hull));
+                //using (XmlWriter xw = XmlWriter.Create(saveDlg.FileName))
                 //{
-                //    writer.Serialize(output, myHull);
+                //    ser.WriteObject(xw, myHull);
                 //}
+
+
+                System.Xml.Serialization.XmlSerializer writer = new System.Xml.Serialization.XmlSerializer(typeof(Hull.SerializableHull));
+
+                using (FileStream output = new FileStream(saveDlg.FileName, FileMode.Create))
+                {
+                    writer.Serialize(output, new Hull.SerializableHull(myHull));
+                }
             }
         }
 
