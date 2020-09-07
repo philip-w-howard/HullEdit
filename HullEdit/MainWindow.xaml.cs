@@ -33,25 +33,28 @@ namespace HullEdit
             InitializeComponent();
             myHull = new Hull();
 
-            FrontDisplay.SetHull(myHull);
-            FrontManip.SetHull(myHull);
-            FrontManip.SetHullDisplay(FrontDisplay);
-
-            TopDisplay.SetHull(myHull);
-            TopManip.SetHull(myHull);
-            TopManip.SetHullDisplay(TopDisplay);
-
-            SideDisplay.SetHull(myHull);
-            SideManip.SetHull(myHull);
-            SideManip.SetHullDisplay(SideDisplay);
-
-            PerspectiveDisplay.SetHull(myHull);
-            PerspectiveManip.SetHull(myHull);
-            PerspectiveManip.SetHullDisplay(PerspectiveDisplay);
+            UpdateManips();
 
             myHull.PropertyChanged += hull_PropertyChanged;
         }
 
+        private void UpdateManips()
+        {
+            FrontManip.SetHull(myHull);
+            FrontManip.SetHullDisplay(FrontDisplay);
+
+            TopManip.SetHull(myHull);
+            TopManip.SetHullDisplay(TopDisplay);
+
+            SideManip.SetHull(myHull);
+            SideManip.SetHullDisplay(SideDisplay);
+
+            PerspectiveManip.SetHull(myHull);
+            PerspectiveManip.SetHullDisplay(PerspectiveDisplay);
+
+            UpdateDisplays();
+
+        }
         private void UpdateDisplays()
         {
             Hull displayHull = myHull.CopyToFullHull();
@@ -113,12 +116,11 @@ namespace HullEdit
 
             if (openFileDialog.ShowDialog() == true)
             {
-                if (myHull == null) myHull = new Hull();
                 myHull.LoadFromHullFile(openFileDialog.FileName);
 
                 PerspectiveManip.perspective = HullManip.PerspectiveType.PERSPECTIVE;
                 PerspectiveManip.IsEditable = false;
-                UpdateDisplays();
+                UpdateManips();
 
                 PanelsMenu.IsEnabled = true;
             }
@@ -148,9 +150,11 @@ namespace HullEdit
                     // Call the Deserialize method to restore the object's state.
                     tempHull = (Hull.SerializableHull)serializer.Deserialize(reader);
                     myHull = new Hull(tempHull);
+                    myHull.PropertyChanged += hull_PropertyChanged;
+
                     PerspectiveManip.perspective = HullManip.PerspectiveType.PERSPECTIVE;
                     PerspectiveManip.IsEditable = false;
-                    UpdateDisplays();
+                    UpdateManips();
                 }
             }
         }
