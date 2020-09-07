@@ -139,15 +139,15 @@ namespace HullEdit
             Nullable<bool> result = openDlg.ShowDialog();
             if (result == true)
             {
-                Hull tempHull;
+                Hull.SerializableHull tempHull;
 
-                System.Xml.Serialization.XmlSerializer serializer = new System.Xml.Serialization.XmlSerializer(typeof(Hull));
+                System.Xml.Serialization.XmlSerializer serializer = new System.Xml.Serialization.XmlSerializer(typeof(Hull.SerializableHull));
 
                 using (Stream reader = new FileStream(openDlg.FileName, FileMode.Open))
                 {
                     // Call the Deserialize method to restore the object's state.
-                    tempHull = (Hull)serializer.Deserialize(reader);
-                    myHull = tempHull;
+                    tempHull = (Hull.SerializableHull)serializer.Deserialize(reader);
+                    myHull = new Hull(tempHull);
                     PerspectiveManip.perspective = HullManip.PerspectiveType.PERSPECTIVE;
                     PerspectiveManip.IsEditable = false;
                     UpdateDisplays();
@@ -168,13 +168,6 @@ namespace HullEdit
             Nullable<bool> result = saveDlg.ShowDialog();
             if (result == true)
             {
-                //var ser = new DataContractSerializer(typeof(Hull));
-                //using (XmlWriter xw = XmlWriter.Create(saveDlg.FileName))
-                //{
-                //    ser.WriteObject(xw, myHull);
-                //}
-
-
                 System.Xml.Serialization.XmlSerializer writer = new System.Xml.Serialization.XmlSerializer(typeof(Hull.SerializableHull));
 
                 using (FileStream output = new FileStream(saveDlg.FileName, FileMode.Create))

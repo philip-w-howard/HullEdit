@@ -2,16 +2,11 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
-using System.Linq;
-using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Media.Media3D;
 
 
 namespace HullEdit
 {
-    [DataContract()]
     public class Hull : INotifyPropertyChanged
     {
         private const int POINTS_PER_CHINE = 50;
@@ -30,15 +25,13 @@ namespace HullEdit
             return m_bulkheads[0].Count;
         }
 
-        [DataMember(Name = "bulkheads")]
-        public List<Bulkhead> m_bulkheads;
+        private List<Bulkhead> m_bulkheads;
         private List<Point3DCollection> m_chines;
 
         public Bulkhead GetBulkhead(int index) { return m_bulkheads[index]; }
         public Point3DCollection GetChine(int index) { return m_chines[index]; }
 
-        [DataMember(Name = "isValid")]
-        internal bool m_IsValid;
+        private bool m_IsValid;
         public bool IsValid
         {
             get
@@ -64,6 +57,28 @@ namespace HullEdit
         }
 
         public Hull() { m_IsValid = false; }
+
+        public Hull(SerializableHull hull)
+        {
+            m_IsValid = hull.isValid;
+            m_chines = null;
+            m_bulkheads = null;
+            if (m_IsValid && hull.bulkheads != null)
+            {
+                m_bulkheads = new List<Bulkhead>();
+                foreach (Bulkhead.SerializableBulkhead bulk in hull.bulkheads)
+                {
+                    m_bulkheads.Add(new Bulkhead(bulk));
+                }
+
+                PrepareChines(POINTS_PER_CHINE);
+                RepositionToZero();
+
+                m_IsValid = true;
+                HullData++;
+                Notify("HullData");
+            }
+        }
 
         public void LoadFromHullFile(string filename)
         {

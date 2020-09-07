@@ -2,36 +2,38 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
-//using System.Linq;
-//using System.Text;
-//using System.Threading.Tasks;
 using System.Windows.Media.Media3D;
-using System.Runtime.Serialization;
-using System.Xml;
 
 namespace HullEdit
 {
-    [DataContract()]
     public class Bulkhead : INotifyPropertyChanged
     {
         public enum BulkheadType { BOW, VERTICAL, TRANSOM };
         public int Count { get { return m_points.Count; } }
 
-        [DataMember(Name = "transom_angle")]
-        internal double m_transom_angle;
+        private double m_transom_angle;
 
         public double TransomAngle { get { return m_transom_angle; } }
 
-        [DataMember(Name = "bulkheadType")]
         public BulkheadType type { get; set; }
 
-        [DataMember(Name = "points")]
-        internal Point3DCollection m_points;
+        private Point3DCollection m_points;
 
-        [DataMember(Name = "isValid")]
         internal bool m_IsValid;
         public bool IsValid { get { return m_IsValid; } }
 
+        public Bulkhead()
+        {
+            m_IsValid = false;
+        }
+
+        public Bulkhead(SerializableBulkhead bulk)
+        {
+            m_IsValid = bulk.isValid;
+            m_transom_angle = bulk.transom_angle;
+            m_points = bulk.points.Clone();
+            type = bulk.bulkheadType;
+        }
         public event PropertyChangedEventHandler PropertyChanged;
         void Notify(string propName)
         {
