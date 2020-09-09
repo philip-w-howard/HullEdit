@@ -155,6 +155,8 @@ namespace HullEdit
                     PerspectiveManip.perspective = HullManip.PerspectiveType.PERSPECTIVE;
                     PerspectiveManip.IsEditable = false;
                     UpdateManips();
+
+                    PanelsMenu.IsEnabled = true;
                 }
             }
         }
@@ -247,9 +249,7 @@ namespace HullEdit
 
         private void PanelsClick(object sender, RoutedEventArgs e)
         {
-            Panels p = new Panels(myHull);
-
-            PanelsLayoutWindow layout = new PanelsLayoutWindow(p);
+            PanelsLayoutWindow layout = new PanelsLayoutWindow(myHull);
             layout.Width = 600;
             layout.Height = 400;
 

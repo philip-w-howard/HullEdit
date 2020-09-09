@@ -38,6 +38,15 @@ namespace HullEdit
             OutputFormat = OutputFormatType.SIXTEENTHS;
         }
 
+        public PanelDisplay(SerializablePanelDisplay display)
+        {
+            OutputFormat = display.OutputFormat;
+            m_scale = display.scale;
+            X = display.X;
+            Y = display.Y;
+            m_panel = new Panel(display.panel);
+        }
+
         private Point ScaledPoint(Point point)
         {
             point.X *= scale;
@@ -185,6 +194,23 @@ namespace HullEdit
             }
 
             return result;
+        }
+
+        public class SerializablePanelDisplay
+        {
+            public OutputFormatType OutputFormat;
+            public double scale;
+            public Panel.SerializablePanel panel;
+            public double X, Y;
+
+            public SerializablePanelDisplay() { }
+            public SerializablePanelDisplay(PanelDisplay display)
+            {
+                scale = display.scale;
+                panel = new Panel.SerializablePanel(display.m_panel);
+                X = display.X;
+                Y = display.Y;
+            }
         }
     }
 }

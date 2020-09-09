@@ -45,6 +45,13 @@ namespace HullEdit
         {
         }
 
+        public Panel(Panel.SerializablePanel panel)
+        {
+            name = panel.name;
+            m_panelPoints = panel.points.Clone();
+            ShiftTo(0, 0);
+        }
+
         // Develop the panel from two chines
         public Panel(Point3DCollection chine1, Point3DCollection chine2)
         {
@@ -272,6 +279,22 @@ namespace HullEdit
             m_panelPoints = points;
             ShiftTo(0, 0);
             Notify("panel.flip");
+        }
+
+        public class SerializablePanel
+        {
+            public string name { get; set; }
+
+            public PointCollection points;
+
+            public SerializablePanel()
+            { }
+
+            public SerializablePanel(Panel panel)
+            {
+                name = panel.name;
+                points = panel.m_panelPoints.Clone();
+            }
         }
     }
 }

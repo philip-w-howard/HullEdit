@@ -22,6 +22,8 @@ namespace HullEdit
 
         public Panels(Hull hull)
         {
+            throw new Exception("Obsolete code");
+
             Hull highResHull = hull.Copy();
             highResHull.PrepareChines(POINTS_PER_CHINE);
 

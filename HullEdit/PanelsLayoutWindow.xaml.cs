@@ -14,6 +14,7 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Media.Media3D;
 using System.Windows.Shapes;
 
 namespace HullEdit
@@ -28,6 +29,8 @@ namespace HullEdit
     /// </summary>
     public partial class PanelsLayoutWindow : Window
     {
+        private const int POINTS_PER_CHINE = 50;
+
         private Brush DEFAULT_BACKGROUND = Brushes.White;
         private Brush DEFAULT_FOREGROUND = Brushes.Black;
         private Brush SELECTED_FOREGROUND = Brushes.Red;
@@ -60,27 +63,23 @@ namespace HullEdit
         }
 
         private PanelDisplay m_selectedPanel;
-        Panels m_panels;
+        List<Panel> m_panels;
         ObservableCollection<PanelDisplay> m_displayPanels = new ObservableCollection<PanelDisplay>();
 
         Point m_dragLoc;
 
-        public PanelsLayoutWindow(Panels panels)
+        public PanelsLayoutWindow(Hull hull)
         {
             m_scale = 1;
-            m_panels = panels;
+            Panelize(hull);
             InitializeComponent();
 
             ItemList panelList = (ItemList)this.FindResource("PanelList");
             if (panelList != null)
             {
-                for (int ii = 1; ii <= m_panels.panels.Count; ii++)
+                foreach (Panel panel in m_panels)
                 {
-                    panelList.Add("Panel " + ii);
-                }
-                for (int ii = 1; ii <= m_panels.bulkheads.Count; ii++)
-                {
-                    panelList.Add("Bulkhead " + ii);
+                    panelList.Add(panel.name);
                 }
             }
 
@@ -141,9 +140,9 @@ namespace HullEdit
             double panelWidth = m_panelWidth * m_overallScale;
             double panelHeight = m_panelHeight * m_overallScale;
 
-            for (int row=0; row< m_NumVerticalPanels; row++)
+            for (int row = 0; row < m_NumVerticalPanels; row++)
             {
-                for (int col=0; col< m_NumHorizontalPanels; col++)
+                for (int col = 0; col < m_NumHorizontalPanels; col++)
                 {
                     Rectangle rect = new Rectangle();
                     rect.Width = panelWidth;
@@ -227,7 +226,7 @@ namespace HullEdit
             // If the conversion fails, we didn't select a panel
             PanelDisplay selectedPanel = sender as PanelDisplay;
 
- //           if (e.LeftButton == MouseButtonState.Pressed)
+            //           if (e.LeftButton == MouseButtonState.Pressed)
             {
                 if (selectedPanel != null)
                 {
@@ -260,8 +259,33 @@ namespace HullEdit
 
         private void saveClick(object sender, RoutedEventArgs e)
         {
-            canvas.Height -= 200;
-            canvas.Width -= 200;
+            //private PanelDisplay m_selectedPanel;
+            //Panels m_panels;
+            //ObservableCollection<PanelDisplay> m_displayPanels = new ObservableCollection<PanelDisplay>();
+
+            //Point m_dragLoc;
+
+
+
+            //if (myHull == null || !myHull.IsValid) return;
+
+            //SaveFileDialog saveDlg = new SaveFileDialog();
+
+            //saveDlg.Filter = "AVS Hull files (*.avsh)|*.avsh|All files (*.*)|*.*";
+            //saveDlg.FilterIndex = 0;
+            //saveDlg.RestoreDirectory = true;
+
+            //Nullable<bool> result = saveDlg.ShowDialog();
+            //if (result == true)
+            //{
+            //    System.Xml.Serialization.XmlSerializer writer = new System.Xml.Serialization.XmlSerializer(typeof(Hull.SerializableHull));
+
+            //    using (FileStream output = new FileStream(saveDlg.FileName, FileMode.Create))
+            //    {
+            //        writer.Serialize(output, new Hull.SerializableHull(myHull));
+            //    }
+            //}
+
         }
 
         private void ZoomClick(object sender, RoutedEventArgs e)
@@ -330,32 +354,25 @@ namespace HullEdit
 
             if (selection != null)
             {
-                string[] words = selection.Split();
-                if (words.Length == 2)
+                Panel panel = null;
+                foreach (Panel p in m_panels)
                 {
-                    int index = Int32.Parse(words[1]);
-                    Panel panel = null;
-
-                    // Figure out what panel was selected
-                    if (words[0] == "Panel")
+                    if (selection == p.name)
                     {
-                        panel = m_panels.panels[index - 1];
+                        panel = p;
+                        break;
                     }
-                    else if (words[0] == "Bulkhead")
-                    {
-                        panel = m_panels.bulkheads[index - 1];
-                    }
+                }
 
-                    if (panel != null)
-                    {
-                        // Move over by half the size so new panel shows up centered on the mouse
-                        Size size = panel.GetSize();
-                        loc.X -= size.Width / 2;
-                        loc.Y -= size.Height / 2;
+                if (panel != null)
+                {
+                    // Move over by half the size so new panel shows up centered on the mouse
+                    Size size = panel.GetSize();
+                    loc.X -= size.Width / 2;
+                    loc.Y -= size.Height / 2;
 
-                        DisplayPanel(panel, loc.X, loc.Y);
-                        ResizeCanvas();
-                    }
+                    DisplayPanel(panel, loc.X, loc.Y);
+                    ResizeCanvas();
                 }
             }
         }
@@ -363,13 +380,7 @@ namespace HullEdit
         private void AddAllClick(object sender, RoutedEventArgs e)
         {
             double y = 10;
-            foreach (Panel p in m_panels.panels)
-            {
-                DisplayPanel(p, 10, y);
-                y += 15;
-            }
-
-            foreach (Panel p in m_panels.bulkheads)
+            foreach (Panel p in m_panels)
             {
                 DisplayPanel(p, 10, y);
                 y += 15;
@@ -380,8 +391,8 @@ namespace HullEdit
 
         private void ResizeCanvas()
         {
-            double maxX = viewerGrid.ActualWidth/scale;
-            double maxY = viewerGrid.ActualHeight/scale;
+            double maxX = viewerGrid.ActualWidth / scale;
+            double maxY = viewerGrid.ActualHeight / scale;
 
             maxX = Math.Max(maxX, m_NumHorizontalPanels * m_panelWidth * m_overallScale);
             maxY = Math.Max(maxY, m_NumVerticalPanels * m_panelHeight * m_overallScale);
@@ -447,5 +458,61 @@ namespace HullEdit
                 }
             }
         }
+
+        private void Panelize(Hull hull)
+        {
+            Hull highResHull = hull.Copy();
+            highResHull.PrepareChines(POINTS_PER_CHINE);
+
+            int numPanels = highResHull.numChines() - 1;
+
+            m_panels = new List<Panel>();
+
+            for (int ii = 0; ii < numPanels; ii++)
+            {
+                Panel panel = new Panel(highResHull.GetChine(ii), highResHull.GetChine(ii + 1));
+                panel.name = "Chine " + (ii + 1);
+                m_panels.Add(panel);
+            }
+
+            //*********************************
+            // bulkheads:
+            int numBulkheads = hull.numBulkheads();
+
+            if (hull.GetBulkhead(numBulkheads - 1).type == Bulkhead.BulkheadType.BOW) numBulkheads--;
+
+            Hull fullHull = hull.CopyToFullHull();
+
+            for (int bulkhead = 0; bulkhead < fullHull.numBulkheads(); bulkhead++)
+            {
+                int numChines = fullHull.numChines();
+
+                if (fullHull.GetBulkhead(bulkhead).type != Bulkhead.BulkheadType.BOW)
+                {
+                    Bulkhead bulk = fullHull.GetBulkhead(bulkhead);
+                    Point3DCollection points = new Point3DCollection();
+
+                    Point3D basePoint = bulk.GetPoint(0);
+
+                    for (int chine = 0; chine < numChines; chine++)
+                    {
+                        Point3D point = bulk.GetPoint(chine);
+                        if (bulk.type == Bulkhead.BulkheadType.TRANSOM)
+                        {
+                            point.Y = basePoint.Y + (point.Y - basePoint.Y) / Math.Sin(bulk.TransomAngle);
+                        }
+                        points.Add(bulk.GetPoint(chine));
+                    }
+
+                    // close the shape
+                    if (points[0].X != 0) points.Add(points[0]);
+
+                    Panel panel = new Panel(points);
+                    panel.name = "Bulkhead " + (bulkhead + 1);
+                    m_panels.Add(panel);
+                }
+            }
+        }
+
     }
 }
