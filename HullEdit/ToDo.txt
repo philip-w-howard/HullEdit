@@ -1,10 +1,8 @@
 ﻿Features
-	Eliminate Panels. Change it to List<Panel> inside PanelsLayoutWindow.
-
 	Save
 		HUL format
 		AVS format
-		Save panels: add PanelDisplay(SerializablePanelDisplay) constructor
+		Save panels: Open needs to finish creating window.
 
 	cut layout
 		Ability to split panels in two

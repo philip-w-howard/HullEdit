@@ -68,6 +68,8 @@ namespace HullEdit
 
         Point m_dragLoc;
 
+        public PanelsLayoutWindow() { }
+
         public PanelsLayoutWindow(Hull hull)
         {
             m_scale = 1;
@@ -77,6 +79,8 @@ namespace HullEdit
             ItemList panelList = (ItemList)this.FindResource("PanelList");
             if (panelList != null)
             {
+                panelList.Clear();
+
                 foreach (Panel panel in m_panels)
                 {
                     panelList.Add(panel.name);
@@ -85,6 +89,7 @@ namespace HullEdit
 
             UpdatePanelLayout();
         }
+
 
         public void DisplayPanel(Panel p, double x, double y)
         {
@@ -253,38 +258,78 @@ namespace HullEdit
 
         private void openClick(object sender, RoutedEventArgs e)
         {
-            canvas.Height = canvas.ActualHeight + 200;
-            canvas.Width = canvas.ActualWidth + 200;
+            OpenFileDialog openDlg = new OpenFileDialog();
+
+            openDlg.Filter = "AVS Panels files (*.avsp)|*.avsp|All files (*.*)|*.*";
+            openDlg.FilterIndex = 0;
+            openDlg.RestoreDirectory = true;
+
+            Nullable<bool> result = openDlg.ShowDialog();
+            if (result == true)
+            {
+                SerializablePanelsLayoutWindow tempWindow;
+
+                System.Xml.Serialization.XmlSerializer serializer = new System.Xml.Serialization.XmlSerializer(typeof(SerializablePanelsLayoutWindow));
+
+                using (Stream reader = new FileStream(openDlg.FileName, FileMode.Open))
+                {
+                    // Call the Deserialize method to restore the object's state.
+                    tempWindow = (SerializablePanelsLayoutWindow)serializer.Deserialize(reader);
+
+                    m_panelWidth = tempWindow.m_panelWidth;
+                    m_panelHeight = tempWindow.m_panelHeight;
+                    m_NumHorizontalPanels = tempWindow.m_NumHorizontalPanels;
+                    m_NumVerticalPanels = tempWindow.m_NumVerticalPanels;
+                    m_overallScale = tempWindow.m_overallScale;
+
+                    m_scale = tempWindow.scale;
+                    m_panels = new List<Panel>();
+                    m_displayPanels = new ObservableCollection<PanelDisplay>();
+
+                    foreach (Panel.SerializablePanel p in tempWindow.panels)
+                    {
+                        m_panels.Add(new Panel(p));
+                    }
+
+                    foreach (PanelDisplay.SerializablePanelDisplay disp in tempWindow.displayPanels)
+                    {
+                        DisplayPanel(new PanelDisplay(disp));
+                    }
+
+                    ItemList panelList = (ItemList)this.FindResource("PanelList");
+                    if (panelList != null)
+                    {
+                        panelList.Clear();
+
+                        foreach (Panel panel in m_panels)
+                        {
+                            panelList.Add(panel.name);
+                        }
+                    }
+
+                    //UpdatePanelLayout();
+                }
+            }
         }
 
         private void saveClick(object sender, RoutedEventArgs e)
         {
-            //private PanelDisplay m_selectedPanel;
-            //Panels m_panels;
-            //ObservableCollection<PanelDisplay> m_displayPanels = new ObservableCollection<PanelDisplay>();
+            SaveFileDialog saveDlg = new SaveFileDialog();
 
-            //Point m_dragLoc;
+            saveDlg.Filter = "AVS Panels files (*.avsp)|*.avsp|All files (*.*)|*.*";
+            saveDlg.FilterIndex = 0;
+            saveDlg.RestoreDirectory = true;
 
+            Nullable<bool> result = saveDlg.ShowDialog();
+            if (result == true)
+            {
+                System.Xml.Serialization.XmlSerializer writer = new System.Xml.Serialization.XmlSerializer(typeof(SerializablePanelsLayoutWindow));
 
-
-            //if (myHull == null || !myHull.IsValid) return;
-
-            //SaveFileDialog saveDlg = new SaveFileDialog();
-
-            //saveDlg.Filter = "AVS Hull files (*.avsh)|*.avsh|All files (*.*)|*.*";
-            //saveDlg.FilterIndex = 0;
-            //saveDlg.RestoreDirectory = true;
-
-            //Nullable<bool> result = saveDlg.ShowDialog();
-            //if (result == true)
-            //{
-            //    System.Xml.Serialization.XmlSerializer writer = new System.Xml.Serialization.XmlSerializer(typeof(Hull.SerializableHull));
-
-            //    using (FileStream output = new FileStream(saveDlg.FileName, FileMode.Create))
-            //    {
-            //        writer.Serialize(output, new Hull.SerializableHull(myHull));
-            //    }
-            //}
+                using (FileStream output = new FileStream(saveDlg.FileName, FileMode.Create))
+                {
+                    writer.Serialize(output, new SerializablePanelsLayoutWindow(this));
+                }
+            }
 
         }
 
@@ -513,6 +558,42 @@ namespace HullEdit
                 }
             }
         }
+        public class SerializablePanelsLayoutWindow
+        {
+            // values from setup window
+            public double m_panelWidth;
+            public double m_panelHeight;
+            public int m_NumHorizontalPanels;
+            public int m_NumVerticalPanels;
+            public double m_overallScale;
 
+            public double scale;
+            public List<Panel.SerializablePanel> panels;
+            public List<PanelDisplay.SerializablePanelDisplay> displayPanels;
+
+            public SerializablePanelsLayoutWindow() { }
+            public SerializablePanelsLayoutWindow(PanelsLayoutWindow window)
+            {
+                m_panelWidth = window.m_panelWidth;
+                m_panelHeight = window.m_panelHeight;
+                m_NumHorizontalPanels = window.m_NumHorizontalPanels;
+                m_NumVerticalPanels = window.m_NumVerticalPanels;
+                m_overallScale = window.m_overallScale;
+
+                scale = window.m_scale;
+                panels = new List<Panel.SerializablePanel>();
+                displayPanels = new List<PanelDisplay.SerializablePanelDisplay>();
+
+                foreach (Panel p in window.m_panels)
+                {
+                    panels.Add(new Panel.SerializablePanel(p));
+                }
+
+                foreach (PanelDisplay disp in window.m_displayPanels)
+                {
+                    displayPanels.Add(new PanelDisplay.SerializablePanelDisplay(disp));
+                }
+            }
+        }
     }
 }
