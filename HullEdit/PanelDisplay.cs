@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Media.Media3D;
 using System.Windows.Shapes;
 
 namespace HullEdit
@@ -212,5 +213,49 @@ namespace HullEdit
                 Y = display.Y;
             }
         }
+
+        public bool Split(double start, double radius, double depth, out Panel panel_1, out Panel panel_2)
+        {
+            bool addTo_1 = true;
+            PointCollection points_1 = new PointCollection();
+            PointCollection points_2 = new PointCollection();
+            Point points_2_start = new Point(0,0);
+
+
+            for (int ii=0; ii<m_panel.NumPoints-1; ii++)
+            {
+                double min = Math.Min(m_panel.point(ii).X, m_panel.point(ii + 1).X);
+                double max = Math.Max(m_panel.point(ii).X, m_panel.point(ii + 1).X);
+                if (min <= start && max >= start && min != max)
+                {
+                    if (addTo_1)
+                        points_2_start = m_panel.point(ii+1);
+                    else
+                        points_2.Add(points_2_start);
+
+                    addTo_1 = !addTo_1;
+
+                }
+                else
+                {
+                    if (addTo_1)
+                        points_1.Add(m_panel.point(ii));
+                    else
+                        points_2.Add(m_panel.point(ii));
+                }
+            }
+
+            // close the first panel
+            points_1.Add(points_1[0]);
+
+            panel_1 = new Panel(points_1);
+            panel_2 = new Panel(points_2);
+
+            panel_1.name = m_panel.name + "A";
+            panel_2.name = m_panel.name + "B";
+
+            return true;
+        }
+
     }
 }

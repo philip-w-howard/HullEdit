@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:HullEdit"
         mc:Ignorable="d"
-        Title="PanelSetupWindow" Height="200" Width="300">
+        Title="PanelSetupWindow" SizeToContent="WidthAndHeight">
     <StackPanel DataContext="{DynamicResource MySetupData}">
         <Grid Width="200" HorizontalAlignment="Left">
             <Grid.ColumnDefinitions>

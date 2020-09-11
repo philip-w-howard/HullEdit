@@ -72,6 +72,12 @@ namespace HullEdit
             ShiftTo(0, 0);
         }
 
+        public Panel(PointCollection points)
+        {
+            m_panelPoints = points.Clone();
+            ShiftTo(0, 0);
+        }
+
         public Panel Copy()
         {
             Panel newPanel = new Panel();

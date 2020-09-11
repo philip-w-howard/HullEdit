@@ -1,11 +1,12 @@
 ﻿Features
-	Save
-		HUL format
-		AVS format
-		Save panels: Open needs to finish creating window.
-
 	cut layout
 		Ability to split panels in two
+			Distance from left
+			Radius
+			Depth
+
+			Compute center of segment for cut-off
+			Build squiggle cut
 
 	Status bar at the bottom showing x,y,z location, etc.
 
