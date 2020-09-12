@@ -60,10 +60,12 @@ namespace HullEdit
             {
                 OK = false;
             }
+            this.Close();
         }
         private void CancelClick(object sender, RoutedEventArgs e)
         {
             OK = false;
+            this.Close();
         }
     }
 }

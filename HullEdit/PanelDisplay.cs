@@ -229,9 +229,16 @@ namespace HullEdit
                 if (min <= start && max >= start && min != max)
                 {
                     if (addTo_1)
-                        points_2_start = m_panel.point(ii+1);
-                    else
+                    {
+                        points_1.Add(m_panel.point(ii));
+                        points_2_start = m_panel.point(ii);
                         points_2.Add(points_2_start);
+                    }
+                    else
+                    {
+                        points_2.Add(m_panel.point(ii + 1));
+                        points_2.Add(points_2_start);
+                    }
 
                     addTo_1 = !addTo_1;
 
