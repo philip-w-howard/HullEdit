@@ -220,28 +220,53 @@ namespace HullEdit
             PointCollection points_1 = new PointCollection();
             PointCollection points_2 = new PointCollection();
             Point points_2_start = new Point(0,0);
+            Point top = new Point();
+            Point bottom = new Point();
 
 
             for (int ii=0; ii<m_panel.NumPoints-1; ii++)
             {
-                double min = Math.Min(m_panel.point(ii).X, m_panel.point(ii + 1).X);
-                double max = Math.Max(m_panel.point(ii).X, m_panel.point(ii + 1).X);
-                if (min <= start && max >= start && min != max)
+                Point first = m_panel.point(ii);
+                Point second = m_panel.point(ii + 1);
+                Point startPoint = new Point();
+                double min = Math.Min(first.X, second.X);
+                double max = Math.Max(first.X, second.X);
+                if (min <= start && max >= start)
                 {
-                    if (addTo_1)
+                    if (first.X == start)
                     {
-                        points_1.Add(m_panel.point(ii));
-                        points_2_start = m_panel.point(ii);
-                        points_2.Add(points_2_start);
+                        startPoint = first;
+                    }
+                    else if (second.X == start)
+                    {
+                        startPoint = second;
                     }
                     else
                     {
-                        points_2.Add(m_panel.point(ii + 1));
-                        points_2.Add(points_2_start);
+                        // need to find point on line between first and second
+                        // NOTE: because of the above conditions, we can't have a vertical line. They are ruled out.
+                        double slope = (second.Y - first.Y) / (second.X - first.X);
+                        startPoint = new Point(start, first.Y + slope * (start - first.X));
+                    }
+
+                    if (addTo_1)
+                    {
+                        top = startPoint;
+                        if (first != startPoint) points_1.Add(first);
+
+                        points_1.Add(top);
+                        points_2.Add(top);
+                    }
+                    else
+                    {
+                        bottom = startPoint;
+
+                        if (first != startPoint) points_2.Add(m_panel.point(ii));
+                        points_2.Add(bottom);
+                        points_1.Add(bottom);
                     }
 
                     addTo_1 = !addTo_1;
-
                 }
                 else
                 {
@@ -252,8 +277,9 @@ namespace HullEdit
                 }
             }
 
-            // close the first panel
+            // close the panels
             points_1.Add(points_1[0]);
+            points_2.Add(top);
 
             panel_1 = new Panel(points_1);
             panel_2 = new Panel(points_2);
