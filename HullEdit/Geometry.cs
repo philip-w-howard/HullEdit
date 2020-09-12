@@ -312,5 +312,24 @@ namespace HullEdit
             }
         }
 
+        static public void CreateArc(PointCollection points, double radius, Point center, double startAngle, double endAngle, int numPoints)
+        {
+            // if points already exists, we will append points to it.
+            // Otherwise, create a new list
+            if (points == null) points = new PointCollection();
+
+            double delta = (endAngle - startAngle) / numPoints;
+            double angle = startAngle;
+
+            for (int ii = 0; ii < numPoints - 1; ii++)
+            {
+                points.Add(new Point(center.X + Math.Cos(angle) * radius, center.Y + Math.Sin(angle) * radius));
+                angle += delta;
+            }
+
+            // by removing the last point from the loop, we are guaranteed to end in the right place.
+            // No round-off error
+            points.Add(new Point(center.X + Math.Cos(endAngle) * radius, center.Y + Math.Sin(endAngle) * radius));
+        }
     }
 }
