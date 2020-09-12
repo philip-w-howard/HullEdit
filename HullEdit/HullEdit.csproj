@@ -66,6 +66,7 @@
     <Compile Include="PanelSnipWindow.xaml.cs">
       <DependentUpon>PanelSnipWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="PanelSplitter.cs" />
     <Compile Include="PanelsSetupWindow.xaml.cs">
       <DependentUpon>PanelsSetupWindow.xaml</DependentUpon>
     </Compile>

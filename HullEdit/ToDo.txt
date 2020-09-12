@@ -1,12 +1,7 @@
 ﻿Features
 	cut layout
-		Ability to split panels in two
-			Distance from left
-			Radius
-			Depth
-
-			Compute center of segment for cut-off
-			Build squiggle cut
+		Build squiggle cut
+			SquareTongue: panel_2 isn't quite right.
 
 	Status bar at the bottom showing x,y,z location, etc.
 

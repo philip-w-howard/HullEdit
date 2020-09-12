@@ -253,8 +253,6 @@ namespace HullEdit
                     {
                         top = startPoint;
                         if (first != startPoint) points_1.Add(first);
-
-                        points_1.Add(top);
                         points_2.Add(top);
                     }
                     else
@@ -262,8 +260,19 @@ namespace HullEdit
                         bottom = startPoint;
 
                         if (first != startPoint) points_2.Add(m_panel.point(ii));
-                        points_2.Add(bottom);
-                        points_1.Add(bottom);
+                        PointCollection splitter_1 = PanelSplitter.SquareTongues(top, bottom, radius, depth);
+                        PointCollection splitter_2 = splitter_1.Clone();
+                        splitter_2.Reverse();
+
+                        foreach (Point p in splitter_1)
+                        {
+                            points_1.Add(p);
+                        }
+
+                        foreach (Point p in splitter_2)
+                        {
+                            points_2.Add(p);
+                        }
                     }
 
                     addTo_1 = !addTo_1;
@@ -279,7 +288,7 @@ namespace HullEdit
 
             // close the panels
             points_1.Add(points_1[0]);
-            points_2.Add(top);
+            //points_2.Add(top);
 
             panel_1 = new Panel(points_1);
             panel_2 = new Panel(points_2);
