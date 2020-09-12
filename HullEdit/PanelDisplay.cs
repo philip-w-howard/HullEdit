@@ -259,10 +259,9 @@ namespace HullEdit
                     {
                         bottom = startPoint;
 
-                        if (first != startPoint) points_2.Add(m_panel.point(ii));
+                        if (first != startPoint) points_2.Add(first);
                         PointCollection splitter_1 = PanelSplitter.SquareTongues(top, bottom, radius, depth);
-                        PointCollection splitter_2 = splitter_1.Clone();
-                        splitter_2.Reverse();
+                        IEnumerable<Point> splitter_2 = splitter_1.Reverse();
 
                         foreach (Point p in splitter_1)
                         {
