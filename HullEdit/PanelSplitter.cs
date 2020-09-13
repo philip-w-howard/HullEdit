@@ -181,19 +181,19 @@ namespace HullEdit
 
             for (int ii = 0; ii < numTongues - 1; ii++)
             {
-               // Geometry.CreateArc(splitter, radius, current, startFullAngle(verticalDir), endFullAngle(horizontalDir, verticalDir), NUM_POINTS);
+                Geometry.CreateArc(splitter, radius, new Point(current.X, current.Y + verticalDir*radius), startFullAngle(verticalDir), endFullAngle(horizontalDir, verticalDir), NUM_POINTS);
                 current.Y += verticalDir * 2 * radius;
-                splitter.Add(current); //*******************
+                //splitter.Add(current); //*******************
                 current.X += horizontalDir * (depth - 2*radius);
-                splitter.Add(current);
+                //splitter.Add(current);
                 horizontalDir *= -1;
             }
 
-            //Geometry.CreateArc(splitter, radius, current, startFullAngle(verticalDir), endFullAngle(horizontalDir, verticalDir), NUM_POINTS);
+            Geometry.CreateArc(splitter, radius, new Point(current.X, current.Y + verticalDir * radius), startFullAngle(verticalDir), endFullAngle(horizontalDir, verticalDir), NUM_POINTS);
             current.Y += verticalDir * 2 * radius;
             splitter.Add(current); //*******************
             current.X = end.X - horizontalDir * radius;
-            splitter.Add(current);
+            //splitter.Add(current);
 
             Geometry.CreateArc(splitter, radius, new Point(end.X - horizontalDir * radius, end.Y), startFinalAngle(verticalDir), endFinalAngle(horizontalDir, verticalDir), NUM_POINTS / 2);
 
