@@ -119,6 +119,41 @@ namespace HullEdit
             else
                 return Math.PI/2;
         }
+        private static double startFullAngle(double verticalDir)
+        {
+            if (verticalDir == -1)
+                return Math.PI / 2;
+            else
+                return 3 * Math.PI / 2;
+        }
+
+        private static double endFullAngle(double horizontalDir, double verticalDir)
+        {
+            double startAngle = startFullAngle(verticalDir);
+
+            if (horizontalDir == 1)
+                return startAngle + Math.PI;
+            else
+                return startAngle - Math.PI;
+        }
+
+        private static double startFinalAngle(double verticalDir)
+        {
+            if (verticalDir == -1)
+                return Math.PI / 2;
+            else
+                return 3 * Math.PI / 2;
+        }
+        private static double endFinalAngle(double horizontalDir, double verticalDir)
+        {
+            double startAngle = startFinalAngle(verticalDir);
+
+            if (horizontalDir == 1)
+                return startAngle - Math.PI/2;
+            else
+                return startAngle + Math.PI/2;
+        }
+
         public static PointCollection Tongues(Point start, Point end, int numTongues, double depth)
         {
             const int NUM_POINTS = 180;
@@ -129,7 +164,7 @@ namespace HullEdit
             PointCollection splitter = new PointCollection();
 
             double panelHeight = Math.Abs(start.Y - end.Y);
-            double tongueHeight = panelHeight / (numTongues + 1); ;
+            double radius = panelHeight / (numTongues + 1) / 2; 
 
             if (start.Y > end.Y)
                 verticalDir = -1;
@@ -137,30 +172,32 @@ namespace HullEdit
                 verticalDir = 1;
 
             splitter.Add(start);
-            Geometry.CreateArc(splitter, tongueHeight / 2, new Point(start.X + horizontalDir * tongueHeight/2, start.Y), startHalfAngle(verticalDir), endHalfAngle(verticalDir), NUM_POINTS / 2);
+            Geometry.CreateArc(splitter, radius, new Point(start.X + horizontalDir * radius, start.Y), startHalfAngle(verticalDir), endHalfAngle(verticalDir), NUM_POINTS / 2);
 
-            current = new Point(start.X, start.Y + verticalDir * tongueHeight / 2);
+            current = new Point(start.X + horizontalDir * (depth/2 - radius), start.Y + verticalDir * radius);
             splitter.Add(current);
 
-            current.X += horizontalDir * depth / 2;
-            splitter.Add(current);
             horizontalDir *= -1;
 
             for (int ii = 0; ii < numTongues - 1; ii++)
             {
-                current.Y += verticalDir * tongueHeight;
-                splitter.Add(current);
-                current.X += horizontalDir * depth;
+               // Geometry.CreateArc(splitter, radius, current, startFullAngle(verticalDir), endFullAngle(horizontalDir, verticalDir), NUM_POINTS);
+                current.Y += verticalDir * 2 * radius;
+                splitter.Add(current); //*******************
+                current.X += horizontalDir * (depth - 2*radius);
                 splitter.Add(current);
                 horizontalDir *= -1;
             }
-            current.Y += verticalDir * tongueHeight;
-            splitter.Add(current);
-            current.X += horizontalDir * depth / 2;
-            splitter.Add(current);
-            horizontalDir *= -1;
 
-            splitter.Add(end);
+            //Geometry.CreateArc(splitter, radius, current, startFullAngle(verticalDir), endFullAngle(horizontalDir, verticalDir), NUM_POINTS);
+            current.Y += verticalDir * 2 * radius;
+            splitter.Add(current); //*******************
+            current.X = end.X - horizontalDir * radius;
+            splitter.Add(current);
+
+            Geometry.CreateArc(splitter, radius, new Point(end.X - horizontalDir * radius, end.Y), startFinalAngle(verticalDir), endFinalAngle(horizontalDir, verticalDir), NUM_POINTS / 2);
+
+            splitter.Add(end); //********************
 
             return splitter;
         }
