@@ -18,10 +18,10 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <Label Grid.Row="0" Grid.Column="0">Distance from left</Label>
-        <Label Grid.Row="1" Grid.Column="0">Radius</Label>
+        <Label Grid.Row="1" Grid.Column="0">Number of tongues</Label>
         <Label Grid.Row="2" Grid.Column="0">Depth</Label>
         <TextBox  Grid.Row="0" Grid.Column="1" Name="distanceValue" Width="40" />
-        <TextBox Grid.Row="1" Grid.Column="1" Name="radiusValue" Width="40" />
+        <TextBox Grid.Row="1" Grid.Column="1" Name="numTonguesValue" Width="40" />
         <TextBox Grid.Row="2" Grid.Column="1" Name="depthValue" Width="40" />
 
         <StackPanel Margin="20" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal">

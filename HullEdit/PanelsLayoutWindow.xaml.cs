@@ -607,7 +607,7 @@ namespace HullEdit
                 {
                     Panel panel_1, panel_2;
 
-                    if (m_selectedPanel.Split(snip.start, snip.radius, snip.depth, out panel_1, out panel_2))
+                    if (m_selectedPanel.Split(snip.start, snip.numTongues, snip.depth, out panel_1, out panel_2))
                     {
                         DisplayPanel(panel_1, m_selectedPanel.X, m_selectedPanel.Y);
                         DisplayPanel(panel_2, m_selectedPanel.X + snip.start, m_selectedPanel.Y);

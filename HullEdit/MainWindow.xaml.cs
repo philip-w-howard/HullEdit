@@ -256,6 +256,15 @@ namespace HullEdit
             layout.Show();
         }
 
+        private void ResizeClick(object sender, RoutedEventArgs e)
+        {
+            ResizeWindow resize = new ResizeWindow(myHull);
+            //resize.Width = 600;
+            //resize.Height = 400;
+
+            resize.Show();
+        }
+
         void hull_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == "BulkheadData")

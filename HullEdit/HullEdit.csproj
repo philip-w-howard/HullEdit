@@ -74,6 +74,9 @@
     <Compile Include="PanelsLayoutWindow.xaml.cs">
       <DependentUpon>PanelsLayoutWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ResizeWindow.xaml.cs">
+      <DependentUpon>ResizeWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Splines.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -96,6 +99,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="PanelsLayoutWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ResizeWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

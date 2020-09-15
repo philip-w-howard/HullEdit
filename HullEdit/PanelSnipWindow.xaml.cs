@@ -21,7 +21,7 @@ namespace HullEdit
     {
         public bool OK;
         public double start;
-        public double radius;
+        public double numTongues;
         public double depth;
 
         public PanelSnipWindow()
@@ -44,9 +44,9 @@ namespace HullEdit
             {
                 OK = false;
             }
-            if (Double.TryParse(radiusValue.Text, out value))
+            if (Double.TryParse(numTonguesValue.Text, out value))
             {
-                radius = value;
+                numTongues = value;
             }
             else
             {

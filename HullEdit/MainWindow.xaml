@@ -17,6 +17,7 @@
                     </MenuItem>
                     <MenuItem Header="_Tools">
                         <MenuItem Name="PanelsMenu" Header="_Panels" Click="PanelsClick" IsEnabled="False"/>
+                        <MenuItem Name ="ResizeMenu" Header="_Resize" Click="ResizeClick" />
                     </MenuItem>
                 </Menu>
             </ToolBar>
