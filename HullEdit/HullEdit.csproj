@@ -57,6 +57,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Bulkhead.cs" />
+    <Compile Include="DxfMaker.cs" />
     <Compile Include="Geometry.cs" />
     <Compile Include="Hull.cs" />
     <Compile Include="HullDisplay.cs" />

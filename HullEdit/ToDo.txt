@@ -25,7 +25,9 @@
 	Undo/Redo capability
 
 Code/Implementation Enhancements
-    Serializability:
+    Use data binding for more dialogs (see resize as example)
+
+	Serializability:
 		Mark object as [Serializable()]
 		Can mark individual fields as [NonSerialized()]
 	Does Bulkhead need to implement INotifyPropertyChanged?
