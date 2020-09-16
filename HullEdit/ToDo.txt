@@ -1,7 +1,5 @@
 ﻿Features
-	cut layout
-		Build squiggle cut
-			SquareTongue: panel_2 isn't quite right.
+	DXF output
 
 	Status bar at the bottom showing x,y,z location, etc.
 
@@ -15,6 +13,11 @@
 	Spline bulkhead for bow/stern (Not in Carson Hull)
 
 	Add/position bulkheads
+
+	Bulkhead: fix top/bottom to center line
+	
+	Create floor/deck for non-centerline bulkheads
+
 	Splines.GetAt(coord)
 
 	Rotate perspective x,y with mouse movement

@@ -27,13 +27,13 @@ namespace HullEdit
 
         public ResizeWindowData() { }
 
-        public bool Checked
+        public bool Proportional
         {
             get { return _checked; }
             set
             {
                 _checked = value;
-                Notify("Checked");
+                Notify("Proportional");
             }
         }
         public double Width
@@ -41,6 +41,14 @@ namespace HullEdit
             get { return _width; }
             set
             {
+                if (Proportional)
+                {
+                    double ratio = value / _width;
+                    _length *= ratio;
+                    Notify("Length");
+                    _height *= ratio;
+                    Notify("Height");
+                }
                 _width = value;
                 Notify("Width");
             }
@@ -50,6 +58,14 @@ namespace HullEdit
             get { return _height; }
             set
             {
+                if (Proportional)
+                {
+                    double ratio = value / _height;
+                    _length *= ratio;
+                    Notify("Length");
+                    _width *= ratio;
+                    Notify("Width");
+                }
                 _height = value;
                 Notify("Height");
             }
@@ -58,6 +74,14 @@ namespace HullEdit
         {
             get { return _length; }
             set {
+                if (Proportional)
+                {
+                    double ratio = value / _length;
+                    _height *= ratio;
+                    Notify("Height");
+                    _width *= ratio;
+                    Notify("Width");
+                }
                 _length = value;
                 Notify("Length");
             }
@@ -83,11 +107,19 @@ namespace HullEdit
 
             if (resizeData != null)
             {
+                bool proportional = resizeData.Proportional;
+
+                // Need to turn off Proportional for initial setup
+                resizeData.Proportional = false;
+
                 Size3D size = hull.GetSize();
-                resizeData.Width = size.X;
+                resizeData.Width = size.X*2;    // multiply by 2 because this is half-hull
                 resizeData.Height = size.Y;
                 resizeData.Length = size.Z;
-                resizeData.Checked = true;
+                resizeData.Proportional = true;
+
+                // Reset proportional
+                resizeData.Proportional = proportional;
             }
         }
 

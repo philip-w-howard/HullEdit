@@ -16,6 +16,7 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Media.Media3D;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Xml;
@@ -258,11 +259,30 @@ namespace HullEdit
 
         private void ResizeClick(object sender, RoutedEventArgs e)
         {
-            ResizeWindow resize = new ResizeWindow(myHull);
-            //resize.Width = 600;
-            //resize.Height = 400;
+            Size3D originalSize = myHull.GetSize();
+            originalSize.X *= 2;    // compensate because this is a half-hull
 
-            resize.Show();
+            ResizeWindow resize = new ResizeWindow(myHull);
+
+            resize.ShowDialog();
+
+            if (resize.OK)
+            {
+                ResizeWindowData resizeData = (ResizeWindowData)resize.FindResource("ResizeData");
+                double scale_x = 1.0;
+                double scale_y = 1.0;
+                double scale_z = 1.0;
+
+                if (resizeData != null)
+                {
+                    scale_x = resizeData.Width / originalSize.X;
+                    scale_y = resizeData.Height / originalSize.Y;
+                    scale_z = resizeData.Length / originalSize.Z;
+
+                    myHull.Scale(scale_x, scale_y, scale_z);
+                    UpdateDisplays();
+                }
+            }
         }
 
         void hull_PropertyChanged(object sender, PropertyChangedEventArgs e)
