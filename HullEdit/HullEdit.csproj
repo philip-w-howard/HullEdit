@@ -79,6 +79,7 @@
       <DependentUpon>ResizeWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Splines.cs" />
+    <Compile Include="SVGWriter.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

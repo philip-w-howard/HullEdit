@@ -66,6 +66,18 @@ namespace HullEdit
             }
         }
 
+        public PointCollection GetPoints()
+        {
+            PointCollection points = new PointCollection();
+            
+            for (int ii = 1; ii < m_panel.NumPoints; ii++)
+            {
+                Point p = ScaledPoint(m_panel.point(ii));
+                points.Add(p);
+            }
+
+            return points;
+        }
         // Draw the panel.
         // This requires a horrible hierarchy of classes, but it allows us to draw a filled figure,
         // which makes it clickable.

@@ -503,6 +503,26 @@ namespace HullEdit
                 }
             }
         }
+        private void outputSVG(object sender, RoutedEventArgs e)
+        {
+            SaveFileDialog saveDlg = new SaveFileDialog();
+
+            saveDlg.Filter = "SVG files (*.svg)|*.svg|All files (*.*)|*.*";
+            saveDlg.FilterIndex = 1;
+            saveDlg.RestoreDirectory = true;
+
+            Nullable<bool> result = saveDlg.ShowDialog();
+            if (result == true)
+            {
+                SVGWriter output = new SVGWriter(saveDlg.FileName);
+                foreach (PanelDisplay panel in m_displayPanels)
+                {
+                    output.Write(panel);
+                }
+
+                output.Close();
+            }
+        }
 
         private void Panelize(Hull hull)
         {
@@ -617,11 +637,6 @@ namespace HullEdit
                     }
                 }
             }
-//public bool OK;
-//public double start;
-//public double radius;
-//public double depth;
-
+        }
     }
-}
 }
