@@ -15,9 +15,9 @@ namespace HullEdit
         public SVGWriter(string filename)
         {
             svgFile = new System.IO.StreamWriter(filename);
-            svgFile.WriteLine("<?xml version=\"1.0\" encoding=\"utf - 8\"?>");
+            svgFile.WriteLine("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
             svgFile.WriteLine("<!-- Generator: AVS Hull 0.0.0, SVGWriter V0.0.0  -->");
-            svgFile.WriteLine("<!DOCTYPE svg PUBLIC \" -//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">");
+            svgFile.WriteLine("<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">");
             svgFile.WriteLine("<svg version=\"1.1\" id=\"Layer_1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\"");
             svgFile.WriteLine("     x=\"0px\" y=\"0px\"");
             svgFile.WriteLine("     Width=\"96in\" Height=\"48in\" xml:space=\"preserve\">");
@@ -40,7 +40,8 @@ namespace HullEdit
             {
                 svgFile.Write(" " + p.X + "," + p.Y + " ");
             }
-            svgFile.WriteLine("\" style=\"file:none;stroke:black;stroke-width:1\" />");
+
+            svgFile.WriteLine("\" style=\"fill:none;stroke:black;stroke-width:1\" />");
         }
     }
 }

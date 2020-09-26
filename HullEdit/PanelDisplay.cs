@@ -54,6 +54,12 @@ namespace HullEdit
             point.Y *= scale;
             return point;
         }
+        private Point AbsolutePoint(Point point)
+        {
+            point.X += X;
+            point.Y += Y;
+            return point;
+        }
 
         public Size size
         {
@@ -72,9 +78,12 @@ namespace HullEdit
             
             for (int ii = 1; ii < m_panel.NumPoints; ii++)
             {
-                Point p = ScaledPoint(m_panel.point(ii));
+                Point p = AbsolutePoint(m_panel.point(ii));
                 points.Add(p);
             }
+
+            // close the path
+            points.Add(AbsolutePoint(m_panel.point(0)));
 
             return points;
         }
