@@ -56,8 +56,8 @@ namespace HullEdit
         }
         private Point AbsolutePoint(Point point)
         {
-            point.X += X;
-            point.Y += Y;
+            point.X += X/scale;
+            point.Y += Y/scale;
             return point;
         }
 
@@ -75,15 +75,17 @@ namespace HullEdit
         public PointCollection GetPoints()
         {
             PointCollection points = new PointCollection();
-            
-            for (int ii = 1; ii < m_panel.NumPoints; ii++)
+            Point p;
+
+            for (int ii = 0; ii < m_panel.NumPoints; ii++)
             {
-                Point p = AbsolutePoint(m_panel.point(ii));
+                p = AbsolutePoint(m_panel.point(ii));
                 points.Add(p);
             }
 
             // close the path
-            points.Add(AbsolutePoint(m_panel.point(0)));
+            // p = AbsolutePoint(m_panel.point(0));
+            // points.Add(p);
 
             return points;
         }
