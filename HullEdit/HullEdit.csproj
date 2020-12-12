@@ -58,6 +58,7 @@
     </ApplicationDefinition>
     <Compile Include="Bulkhead.cs" />
     <Compile Include="DxfMaker.cs" />
+    <Compile Include="GCodeWriter.cs" />
     <Compile Include="Geometry.cs" />
     <Compile Include="Hull.cs" />
     <Compile Include="HullDisplay.cs" />

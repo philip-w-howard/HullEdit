@@ -503,6 +503,28 @@ namespace HullEdit
                 }
             }
         }
+
+        private void outputGCode(object sender, RoutedEventArgs e)
+        {
+            SaveFileDialog saveDlg = new SaveFileDialog();
+
+            saveDlg.Filter = "GCode files (*.gcode)|*.gcode|All files (*.*)|*.*";
+            saveDlg.FilterIndex = 1;
+            saveDlg.RestoreDirectory = true;
+
+            Nullable<bool> result = saveDlg.ShowDialog();
+            if (result == true)
+            {
+                GCodeWriter output = new GCodeWriter(saveDlg.FileName);
+                foreach (PanelDisplay panel in m_displayPanels)
+                {
+                    output.Write(panel);
+                }
+
+                output.Close();
+            }
+        }
+
         private void outputSTL(object sender, RoutedEventArgs e)
         {
             SaveFileDialog saveDlg = new SaveFileDialog();

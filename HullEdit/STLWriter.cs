@@ -33,6 +33,7 @@ namespace HullEdit
         public void Write(PanelDisplay panel)
         {
             Point lastPoint = new Point(0, 0);
+            Point firstPoint = new Point(0, 0);
             PointCollection points = panel.GetPoints();
             Boolean first = true;
 
@@ -41,6 +42,7 @@ namespace HullEdit
                 if (first)
                 {
                     lastPoint = p;
+                    firstPoint = p;
                     first = false;
                 }
                 else
@@ -63,6 +65,22 @@ namespace HullEdit
                     lastPoint = p;
                 }
             }
+            // go back to first point
+            stlFile.WriteLine("facet normal 0.0E1 0.0E1 0.0E1"); // normal vector
+            stlFile.WriteLine("outer loop");
+            stlFile.WriteLine("vertex {0:E} {1:E} {2:E}", lastPoint.X, lastPoint.Y, -m_depth);
+            stlFile.WriteLine("vertex {0:E} {1:E} {2:E}", lastPoint.X, lastPoint.Y, 0);
+            stlFile.WriteLine("vertex {0:E} {1:E} {2:E}", firstPoint.X, firstPoint.Y, 0);
+            stlFile.WriteLine("endloop");
+            stlFile.WriteLine("endfacet");
+
+            stlFile.WriteLine("facet normal ni nj nk"); // normal vector
+            stlFile.WriteLine("outer loop");
+            stlFile.WriteLine("vertex {0:E} {1:E} {2:E}", lastPoint.X, lastPoint.Y, -m_depth);
+            stlFile.WriteLine("vertex {0:E} {1:E} {2:E}", firstPoint.X, firstPoint.Y, 0);
+            stlFile.WriteLine("vertex {0:E} {1:E} {2:E}", firstPoint.X, firstPoint.Y, -m_depth);
+            stlFile.WriteLine("endloop");
+            stlFile.WriteLine("endfacet");
         }
     }
 }
