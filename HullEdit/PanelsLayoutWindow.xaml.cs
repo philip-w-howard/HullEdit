@@ -503,6 +503,27 @@ namespace HullEdit
                 }
             }
         }
+        private void outputSTL(object sender, RoutedEventArgs e)
+        {
+            SaveFileDialog saveDlg = new SaveFileDialog();
+
+            saveDlg.Filter = "STL files (*.stl)|*.stl|All files (*.*)|*.*";
+            saveDlg.FilterIndex = 1;
+            saveDlg.RestoreDirectory = true;
+
+            Nullable<bool> result = saveDlg.ShowDialog();
+            if (result == true)
+            {
+                STLWriter output = new STLWriter(saveDlg.FileName);
+                foreach (PanelDisplay panel in m_displayPanels)
+                {
+                    output.Write(panel);
+                }
+
+                output.Close();
+            }
+        }
+
         private void outputSVG(object sender, RoutedEventArgs e)
         {
             SaveFileDialog saveDlg = new SaveFileDialog();

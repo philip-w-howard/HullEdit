@@ -24,6 +24,7 @@
                         <MenuItem Header="_Open" Click="openClick"/>
                         <MenuItem Header="_Save" Click="saveClick"/>
                         <MenuItem Header="Output _Panel Offsets" Click="outputClick" />
+                        <MenuItem Header="Output S_TL file" Click="outputSTL" />
                         <MenuItem Header="Output S_VG file" Click="outputSVG" />
                     </MenuItem>
                     <MenuItem Header="_View">
