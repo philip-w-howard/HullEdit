@@ -297,12 +297,15 @@ namespace HullEdit
 
         private void MenuItem_Click(object sender, RoutedEventArgs e)
         {
-            Point P1 = new Point(0, 1);
-            Point P2 = new Point(-1, 0);
-            Point P3 = new Point(0, 0);
-            double leftAngle=0, rightAngle=0;
+            PointCollection points = new PointCollection();
+            points.Add(new Point(0, 0));
+            points.Add(new Point(0, 1));
+            points.Add(new Point(.25, .25));
+            points.Add(new Point(1, 0));
+            points.Add(new Point(0, 0));
+            double leftAngle =0, rightAngle=0;
 
-            Geometry.ComputeAngle(P1, P2, P3, ref leftAngle, ref rightAngle);
+            Geometry.ComputeAngles(points, ref leftAngle, ref rightAngle);
 
             Console.WriteLine("Angles {0}, {1}", 180/Math.PI*leftAngle, 180 / Math.PI * rightAngle);
         }

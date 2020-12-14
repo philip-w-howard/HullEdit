@@ -152,34 +152,39 @@ namespace HullEdit
             leftAngle = 2 * Math.PI - rightAngle;
 
         }
-        
-        public static void ComputeAngle2(Point p1, Point p2, Point p3, ref double leftAngle, ref double rightAngle)
+ 
+        // Compute the angles going all the way around a closed shape defined by points.
+        // leftAngle is the sum of the angles on the left hand side
+        // rightAngle is the sum of the angles on the right hand side
+        // NOTE: This algorithm assumes a closed shape with the first and last points in the colleciton being the same.
+        static public void ComputeAngles(PointCollection points, ref double leftAngle, ref double rightAngle)
         {
-            double m1, m2;
-            double run1, run2, rise1, rise2;
+            double left=0, right=0;
+            leftAngle = 0;
+            rightAngle = 0;
 
-            run1 = p1.X - p2.X;
-            run2 = p2.X - p3.X;
-            rise1 = p1.Y - p2.Y;
-            rise2 = p2.Y - p3.Y;
+            Point p1, p2;
+            
+            // Prime the pipeline with the last non-duplicated point
+            p2 = points[points.Count - 2];
 
-            if (run1 != 0)
-                m1 = rise1 / run1;
-            else
-                m1 = rise1 * 1.0E50;    // an arbitrary big number with appropriate sign
+            // NaN is a flag to indicate the pipeline isn't full yet
+            p1 = new Point(Double.NaN, Double.NaN);
 
-            if (run2 != 0)
-                m2 = rise2 / run2;
-            else
-                m2 = rise2 * 1.0E50;    // an arbitrary big number with appropriate sign
-
-            double tan = (m2 - m1) / (1 + m1 * m2);
-            leftAngle = Math.Atan(tan);
-            rightAngle = Math.Atan(-tan);
-            if (leftAngle < 0) leftAngle += Math.PI;
-            if (rightAngle < 0) rightAngle += Math.PI;
+            foreach (Point p in points)
+            {
+                if (!Double.IsNaN(p1.X))
+                {
+                    ComputeAngle(p1, p2, p, ref left, ref right);
+                    leftAngle += left;
+                    rightAngle += right;
+                }
+                p1 = p2;
+                p2 = p;
+            }
         }
-        // Determine if the point (p3_x,p3_y) is near the line defined by (p1_x, p1_y) and (p2_x, p2_y)
+
+         // Determine if the point (p3_x,p3_y) is near the line defined by (p1_x, p1_y) and (p2_x, p2_y)
         static public bool IsNearLine(double p1_x, double p1_y, double p2_x, double p2_y, double p3_x, double p3_y, double delta)
         {
             if (p1_x == p2_x) // vertical line
