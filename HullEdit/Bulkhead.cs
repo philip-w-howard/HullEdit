@@ -6,6 +6,7 @@ using System.Windows.Media.Media3D;
 
 namespace HullEdit
 {
+    // Class representing a bulkhead: A closed polygon that represents a half-hull
     public class Bulkhead : INotifyPropertyChanged
     {
         public enum BulkheadType { BOW, VERTICAL, TRANSOM };

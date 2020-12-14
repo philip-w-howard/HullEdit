@@ -11,6 +11,8 @@ namespace HullEdit
 {
     class Geometry
     {
+        // Compute the two solutions to the quadradic forumula.
+        // a,b,c have the normal meaning for the quadradic formula.
         static public double QuadradicSolution(double a, double b, double c, out double x1, out double x2)
         {
             x1 = Double.NaN;
@@ -27,6 +29,10 @@ namespace HullEdit
             return 0;
         }
 
+        // Compute the intersection of two circles
+        // p1, r1 specify the center and radius of one circle
+        // p2, r2 specify the center and radius of the other circle
+        // intersection1 and intersection2 are the two intersecting points.
         static public double Intersection(Point p1, double r1, Point p2, double r2, out Point intersection1, out Point intersection2)
         {
             intersection1 = new Point();
@@ -73,6 +79,106 @@ namespace HullEdit
             return 0;
         }
 
+        // Find the intersection of two lines
+        // Line 1 is specified by Pa1, Pa2
+        // Line 2 is specified by Pb1, Pb2
+        static public Point Intersection(Point Pa1, Point Pa2, Point Pb1, Point Pb2)
+        {
+            double rise1, run1, rise2, run2;
+            double m1, m2, b1, b2;
+
+            rise1 = Pa1.Y - Pa2.Y;
+            run1 = Pa1.X - Pa2.X;
+
+            rise2 = Pb1.Y - Pb2.Y;
+            run2 = Pb1.X - Pb2.X;
+
+            if (run1 != 0)
+            {
+                m1 = rise1 / run1;
+                b1 = Pa1.Y - Pa1.X * m1;
+            }
+            else
+            {
+                m1 = Double.NaN;
+                b1 = Double.NaN;
+            }
+
+            if (run2 != 0)
+            {
+                m2 = rise2 / run2;
+                b2 = Pb1.Y - Pb1.X * m2;
+            }
+            else
+            {
+                m2 = Double.NaN;
+                b2 = Double.NaN;
+            }
+
+            // parallel lines
+            if (m1 == m2)
+                return new Point(Double.NaN, Double.NaN);
+            else if (run1 == 0)
+                // L1 is vertical
+                return new Point(Pa1.X, m2 * Pa1.X + b2);
+            else if (run2 == 0)
+                // L2 is vertical
+                return new Point(Pb1.X, m1 * Pb1.X + b1);
+            else
+            {
+                // 2 normal lines
+                double x = (b2 - b1) / (m1 - m2);
+                double y = m1 * x + b1;
+                return new Point(x, y);
+            }
+        }
+
+        // Compute angle P1, P2, P3
+        public static void ComputeAngle(Point p1, Point p2, Point p3, ref double leftAngle, ref double rightAngle)
+        {
+            double m1, m2;
+            double run1, run2, rise1, rise2;
+            double angle1, angle2;
+
+            run1 = p1.X - p2.X;
+            run2 = p3.X - p2.X;
+            rise1 = p1.Y - p2.Y;
+            rise2 = p3.Y - p2.Y;
+
+            angle1 = Math.Atan2(rise1, run1);
+            angle2 = Math.Atan2(rise2, run2);
+            rightAngle = angle2 - angle1;
+            if (rightAngle < 0) rightAngle += 2 * Math.PI;
+            leftAngle = 2 * Math.PI - rightAngle;
+
+        }
+        
+        public static void ComputeAngle2(Point p1, Point p2, Point p3, ref double leftAngle, ref double rightAngle)
+        {
+            double m1, m2;
+            double run1, run2, rise1, rise2;
+
+            run1 = p1.X - p2.X;
+            run2 = p2.X - p3.X;
+            rise1 = p1.Y - p2.Y;
+            rise2 = p2.Y - p3.Y;
+
+            if (run1 != 0)
+                m1 = rise1 / run1;
+            else
+                m1 = rise1 * 1.0E50;    // an arbitrary big number with appropriate sign
+
+            if (run2 != 0)
+                m2 = rise2 / run2;
+            else
+                m2 = rise2 * 1.0E50;    // an arbitrary big number with appropriate sign
+
+            double tan = (m2 - m1) / (1 + m1 * m2);
+            leftAngle = Math.Atan(tan);
+            rightAngle = Math.Atan(-tan);
+            if (leftAngle < 0) leftAngle += Math.PI;
+            if (rightAngle < 0) rightAngle += Math.PI;
+        }
         // Determine if the point (p3_x,p3_y) is near the line defined by (p1_x, p1_y) and (p2_x, p2_y)
         static public bool IsNearLine(double p1_x, double p1_y, double p2_x, double p2_y, double p3_x, double p3_y, double delta)
         {
@@ -130,6 +236,7 @@ namespace HullEdit
             }
         }
 
+        // Create a matrix for doing point rotations. The angle around the x,y,z axis are specified.
         public static double[,] CreateRotateMatrix(double x, double y, double z)
         {
             double angle;
@@ -170,6 +277,8 @@ namespace HullEdit
 
             return rotate_all;
         }
+        
+        // Compute the size of an object specified as a collection of points.
         static public void ComputeSize(Point3DCollection points, out double size_x, out double size_y)
         {
             size_x = Double.NaN;
@@ -192,6 +301,7 @@ namespace HullEdit
             size_y = max_y - min_y;
         }
 
+        // Compute the size of an array of shapes.
         static public void ComputeSize(Point3DCollection[] shape, out double size_x, out double size_y)
         {
             size_x = Double.NaN;
@@ -215,6 +325,8 @@ namespace HullEdit
             size_x = max_x - min_x;
             size_y = max_y - min_y;
         }
+        
+        // Compute the size of a 2D shape
         static public void ComputeSize(PointCollection points, out double size_x, out double size_y)
         {
             size_x = Double.NaN;
@@ -236,6 +348,8 @@ namespace HullEdit
             size_x = max_x - min_x;
             size_y = max_y - min_y;
         }
+        
+        // Compute the size of an array of 2D shapes
         static public void ComputeSize(PointCollection[] shape, out double size_x, out double size_y)
         {
             size_x = Double.NaN;
@@ -260,6 +374,7 @@ namespace HullEdit
             size_y = max_y - min_y;
         }
 
+        // Find the bottom left corner of a shape defined as a collection of points.
         static public void ComputeMin(PointCollection points, out double min_x, out double min_y)
         {
             min_x = double.MaxValue;
@@ -272,6 +387,7 @@ namespace HullEdit
             }
         }
 
+        // Change the size of a shape
         static public void ResizeShape(Point3DCollection[] shape, double scale)
         {
             double x, y, z;
@@ -287,6 +403,7 @@ namespace HullEdit
             }
         }
 
+        // Change the size of an array of shapes
         static public void ResizeShape(PointCollection[] shape, double scale)
         {
             double x, y;
@@ -301,6 +418,7 @@ namespace HullEdit
             }
         }
 
+        // Shift the location of a shape
         static public void TranslateShape(PointCollection points, double move_x, double move_y)
         {
             double x, y;
@@ -312,6 +430,8 @@ namespace HullEdit
             }
         }
 
+        // Simulate an arc with a collection of straight lines
+        // The lines are added to the end of the specified points, with a new collection being created ifn points is null
         static public void CreateArc(PointCollection points, double radius, Point center, double startAngle, double endAngle, int numPoints)
         {
             // if points already exists, we will append points to it.
