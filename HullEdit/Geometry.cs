@@ -136,7 +136,6 @@ namespace HullEdit
         // Compute angle P1, P2, P3
         public static void ComputeAngle(Point p1, Point p2, Point p3, ref double leftAngle, ref double rightAngle)
         {
-            double m1, m2;
             double run1, run2, rise1, rise2;
             double angle1, angle2;
 
@@ -150,7 +149,6 @@ namespace HullEdit
             rightAngle = angle2 - angle1;
             if (rightAngle < 0) rightAngle += 2 * Math.PI;
             leftAngle = 2 * Math.PI - rightAngle;
-
         }
  
         // Compute the angles going all the way around a closed shape defined by points.
@@ -184,6 +182,54 @@ namespace HullEdit
             }
         }
 
+        public static void OffsetLine(Point p1, Point p2, double offset, ref Point linePoint1, ref Point linePoint2)
+        {
+            double angle = Math.Atan2(p2.Y - p1.Y, p2.X - p1.X);
+            angle += Math.PI / 2;
+
+            linePoint1 = new Point(p1.X + offset * Math.Cos(angle), p1.Y + offset * Math.Sin(angle));
+            linePoint2 = new Point(p2.X + offset * Math.Cos(angle), p2.Y + offset * Math.Sin(angle));
+        }
+
+        static public PointCollection ParallelShape(PointCollection points, double offset, bool inside = false)
+        {
+            double leftAngle = 0, rightAngle = 0;
+            Geometry.ComputeAngles(points, ref leftAngle, ref rightAngle);
+            bool doLeft = false;
+
+            if (leftAngle < rightAngle && inside)
+                doLeft = true;
+            else if (leftAngle > rightAngle && !inside)
+                doLeft = true;
+
+            if (!doLeft) offset = -offset;
+
+            PointCollection result = new PointCollection();
+
+            // NaN is a flag to indicate the pipeline isn't full yet
+            Point p1 = new Point(Double.NaN, Double.NaN);
+
+            // Prime the pipeline with the last non-duplicated point
+            Point p2 = points[points.Count - 2];
+
+            Point l1a = new Point();
+            Point l1b = new Point();
+            Point l2a = new Point();
+            Point l2b = new Point();
+
+            foreach (Point p in points)
+            {
+                if (!Double.IsNaN(p1.X))
+                {
+                    Geometry.OffsetLine(p2, p1, offset, ref l1a, ref l1b);
+                    Geometry.OffsetLine(p1, p, offset, ref l2a, ref l2b);
+                }
+                p1 = p2;
+                p2 = p;
+            }
+
+            return result;
+        }
          // Determine if the point (p3_x,p3_y) is near the line defined by (p1_x, p1_y) and (p2_x, p2_y)
         static public bool IsNearLine(double p1_x, double p1_y, double p2_x, double p2_y, double p3_x, double p3_y, double delta)
         {

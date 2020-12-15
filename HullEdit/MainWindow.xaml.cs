@@ -308,6 +308,12 @@ namespace HullEdit
             Geometry.ComputeAngles(points, ref leftAngle, ref rightAngle);
 
             Console.WriteLine("Angles {0}, {1}", 180/Math.PI*leftAngle, 180 / Math.PI * rightAngle);
+
+            Point p1 = new Point();
+            Point p2 = new Point();
+
+            Geometry.OffsetLine(new Point(0, 0), new Point(1, 1), 0.25, ref p1, ref p2);
+            Console.WriteLine("New line: {0} {1}", p1, p2);
         }
     }
 }
