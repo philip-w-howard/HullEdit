@@ -299,21 +299,14 @@ namespace HullEdit
         {
             PointCollection points = new PointCollection();
             points.Add(new Point(0, 0));
-            points.Add(new Point(0, 1));
-            points.Add(new Point(.25, .25));
             points.Add(new Point(1, 0));
+            points.Add(new Point(1, 1));
+            points.Add(new Point(0, 1));
             points.Add(new Point(0, 0));
             double leftAngle =0, rightAngle=0;
 
-            Geometry.ComputeAngles(points, ref leftAngle, ref rightAngle);
-
-            Console.WriteLine("Angles {0}, {1}", 180/Math.PI*leftAngle, 180 / Math.PI * rightAngle);
-
-            Point p1 = new Point();
-            Point p2 = new Point();
-
-            Geometry.OffsetLine(new Point(0, 0), new Point(1, 1), 0.25, ref p1, ref p2);
-            Console.WriteLine("New line: {0} {1}", p1, p2);
+            PointCollection newShape = Geometry.ParallelShape(points, 0.25, false);
+            Console.WriteLine("Tool Path: {0}", newShape);
         }
     }
 }

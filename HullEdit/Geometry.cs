@@ -206,16 +206,15 @@ namespace HullEdit
 
             PointCollection result = new PointCollection();
 
-            // NaN is a flag to indicate the pipeline isn't full yet
-            Point p1 = new Point(Double.NaN, Double.NaN);
-
-            // Prime the pipeline with the last non-duplicated point
-            Point p2 = points[points.Count - 2];
+            // Prime the pipeline with the last two non-duplicated points
+            Point p1 = points[points.Count - 2];
+            Point p2 = points[points.Count - 3];
 
             Point l1a = new Point();
             Point l1b = new Point();
             Point l2a = new Point();
             Point l2b = new Point();
+            Point newPoint = new Point();
 
             foreach (Point p in points)
             {
@@ -223,9 +222,13 @@ namespace HullEdit
                 {
                     Geometry.OffsetLine(p2, p1, offset, ref l1a, ref l1b);
                     Geometry.OffsetLine(p1, p, offset, ref l2a, ref l2b);
+
+                    newPoint = Geometry.Intersection(l1a, l1b, l2a, l2b);
+                    result.Add(newPoint);
                 }
-                p1 = p2;
-                p2 = p;
+
+                p2 = p1;
+                p1 = p;
             }
 
             return result;
