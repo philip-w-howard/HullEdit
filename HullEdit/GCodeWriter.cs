@@ -39,11 +39,15 @@ namespace HullEdit
 
         public void Write(PanelDisplay panel)
         {
+            double offset = 0.125;
             PointCollection points = panel.GetPoints();
             Boolean first = true;
             Point firstPoint = new Point(0, 0);
 
-            foreach (Point p in points)
+            // Get the tool path, which is an offset from the panel points
+            PointCollection path = Geometry.ParallelShape(points, offset, false);
+
+            foreach (Point p in path)
             {
                 if (first)
                 {

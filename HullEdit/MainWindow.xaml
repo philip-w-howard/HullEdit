@@ -14,7 +14,6 @@
                         <MenuItem Header="_Open" Click="openClick"/>
                         <MenuItem Header="_Save" Click="saveClick"/>
                         <MenuItem Header="_Import Carlson HUL file" Click="importClick"/>
-                        <MenuItem Header="_Test Geometry" Click="MenuItem_Click" />
                     </MenuItem>
                     <MenuItem Header="_Tools">
                         <MenuItem Name="PanelsMenu" Header="_Panels" Click="PanelsClick" IsEnabled="False"/>
