@@ -515,13 +515,19 @@ namespace HullEdit
             Nullable<bool> result = saveDlg.ShowDialog();
             if (result == true)
             {
-                GCodeWriter output = new GCodeWriter(saveDlg.FileName);
-                foreach (PanelDisplay panel in m_displayPanels)
-                {
-                    output.Write(panel);
-                }
+                GCodeSetupPanel setup = new GCodeSetupPanel();
+                setup.ShowDialog();
 
-                output.Close();
+                if (setup.OK)
+                {
+                    GCodeWriter output = new GCodeWriter(saveDlg.FileName);
+                    foreach (PanelDisplay panel in m_displayPanels)
+                    {
+                        output.Write(panel);
+                    }
+
+                    output.Close();
+                }
             }
         }
 

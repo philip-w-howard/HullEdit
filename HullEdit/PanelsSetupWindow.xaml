@@ -34,7 +34,7 @@
             <Label>Overall Scale:</Label>
             <TextBox Name="OverallScale_Input" Width="20" Text="{Binding overallScale}" />
         </StackPanel>
-        <StackPanel Orientation="Horizontal">
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
             <Button Click="OK_Click" Margin="5">OK</Button>
             <Button Click="Cancel_Click" Margin="5">Cancel</Button>
         </StackPanel>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,18 +9,163 @@ using System.Windows.Media;
 
 namespace HullEdit
 {
+    public class GCodeParameters : INotifyPropertyChanged
+    {
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        void Notify(string propName)
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(propName));
+            }
+        }
+
+        private double m_PlungeSpeed = 5;
+        private double m_CutSpeed = 30;
+        private double m_CutterDiameter = 0.25;
+        private bool m_OffsetInside = false;
+        private double m_MaterialThickness = 0.25;
+        private double m_CutthroughDepth = 0.05;
+        private double m_DepthPerCut = 0.15;
+        private int m_NumTabs = 4;
+        private double m_TabDepth = 0.0625;
+        private double m_TabWidth = 0.375;
+
+        public double PlungeSpeed
+        {
+            get { return m_PlungeSpeed; }
+            set
+            {
+                m_PlungeSpeed = value;
+                Notify("PlungeSpeed");
+            }
+        }
+
+        public double CutSpeed
+        {
+            get { return m_CutSpeed; }
+            set
+            {
+                m_CutSpeed = value;
+                Notify("CutSpeed");
+            }
+        }
+
+        public double CutterDiameter
+        {
+            get { return m_CutterDiameter; }
+            set
+            {
+                m_CutterDiameter = value;
+                Notify("CutterDiamater");
+            }
+        }
+
+        public bool OffsetInside
+        {
+            get { return m_OffsetInside; }
+            set
+            {
+                m_OffsetInside = value;
+                Notify("OffsetInside");
+            }
+        }
+
+        public double MaterialThickness
+        {
+            get { return m_MaterialThickness; }
+            set
+            {
+                m_MaterialThickness = value;
+                Notify("MaterialThickness");
+            }
+        }
+
+        public double CutthroughDepth
+        {
+            get { return m_CutthroughDepth; }
+            set
+            {
+                m_CutthroughDepth = value;
+                Notify("CutthroughDepth");
+            }
+        }
+
+        public double DepthPerCut
+        {
+            get { return m_DepthPerCut; }
+            set
+            {
+                m_DepthPerCut = value;
+                Notify("DepthPerCut");
+            }
+        }
+
+        public int NumTabs
+        {
+            get { return m_NumTabs; }
+            set
+            {
+                m_NumTabs = value;
+                Notify("NumTabs");
+            }
+        }
+
+        public double TabDepth
+        {
+            get { return m_TabDepth; }
+            set
+            {
+                m_TabDepth = value;
+                Notify("TabDepth");
+            }
+        }
+
+        public double TabWidth
+        {
+            get { return m_TabWidth; }
+            set
+            {
+                m_TabWidth = value;
+                Notify("TabWidth");
+            }
+        }
+    }
     class GCodeWriter
     {
+        // Parameters:
+        //      Cut speed
+        //      plunge speed
+        //      cutter diameter
+        //      Inside/Outside
+        //      Depth of material
+        //      Depth per cut
+        //      tabs: number, placement, depth, width
+
+        GCodeParameters parameters = new GCodeParameters();
+
+        //private int m_PlungeSpeed = 5;
+        //private int m_CutSpeed = 30;
+        //private double m_CutterDiameter = 0.25;
+        //private bool m_OffsetInside = false;
+        //private double m_MaterialThickness = 0.25;
+        //private double m_CutthroughDepth = 0.05;
+        //private double m_DepthPerCut = 0.15;
+        //private int m_NumTabs = 4;
+        //private double m_TabDepth = 0.0625;
+        //private double m_TabWidth = 0.375;
+
         private System.IO.StreamWriter gCodeFile;
-        private const int PlungeSpeed = 8;
-        private const int CutSpeed = 30;
 
         public GCodeWriter(string filename)
         {
+            parameters = (GCodeParameters)Application.Current.FindResource("GCodeSetup");
+            
             gCodeFile = new System.IO.StreamWriter(filename);
             gCodeFile.WriteLine("%");
             gCodeFile.WriteLine("O1234 ({0})", filename);
-            gCodeFile.WriteLine("G20 G90 G40 G17 M05");     // inches, absolute, no offset, XY plane, Spindle ON
+            gCodeFile.WriteLine("G20 G90 G40 M05");     // inches, absolute, no offset, Spindle ON. Could add G17: XY plane, but not supported
             gCodeFile.WriteLine("G00 Z0.25 M03");           // 0.25 inches above the surface
         }
 
@@ -27,7 +173,7 @@ namespace HullEdit
         {
             if (gCodeFile != null)
             {
-                gCodeFile.WriteLine("G01 Z0.5 M05");        // lift out of material and turn spindle off
+                gCodeFile.WriteLine("G01 Z0.25 M05");        // lift out of material and turn spindle off
                 gCodeFile.WriteLine("G91 G28 X0");          // return to zero
                 gCodeFile.WriteLine("G91 G28 Z0");
                 gCodeFile.WriteLine("G90");                 // absolute
@@ -39,32 +185,43 @@ namespace HullEdit
 
         public void Write(PanelDisplay panel)
         {
-            double offset = 0.125;
+            double offset = parameters.CutterDiameter/2;
             PointCollection points = panel.GetPoints();
             Boolean first = true;
             Point firstPoint = new Point(0, 0);
 
             // Get the tool path, which is an offset from the panel points
-            PointCollection path = Geometry.ParallelShape(points, offset, false);
+            PointCollection path;
+            if (offset != 0)
+                path = Geometry.ParallelShape(points, offset, parameters.OffsetInside);
+            else
+                path = points;
 
-            foreach (Point p in path)
+            double currentDepth = 0;
+            while (currentDepth < parameters.MaterialThickness)
             {
-                if (first)
+                currentDepth += parameters.DepthPerCut;
+                if (currentDepth > parameters.MaterialThickness) currentDepth = parameters.MaterialThickness + parameters.CutthroughDepth;
+                foreach (Point p in path)
                 {
-                    firstPoint = p;
-                    gCodeFile.WriteLine("G01 Z0.25 F{0}", PlungeSpeed);             // Lift cutter
-                    gCodeFile.WriteLine("G00 X{0} Y{1}", p.X, p.Y);                 // cut 1/8" into surface
-                    gCodeFile.WriteLine("G01 Z-0.125 F{0}", PlungeSpeed);           // cut 1/8" into surface
-                    gCodeFile.WriteLine("G01 X{0} Y{1} F{2}", p.X, p.Y, CutSpeed);  // set cutspeed 
-                    first = false;
+                    if (first)
+                    {
+                        firstPoint = p;
+                        gCodeFile.WriteLine("G01 Z0.25 F{0}", parameters.PlungeSpeed);               // Lift cutter
+                        gCodeFile.WriteLine("G00 X{0} Y{1}", p.X, p.Y);                     // Go to start point
+                        gCodeFile.WriteLine("G01 Z-{0} F{1}", currentDepth, parameters.PlungeSpeed); // cut into surface
+                        gCodeFile.WriteLine("G01 X{0} Y{1} F{2}", p.X, p.Y, parameters.CutSpeed);    // set cutspeed 
+                        first = false;
+                    }
+                    else
+                    {
+                        gCodeFile.WriteLine("G01 X{0} Y{1}", p.X, p.Y);
+                    }
                 }
-                else
-                {
-                    gCodeFile.WriteLine("G01 X{0} Y{1}", p.X, p.Y);
-                }
+                first = true;
             }
             gCodeFile.WriteLine("G01 X{0} Y{1}", firstPoint.X, firstPoint.Y);
-            gCodeFile.WriteLine("G01 Z0.25 F{0}", PlungeSpeed);  // Lift cutter
+            gCodeFile.WriteLine("G01 Z0.25 F{0}", parameters.PlungeSpeed);  // Lift cutter
         }
 
     }
