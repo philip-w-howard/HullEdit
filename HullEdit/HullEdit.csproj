@@ -82,6 +82,7 @@
     <Compile Include="ResizeWindow.xaml.cs">
       <DependentUpon>ResizeWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Settings.cs" />
     <Compile Include="Splines.cs" />
     <Compile Include="STLWriter.cs" />
     <Compile Include="SVGWriter.cs" />

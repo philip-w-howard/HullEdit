@@ -33,7 +33,7 @@ namespace HullEdit
         {
             InitializeComponent();
             myHull = new Hull();
-
+            
             UpdateManips();
 
             myHull.PropertyChanged += hull_PropertyChanged;
@@ -293,6 +293,11 @@ namespace HullEdit
                 UpdateDisplays();
             }
             UpdateDrawings();
+        }
+
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            Properties.Settings.Default.Save();
         }
     }
 }
