@@ -1,12 +1,8 @@
 ﻿Features
     Separate file for each sheet when outputting panels
 
-    Setup dialog for gcode output
     Setup dialog for STL output
-    gcode multiple passes to get to depth.
-
-    tabs in gcode output to keep part attached to sheet
-
+    
 	DXF output
 
 	Status bar at the bottom showing x,y,z location, etc.

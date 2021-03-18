@@ -485,7 +485,7 @@ namespace HullEdit
         }
 
         // Simulate an arc with a collection of straight lines
-        // The lines are added to the end of the specified points, with a new collection being created ifn points is null
+        // The lines are added to the end of the specified points, with a new collection being created if points is null
         static public void CreateArc(PointCollection points, double radius, Point center, double startAngle, double endAngle, int numPoints)
         {
             // if points already exists, we will append points to it.
