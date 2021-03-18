@@ -15,7 +15,8 @@
                 DepthPerCut = "0.15"
                 NumTabs = "4"
                 TabDepth = "0.0625"
-                TabWidth = "0.375" />
+                TabWidth = "0.375"
+                Origin = "0" />
 
     </Application.Resources>
 </Application>

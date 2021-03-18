@@ -31,7 +31,24 @@ namespace HullEdit
         private int m_NumTabs = 4;
         private double m_TabDepth = 0.0625;
         private double m_TabWidth = 0.375;
-
+        private int m_Origin = 0;
+        private List<string> m_OriginTypes = new List<string> { "Panels Bottom Left", "Sheet Bottom Left", "Sheet Center" };
+        /*
+                <ComboBoxItem>Panels Bottom Left</ComboBoxItem>
+                <ComboBoxItem>Sheet Bottom Left</ComboBoxItem>
+                <ComboBoxItem>Sheet Center</ComboBoxItem>
+        */
+        public List<string> OriginTypes
+        {
+            get { return m_OriginTypes; }
+            /*
+            set
+            {
+                m_OriginTypes = value;
+                Notify("OriginTypes");
+            }
+            */
+        }
         public double PlungeSpeed
         {
             get { return m_PlungeSpeed; }
@@ -131,6 +148,17 @@ namespace HullEdit
                 Notify("TabWidth");
             }
         }
+
+        public int Origin
+        {
+            get { return m_Origin; }
+            set
+            {
+                m_Origin = value;
+                Notify("Origin");
+            }
+        }
+
     }
     class GCodeWriter
     {
@@ -144,17 +172,6 @@ namespace HullEdit
         //      tabs: number, placement, depth, width
 
         GCodeParameters parameters = new GCodeParameters();
-
-        //private int m_PlungeSpeed = 5;
-        //private int m_CutSpeed = 30;
-        //private double m_CutterDiameter = 0.25;
-        //private bool m_OffsetInside = false;
-        //private double m_MaterialThickness = 0.25;
-        //private double m_CutthroughDepth = 0.05;
-        //private double m_DepthPerCut = 0.15;
-        //private int m_NumTabs = 4;
-        //private double m_TabDepth = 0.0625;
-        //private double m_TabWidth = 0.375;
 
         private System.IO.StreamWriter gCodeFile;
 
