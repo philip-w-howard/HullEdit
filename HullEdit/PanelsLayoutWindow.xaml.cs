@@ -508,7 +508,7 @@ namespace HullEdit
         {
             SaveFileDialog saveDlg = new SaveFileDialog();
 
-            saveDlg.Filter = "GCode files (*.gcode)|*.gcode|All files (*.*)|*.*";
+            saveDlg.Filter = "GCode files (*.nc)|*.nc|All files (*.*)|*.*";
             saveDlg.FilterIndex = 1;
             saveDlg.RestoreDirectory = true;
 
@@ -517,13 +517,37 @@ namespace HullEdit
             {
                 GCodeSetupPanel setup = new GCodeSetupPanel();
                 setup.ShowDialog();
-
+                Point gcodeOrigin = new Point(0, 0);
                 if (setup.OK)
                 {
+                    GCodeParameters parameters = new GCodeParameters();
+                    parameters = (GCodeParameters)Application.Current.FindResource("GCodeSetup");
+                    if (parameters.OriginTypes[parameters.Origin] == "Panels Bottom Left")
+                    {
+                        double minX = Double.MaxValue;
+                        double minY = Double.MaxValue;
+                        foreach (PanelDisplay panel in m_displayPanels)
+                        {
+                            double x, y;
+                            PointCollection points = panel.GetPoints();
+                            Geometry.ComputeMin(points, out x, out y);
+                            minX = Math.Min(minX, x);
+                            minY = Math.Min(minY, y);
+                        }
+                        gcodeOrigin = new Point(minX, minY);
+                    }
+                    else if (parameters.OriginTypes[parameters.Origin] == "Sheet Bottom Left")
+                    {
+                        gcodeOrigin = new Point(0, 0);
+                    }
+                    else if (parameters.OriginTypes[parameters.Origin] == "Sheet Center")
+                    {
+                        gcodeOrigin = new Point(48, 24);
+                    }
                     GCodeWriter output = new GCodeWriter(saveDlg.FileName);
                     foreach (PanelDisplay panel in m_displayPanels)
                     {
-                        output.Write(panel);
+                        output.Write(panel, gcodeOrigin);
                     }
 
                     output.Close();

@@ -200,7 +200,7 @@ namespace HullEdit
             }
         }
 
-        public void Write(PanelDisplay panel)
+        public void Write(PanelDisplay panel, Point origin)
         {
             double offset = parameters.CutterDiameter/2;
             PointCollection points = panel.GetPoints();
@@ -221,18 +221,20 @@ namespace HullEdit
                 if (currentDepth > parameters.MaterialThickness) currentDepth = parameters.MaterialThickness + parameters.CutthroughDepth;
                 foreach (Point p in path)
                 {
+                    Point spot = new Point(p.X - origin.X, p.Y - origin.Y);
+
                     if (first)
                     {
-                        firstPoint = p;
+                        firstPoint = spot;
                         gCodeFile.WriteLine("G01 Z0.25 F{0}", parameters.PlungeSpeed);               // Lift cutter
-                        gCodeFile.WriteLine("G00 X{0} Y{1}", p.X, p.Y);                     // Go to start point
+                        gCodeFile.WriteLine("G00 X{0} Y{1}", spot.X, spot.Y);                     // Go to start point
                         gCodeFile.WriteLine("G01 Z-{0} F{1}", currentDepth, parameters.PlungeSpeed); // cut into surface
-                        gCodeFile.WriteLine("G01 X{0} Y{1} F{2}", p.X, p.Y, parameters.CutSpeed);    // set cutspeed 
+                        gCodeFile.WriteLine("G01 X{0} Y{1} F{2}", spot.X, spot.Y, parameters.CutSpeed);    // set cutspeed 
                         first = false;
                     }
                     else
                     {
-                        gCodeFile.WriteLine("G01 X{0} Y{1}", p.X, p.Y);
+                        gCodeFile.WriteLine("G01 X{0} Y{1}", spot.X, spot.Y);
                     }
                 }
                 first = true;
