@@ -441,6 +441,19 @@ namespace HullEdit
             }
         }
 
+        // Find the bottom left corner of a shape defined as a collection of points.
+        static public void TopLeft(PointCollection points, out double min_x, out double max_y)
+        {
+            min_x = double.MaxValue;
+            max_y = double.MinValue;
+
+            foreach (Point point in points)
+            {
+                min_x = Math.Min(min_x, point.X);
+                max_y = Math.Max(max_y, point.Y);
+            }
+        }
+
         // Change the size of a shape
         static public void ResizeShape(Point3DCollection[] shape, double scale)
         {

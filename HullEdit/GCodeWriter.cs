@@ -221,7 +221,7 @@ namespace HullEdit
                 if (currentDepth > parameters.MaterialThickness) currentDepth = parameters.MaterialThickness + parameters.CutthroughDepth;
                 foreach (Point p in path)
                 {
-                    Point spot = new Point(p.X - origin.X, p.Y - origin.Y);
+                    Point spot = new Point(p.X - origin.X, -(p.Y - origin.Y));
 
                     if (first)
                     {

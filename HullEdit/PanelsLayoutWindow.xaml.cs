@@ -525,16 +525,16 @@ namespace HullEdit
                     if (parameters.OriginTypes[parameters.Origin] == "Panels Bottom Left")
                     {
                         double minX = Double.MaxValue;
-                        double minY = Double.MaxValue;
+                        double maxY = Double.MinValue;
                         foreach (PanelDisplay panel in m_displayPanels)
                         {
                             double x, y;
                             PointCollection points = panel.GetPoints();
-                            Geometry.ComputeMin(points, out x, out y);
+                            Geometry.TopLeft(points, out x, out y);
                             minX = Math.Min(minX, x);
-                            minY = Math.Min(minY, y);
+                            maxY = Math.Max(maxY, y);
                         }
-                        gcodeOrigin = new Point(minX, minY);
+                        gcodeOrigin = new Point(minX, maxY);
                     }
                     else if (parameters.OriginTypes[parameters.Origin] == "Sheet Bottom Left")
                     {
