@@ -542,7 +542,7 @@ namespace HullEdit
                     }
                     else if (parameters.OriginTypes[parameters.Origin] == "Sheet Center")
                     {
-                        gcodeOrigin = new Point(48, 24);
+                        gcodeOrigin = new Point(m_panelWidth/2, m_panelHeight/2);
                     }
                     GCodeWriter output = new GCodeWriter(saveDlg.FileName);
                     foreach (PanelDisplay panel in m_displayPanels)
